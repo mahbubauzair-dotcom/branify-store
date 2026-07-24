@@ -38,6 +38,8 @@ interface RouterState {
   /** Optional search query for the search view */
   query: string | null;
   navigate: (route: RouteName, opts?: { slug?: string | null; query?: string | null }) => void;
+  /** Set the initial route without affecting history (used by deep-link pages). */
+  initRoute: (route: RouteName, opts?: { slug?: string | null; query?: string | null }) => void;
   back: () => void;
 }
 
@@ -53,6 +55,9 @@ export const useRouterStore = create<RouterState>((set, get) => ({
     if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, behavior: "auto" });
     }
+  },
+  initRoute: (route, opts) => {
+    set({ route, slug: opts?.slug ?? null, query: opts?.query ?? null });
   },
   back: () => {
     const prev = history.pop();
