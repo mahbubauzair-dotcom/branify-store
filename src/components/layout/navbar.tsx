@@ -1,46 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import {
-  ArrowRight,
-  Heart,
-  Menu,
-  Search,
-  ShoppingCart,
-  User,
-  X,
-  type LucideIcon,
-} from "lucide-react";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X, ArrowRight, Search, ChevronRight, Keyboard } from "lucide-react";
 import { Logo } from "@/components/shared/logo";
 import { Button } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetClose,
-} from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { navItems, siteConfig } from "@/config/site";
 import { useRouterStore, useNavigate, type RouteName } from "@/lib/router";
 import { track } from "@/lib/analytics";
-
-type NavLink = { label: string; route: RouteName };
-
-const NAV_LINKS: NavLink[] = [
-  { label: "Home", route: "home" },
-  { label: "Shop", route: "storefront" },
-  { label: "Categories", route: "products" },
-  { label: "About", route: "about" },
-  { label: "Contact", route: "contact" },
-];
-
-const ICON_BTN_CLASS =
-  "relative inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.03] text-white/80 backdrop-blur-xl transition-all hover:border-white/15 hover:bg-white/[0.06] hover:text-white";
+import { services } from "@/data/services";
+import { products, productCategories } from "@/data/products";
+import { tools } from "@/data/tools";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [activeMega, setActiveMega] = useState<string | null>(null);
   const route = useRouterStore((s) => s.route);
   const navigate = useNavigate();
 
@@ -51,248 +27,311 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const go = (r: RouteName) => {
+  const handleNav = (r: RouteName) => {
     navigate(r);
     setMobileOpen(false);
+    setActiveMega(null);
   };
 
-  const isActive = (r: RouteName) =>
-    route === r ||
-    (r === "storefront" && route === "product-detail") ||
-    (r === "products" && route === "product-detail");
+  const go = (r: RouteName) => {
+    navigate(r);
+    setActiveMega(null);
+  };
 
   return (
     <header
       className={cn(
         "sticky top-0 z-40 w-full transition-all duration-300",
         scrolled
-          ? "border-b border-white/[0.08] bg-[#050816]/80 backdrop-blur-xl"
+          ? "border-b border-white/5 bg-background/80 backdrop-blur-xl"
           : "border-b border-transparent bg-transparent",
       )}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
         {/* Logo */}
-        <button
-          onClick={() => go("home")}
-          aria-label="BRANIFY home"
-          className="shrink-0 transition-opacity hover:opacity-90"
-        >
-          <Logo size="sm" />
+        <button onClick={() => go("home")} className="shrink-0 transition-opacity hover:opacity-90">
+          <Logo />
         </button>
 
         {/* Desktop nav */}
-        <nav className="hidden items-center gap-1 lg:flex">
-          {NAV_LINKS.map((link) => {
-            const active = isActive(link.route);
+        <nav className="hidden items-center gap-1 lg:flex" onMouseLeave={() => setActiveMega(null)}>
+          {navItems.map((item) => {
+            const active =
+              route === item.route ||
+              (item.route === "products" && (route === "product-detail")) ||
+              (item.route === "blog" && route === "blog-post") ||
+              (item.route === "tools" && route === "tool-detail");
             return (
-              <button
-                key={link.route}
-                onClick={() => go(link.route)}
-                className={cn(
-                  "relative flex items-center rounded-lg px-3.5 py-2 text-sm font-medium transition-colors",
-                  active
-                    ? "text-white"
-                    : "text-white/60 hover:text-white",
-                )}
+              <div
+                key={item.route}
+                className="relative"
+                onMouseEnter={() => setActiveMega(item.mega ? item.route : null)}
               >
-                {link.label}
+                <button
+                  onClick={() => handleNav(item.route)}
+                  className={cn(
+                    "flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                    active ? "text-white" : "text-muted-foreground hover:text-white",
+                  )}
+                >
+                  {item.label}
+                  {item.mega && (
+                    <ChevronRight className="h-3.5 w-3.5 rotate-90 opacity-50" />
+                  )}
+                </button>
                 {active && (
-                  <motion.span
+                  <motion.div
                     layoutId="nav-underline"
-                    className="absolute -bottom-px left-3 right-3 h-px bg-gradient-to-r from-[#00E5FF] to-[#18F2B2]"
+                    className="absolute -bottom-px left-3 right-3 h-px bg-primary"
                   />
                 )}
-              </button>
+              </div>
             );
           })}
         </nav>
 
-        {/* Right actions */}
+        {/* Actions */}
         <div className="flex items-center gap-2">
-          {/* Search trigger (desktop) */}
           <button
             onClick={() => go("search")}
             aria-label="Search"
-            className="group hidden h-10 items-center gap-2 rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 text-sm text-white/60 backdrop-blur-xl transition-all hover:border-white/15 hover:bg-white/[0.06] hover:text-white md:flex"
+            className="group hidden h-9 items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 text-sm text-muted-foreground transition-colors hover:border-white/20 hover:bg-white/10 hover:text-white sm:flex"
           >
-            <Search className="h-4 w-4" />
+            <Search className="h-3.5 w-3.5" />
             <span className="hidden lg:inline">Search</span>
-            <kbd className="hidden rounded border border-white/10 bg-white/5 px-1.5 py-0.5 text-[10px] font-medium text-white/50 lg:inline">
+            <kbd className="hidden rounded border border-white/10 bg-white/5 px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground/80 lg:inline">
               ⌘K
             </kbd>
           </button>
-
-          {/* Search icon (mobile) */}
           <button
-            onClick={() => go("search")}
-            aria-label="Search"
-            className={cn(ICON_BTN_CLASS, "md:hidden")}
+            onClick={() => window.dispatchEvent(new Event("branify:open-shortcuts"))}
+            aria-label="Keyboard shortcuts"
+            title="Keyboard shortcuts (?)"
+            className="hidden h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-white/5 hover:text-white lg:flex"
           >
-            <Search className="h-4 w-4" />
+            <Keyboard className="h-4 w-4" />
           </button>
-
-          {/* Cart */}
-          <button
-            onClick={() => {
-              track("nav_icon_click", { icon: "cart" });
-              go("storefront");
-            }}
-            aria-label="Cart"
-            className={cn(ICON_BTN_CLASS, "hidden sm:inline-flex")}
-          >
-            <ShoppingCart className="h-4 w-4" />
-            <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-gradient-to-r from-[#00E5FF] to-[#18F2B2] px-1 text-[10px] font-bold text-[#04121a]">
-              0
-            </span>
-          </button>
-
-          {/* Wishlist */}
-          <IconButton
-            icon={Heart}
-            label="Wishlist"
-            onClick={() => {
-              track("nav_icon_click", { icon: "wishlist" });
-              go("products");
-            }}
-          />
-
-          {/* Login */}
-          <IconButton
-            icon={User}
-            label="Login"
-            onClick={() => {
-              track("nav_icon_click", { icon: "login" });
-              go("contact");
-            }}
-          />
-
-          {/* CTA — Start Shopping */}
           <Button
             onClick={() => {
-              track("cta_click", { label: "Start Shopping", location: "navbar" });
-              go("storefront");
+              track("cta_click", { label: "Sign in", location: "navbar" });
+              go("contact");
             }}
-            className="hidden h-10 gap-1.5 rounded-xl bg-gradient-to-r from-[#00E5FF] to-[#18F2B2] px-5 text-sm font-semibold text-[#04121a] shadow-[0_8px_30px_-8px_rgba(0,229,255,0.5)] transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_40px_-8px_rgba(0,229,255,0.65)] sm:inline-flex"
+            variant="ghost"
+            className="hidden text-sm text-muted-foreground hover:text-white md:inline-flex"
           >
-            Start Shopping
-            <ArrowRight className="h-4 w-4" />
+            Sign in
+          </Button>
+          <Button
+            onClick={() => {
+              track("cta_click", { label: "Start a project", location: "navbar" });
+              go("contact");
+            }}
+            size="sm"
+            className="hidden bg-primary text-primary-foreground hover:bg-hover sm:inline-flex"
+          >
+            Start a project
+            <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
           </Button>
 
           {/* Mobile toggle */}
           <button
-            onClick={() => setMobileOpen(true)}
-            aria-label="Open menu"
-            className={cn(ICON_BTN_CLASS, "lg:hidden")}
+            onClick={() => setMobileOpen((v) => !v)}
+            aria-label="Toggle menu"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-white transition-colors hover:bg-white/5 lg:hidden"
           >
-            <Menu className="h-5 w-5" />
+            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile sheet menu */}
-      <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-        <SheetContent
-          side="right"
-          className="w-[88vw] max-w-sm border-l border-white/[0.08] bg-[#050816]/95 p-0 backdrop-blur-xl"
-        >
-          <SheetHeader className="flex flex-row items-center justify-between space-y-0 border-b border-white/[0.08] px-5 py-4">
-            <SheetTitle className="font-display text-base font-bold tracking-tight text-white">
-              Menu
-            </SheetTitle>
-            <SheetClose asChild>
-              <button
-                aria-label="Close menu"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-white/70 transition-colors hover:bg-white/5 hover:text-white"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </SheetClose>
-          </SheetHeader>
-
-          <div className="flex flex-col gap-1 px-3 py-4">
-            {NAV_LINKS.map((link) => {
-              const active = isActive(link.route);
-              return (
-                <button
-                  key={link.route}
-                  onClick={() => go(link.route)}
-                  className={cn(
-                    "flex items-center justify-between rounded-xl px-4 py-3.5 text-left text-base font-medium transition-all",
-                    active
-                      ? "border border-[#00E5FF]/20 bg-[#00E5FF]/[0.06] text-white"
-                      : "text-white/70 hover:bg-white/5 hover:text-white",
-                  )}
-                >
-                  {link.label}
-                  <ArrowRight className="h-4 w-4 opacity-50" />
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="mt-auto flex flex-col gap-2 border-t border-white/[0.08] px-5 py-5">
-            <div className="grid grid-cols-3 gap-2">
-              <MobileIconTile icon={Search} label="Search" onClick={() => go("search")} />
-              <MobileIconTile icon={Heart} label="Wishlist" onClick={() => go("products")} />
-              <MobileIconTile icon={User} label="Login" onClick={() => go("contact")} />
+      {/* Mega menu */}
+      <AnimatePresence>
+        {activeMega && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2 }}
+            className="absolute inset-x-0 top-full hidden lg:block"
+            onMouseEnter={() => setActiveMega(activeMega)}
+            onMouseLeave={() => setActiveMega(null)}
+          >
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+              <div className="overflow-hidden rounded-2xl border border-white/10 bg-card/95 shadow-premium-lg backdrop-blur-xl">
+                {activeMega === "services" && <MegaServices onGo={go} />}
+                {activeMega === "products" && <MegaProducts onGo={go} />}
+                {activeMega === "tools" && <MegaTools onGo={go} />}
+              </div>
             </div>
-            <Button
-              onClick={() => {
-                track("cta_click", { label: "Start Shopping", location: "navbar_mobile" });
-                go("storefront");
-              }}
-              className="mt-2 h-11 gap-1.5 rounded-xl bg-gradient-to-r from-[#00E5FF] to-[#18F2B2] text-sm font-semibold text-[#04121a] shadow-[0_8px_30px_-8px_rgba(0,229,255,0.5)]"
-            >
-              Start Shopping
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </SheetContent>
-      </Sheet>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Mobile menu */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.25 }}
+            className="overflow-hidden border-t border-white/5 bg-background/95 backdrop-blur-xl lg:hidden"
+          >
+            <div className="max-h-[80vh] overflow-y-auto px-4 py-4">
+              <nav className="flex flex-col gap-1">
+                {navItems.map((item) => (
+                  <button
+                    key={item.route}
+                    onClick={() => handleNav(item.route)}
+                    className="flex items-center justify-between rounded-lg px-3 py-3 text-left text-base font-medium text-muted-foreground transition-colors hover:bg-white/5 hover:text-white"
+                  >
+                    {item.label}
+                    <ArrowRight className="h-4 w-4 opacity-40" />
+                  </button>
+                ))}
+              </nav>
+              <div className="mt-4 flex flex-col gap-2 border-t border-white/5 pt-4">
+                <Button onClick={() => handleNav("search")} variant="outline" className="justify-start">
+                  <Search className="mr-2 h-4 w-4" /> Search
+                </Button>
+                <Button
+                  onClick={() => {
+                    setMobileOpen(false);
+                    window.dispatchEvent(new Event("branify:open-shortcuts"));
+                  }}
+                  variant="outline"
+                  className="justify-start"
+                >
+                  <Keyboard className="mr-2 h-4 w-4" /> Keyboard shortcuts
+                </Button>
+                <Button onClick={() => handleNav("contact")} className="bg-primary text-primary-foreground hover:bg-hover">
+                  Start a project <ArrowRight className="ml-1.5 h-4 w-4" />
+                </Button>
+              </div>
+              <p className="mt-4 text-center text-xs text-muted-foreground/60">
+                {siteConfig.email} · {siteConfig.phone}
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
 
-/* ------------------------------------------------------------------ */
-/* Sub-components                                                      */
-/* ------------------------------------------------------------------ */
-function IconButton({
-  icon: Icon,
-  label,
-  onClick,
-}: {
-  icon: LucideIcon;
-  label: string;
-  onClick: () => void;
-}) {
+function MegaServices({ onGo }: { onGo: (r: RouteName) => void }) {
   return (
-    <button
-      onClick={onClick}
-      aria-label={label}
-      title={label}
-      className={cn(ICON_BTN_CLASS, "hidden sm:inline-flex")}
-    >
-      <Icon className="h-4 w-4" />
-    </button>
+    <div className="grid grid-cols-3 gap-2 p-4">
+      <div className="col-span-1 rounded-xl bg-gradient-to-br from-primary/15 to-transparent p-5">
+        <p className="font-display text-lg font-semibold text-white">What we do</p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          End-to-end design, development &amp; growth services for ambitious brands.
+        </p>
+        <button
+          onClick={() => onGo("services")}
+          className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary hover:gap-2 transition-all"
+        >
+          View all services <ArrowRight className="h-3.5 w-3.5" />
+        </button>
+      </div>
+      <div className="col-span-2 grid grid-cols-2 gap-1">
+        {services.slice(0, 8).map((s) => (
+          <button
+            key={s.slug}
+            onClick={() => onGo("services")}
+            className="group flex items-start gap-3 rounded-lg p-3 text-left transition-colors hover:bg-white/5"
+          >
+            <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <s.icon className="h-4 w-4" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-white group-hover:text-primary transition-colors">{s.title}</p>
+              <p className="truncate text-xs text-muted-foreground">{s.tagline}</p>
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }
 
-function MobileIconTile({
-  icon: Icon,
-  label,
-  onClick,
-}: {
-  icon: LucideIcon;
-  label: string;
-  onClick: () => void;
-}) {
+function MegaProducts({ onGo }: { onGo: (r: RouteName) => void }) {
   return (
-    <button
-      onClick={onClick}
-      className="flex flex-col items-center gap-1.5 rounded-xl border border-white/[0.08] bg-white/[0.03] py-3.5 text-white/80 transition-all hover:border-white/15 hover:bg-white/[0.06] hover:text-white"
-    >
-      <Icon className="h-5 w-5" />
-      <span className="text-xs font-medium">{label}</span>
-    </button>
+    <div className="grid grid-cols-3 gap-2 p-4">
+      <div className="col-span-1 rounded-xl bg-gradient-to-br from-primary/15 to-transparent p-5">
+        <p className="font-display text-lg font-semibold text-white">Ready-to-use assets</p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Templates, kits &amp; bundles to launch faster. Instant download.
+        </p>
+        <button
+          onClick={() => onGo("products")}
+          className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary hover:gap-2 transition-all"
+        >
+          Browse marketplace <ArrowRight className="h-3.5 w-3.5" />
+        </button>
+      </div>
+      <div className="col-span-2">
+        <div className="mb-2 flex flex-wrap gap-1.5 px-3">
+          {productCategories.slice(1).map((c) => (
+            <span key={c} className="rounded-full border border-white/10 px-2.5 py-1 text-xs text-muted-foreground">
+              {c}
+            </span>
+          ))}
+        </div>
+        <div className="grid grid-cols-2 gap-1">
+          {products.slice(0, 6).map((p) => (
+            <button
+              key={p.slug}
+              onClick={() => onGo("products")}
+              className="group flex items-center gap-3 rounded-lg p-3 text-left transition-colors hover:bg-white/5"
+            >
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <p.icon className="h-4 w-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium text-white group-hover:text-primary transition-colors">{p.name}</p>
+                <p className="text-xs text-muted-foreground">${p.price}</p>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MegaTools({ onGo }: { onGo: (r: RouteName) => void }) {
+  return (
+    <div className="grid grid-cols-3 gap-2 p-4">
+      <div className="col-span-1 rounded-xl bg-gradient-to-br from-primary/15 to-transparent p-5">
+        <p className="font-display text-lg font-semibold text-white">Free forever</p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Generators &amp; calculators for modern teams. No signup required.
+        </p>
+        <button
+          onClick={() => onGo("tools")}
+          className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary hover:gap-2 transition-all"
+        >
+          Open all tools <ArrowRight className="h-3.5 w-3.5" />
+        </button>
+      </div>
+      <div className="col-span-2 grid grid-cols-2 gap-1">
+        {tools.slice(0, 8).map((t) => (
+          <button
+            key={t.slug}
+            onClick={() => onGo("tools")}
+            className="group flex items-start gap-3 rounded-lg p-3 text-left transition-colors hover:bg-white/5"
+          >
+            <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <t.icon className="h-4 w-4" />
+            </div>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-medium text-white group-hover:text-primary transition-colors">{t.name}</p>
+              <p className="truncate text-xs text-muted-foreground">{t.category}</p>
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }
