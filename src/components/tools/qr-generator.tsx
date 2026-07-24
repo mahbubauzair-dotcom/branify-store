@@ -18,7 +18,7 @@ import {
 import { toast } from "sonner";
 
 const presetColors = [
-  { label: "Teal", value: "#14B8A6" },
+  { label: "Teal", value: "#0fe1d2" },
   { label: "Indigo", value: "#4F46E5" },
   { label: "Rose", value: "#E11D48" },
   { label: "Amber", value: "#D97706" },
@@ -37,7 +37,7 @@ const eccOptions: { value: EccLevel; label: string }[] = [
 export function QrGenerator() {
   const [text, setText] = useState("");
   const [size, setSize] = useState(256);
-  const [color, setColor] = useState("#14B8A6");
+  const [color, setColor] = useState("#0fe1d2");
   const [ecc, setEcc] = useState<EccLevel>("M");
 
   const colorNoHash = color.replace("#", "").toLowerCase();

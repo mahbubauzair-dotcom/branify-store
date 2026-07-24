@@ -35,7 +35,7 @@ export function ReadingProgress({
       aria-hidden="true"
       style={{ scaleX }}
       className={cn(
-        "fixed inset-x-0 top-0 z-[55] h-1 origin-left bg-gradient-to-r from-teal-400 via-teal-500 to-emerald-400",
+        "fixed inset-x-0 top-0 z-[55] h-1 origin-left bg-gradient-to-r from-[#0fe1d2] via-[#02b6bc] to-[#2fb8af]",
         className,
       )}
     />

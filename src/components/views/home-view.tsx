@@ -208,12 +208,12 @@ function HeroDashboard() {
               <svg viewBox="0 0 300 100" className="h-full w-full" preserveAspectRatio="none">
                 <defs>
                   <linearGradient id="hero-chart" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#14b8a6" stopOpacity="0.4" />
-                    <stop offset="100%" stopColor="#14b8a6" stopOpacity="0" />
+                    <stop offset="0%" stopColor="#0fe1d2" stopOpacity="0.4" />
+                    <stop offset="100%" stopColor="#0fe1d2" stopOpacity="0" />
                   </linearGradient>
                 </defs>
                 <path d="M0,80 C40,70 60,40 100,45 C140,50 160,20 200,25 C240,30 260,10 300,15 L300,100 L0,100 Z" fill="url(#hero-chart)" />
-                <path d="M0,80 C40,70 60,40 100,45 C140,50 160,20 200,25 C240,30 260,10 300,15" fill="none" stroke="#14b8a6" strokeWidth="2" />
+                <path d="M0,80 C40,70 60,40 100,45 C140,50 160,20 200,25 C240,30 260,10 300,15" fill="none" stroke="#0fe1d2" strokeWidth="2" />
               </svg>
             </div>
             <div className="grid grid-cols-3 gap-3">

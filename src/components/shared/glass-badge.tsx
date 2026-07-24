@@ -16,7 +16,7 @@ export function GlassBadge({
   variant?: "teal" | "neutral" | "emerald" | "amber" | "rose" | "violet";
 }) {
   const variants: Record<string, string> = {
-    teal: "bg-teal-500/10 text-teal-300 border-teal-400/20",
+    teal: "bg-[#0fe1d2]/10 text-[#0fe1d2] border-[#0fe1d2]/20",
     neutral: "bg-white/10 text-white border-white/15",
     emerald: "bg-emerald-500/10 text-emerald-300 border-emerald-400/20",
     amber: "bg-amber-500/10 text-amber-300 border-amber-400/20",

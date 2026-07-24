@@ -19,7 +19,7 @@ export function AnnouncementBar() {
           animate={{ height: "auto", opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="relative z-50 overflow-hidden border-b border-white/5 bg-gradient-to-r from-teal-600 via-teal-500 to-emerald-500"
+          className="relative z-50 overflow-hidden border-b border-white/5 bg-gradient-to-r from-[#02b6bc] via-[#0fe1d2] to-[#2fb8af]"
         >
           <div className="absolute inset-0 bg-grid opacity-20" />
           <div className="relative mx-auto flex max-w-7xl items-center justify-center gap-3 px-4 py-2.5 text-center">
