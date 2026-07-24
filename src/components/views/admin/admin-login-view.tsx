@@ -59,31 +59,47 @@ export function AdminLoginView() {
       return;
     }
     setSubmitting(true);
+
+    // Retry up to 3 times — the dev server may be briefly restarting.
+    let lastError = "";
     try {
-      const res = await fetch("/api/admin/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim(), password }),
-        // Login takes ~2s due to scrypt hashing — give it room.
-        signal: AbortSignal.timeout(15000),
-      });
-      const data = await res.json().catch(() => null);
-      if (!res.ok || !data?.ok) {
-        const msg = data?.error || "Invalid email or password.";
-        toast.error(msg);
-        return;
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          const res = await fetch("/api/admin/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: email.trim(), password }),
+            signal: AbortSignal.timeout(15000),
+          });
+          const data = await res.json().catch(() => null);
+          if (res.ok && data?.ok) {
+            toast.success("Welcome back");
+            navigate("admin-dashboard");
+            return;
+          }
+          // Auth error (wrong credentials) — don't retry.
+          if (res.status === 401 || res.status === 400) {
+            toast.error(data?.error || "Invalid email or password.");
+            return;
+          }
+          // Server error (500) — retry with backoff.
+          lastError = data?.error || "Server error";
+        } catch (err) {
+          if (err instanceof DOMException && err.name === "TimeoutError") {
+            lastError = "The server took too long to respond.";
+          } else if (err instanceof TypeError) {
+            lastError = "Cannot reach the server.";
+          } else {
+            lastError = "Network error.";
+          }
+        }
+        // Wait before retrying (1s, 2s).
+        if (attempt < 3) {
+          await new Promise((r) => setTimeout(r, attempt * 1000));
+        }
       }
-      toast.success("Welcome back");
-      navigate("admin-dashboard");
-    } catch (err) {
-      // Distinguish timeout/network errors from server errors.
-      if (err instanceof DOMException && err.name === "TimeoutError") {
-        toast.error("The server took too long to respond. Please try again.");
-      } else if (err instanceof TypeError) {
-        toast.error("Cannot reach the server. Please check your connection and try again.");
-      } else {
-        toast.error("Network error. Please try again.");
-      }
+      // All retries failed.
+      toast.error(`${lastError} The server may be restarting — please try again in a moment.`);
     } finally {
       setSubmitting(false);
     }
