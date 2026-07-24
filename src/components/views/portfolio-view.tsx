@@ -44,6 +44,7 @@ import {
   GradientCover,
   AuroraBackground,
 } from "@/components/shared/gradient-cover";
+import { GlassBadge } from "@/components/shared/glass-badge";
 import { useCountUp, useInViewOnce } from "@/hooks/use-count-up";
 
 export function PortfolioView() {
@@ -161,14 +162,12 @@ function ProjectCard({ project, onOpen }: { project: Project; onOpen: () => void
   return (
     <Card
       onClick={onOpen}
-      className="group relative h-full cursor-pointer overflow-hidden rounded-2xl border-white/5 bg-card/40 backdrop-blur transition-all hover:-translate-y-1 hover:border-primary/30 hover:bg-card/60 hover:shadow-glow"
+      className="card-premium group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border-white/5 bg-card/40 backdrop-blur hover:border-primary/30 hover:bg-card/60"
     >
       <GradientCover variant={project.cover} className="h-56" pattern="grid">
         <div className="flex h-full flex-col justify-between p-5">
           <div className="flex items-center justify-between">
-            <Badge className="bg-white/10 text-white backdrop-blur hover:bg-white/15">
-              {project.category}
-            </Badge>
+            <GlassBadge variant="neutral">{project.category}</GlassBadge>
             <span className="rounded-full bg-black/30 px-2.5 py-1 text-xs font-medium text-white/80 backdrop-blur">
               {project.year}
             </span>
@@ -197,14 +196,14 @@ function ProjectCard({ project, onOpen }: { project: Project; onOpen: () => void
           {project.summary}
         </p>
 
-        {/* Results tiles */}
+        {/* Results tiles — mono font for data-driven aesthetic */}
         <div className="mt-5 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
           {project.results.slice(0, 4).map((r) => (
             <div
               key={r.label}
               className="rounded-xl border border-white/5 bg-background/40 px-3 py-2.5 text-center"
             >
-              <p className="font-display text-lg font-bold text-primary">{r.value}</p>
+              <p className="font-mono text-lg font-bold text-primary tabular-nums">{r.value}</p>
               <p className="mt-0.5 text-[11px] uppercase tracking-wide text-muted-foreground">
                 {r.label}
               </p>
@@ -340,7 +339,7 @@ function CaseStudyDialog({ project, onClose }: { project: Project; onClose: () =
                 key={r.label}
                 className="rounded-2xl border border-white/5 bg-card/40 p-4 text-center backdrop-blur"
               >
-                <p className="font-display text-3xl font-bold text-primary">{r.value}</p>
+                <p className="font-mono text-3xl font-bold text-primary tabular-nums">{r.value}</p>
                 <p className="mt-1 text-xs uppercase tracking-wide text-muted-foreground">
                   {r.label}
                 </p>

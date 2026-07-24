@@ -367,7 +367,7 @@ function BlogCard({ post }: { post: BlogPost }) {
   return (
     <Card
       onClick={() => navigate("blog-post", { slug: post.slug })}
-      className="group h-full cursor-pointer overflow-hidden rounded-2xl border-white/5 bg-card/40 backdrop-blur transition-all hover:border-primary/30 hover:bg-card/60 hover:shadow-glow"
+      className="card-premium group flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border-white/5 bg-card/40 backdrop-blur hover:border-primary/30 hover:bg-card/60"
     >
       <GradientCover variant={post.cover} className="h-44">
         <div className="flex h-full items-center justify-center">

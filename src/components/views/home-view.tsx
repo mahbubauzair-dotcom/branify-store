@@ -28,6 +28,8 @@ import { CursorSpotlight } from "@/components/shared/cursor-spotlight";
 import { MagneticButton } from "@/components/shared/magnetic-button";
 import { SectionDivider, SectionGlow } from "@/components/shared/section-divider";
 import { useCountUp, useInViewOnce } from "@/hooks/use-count-up";
+import { useParallax } from "@/hooks/use-parallax";
+import { track } from "@/lib/analytics";
 
 const whyFeatures = [
   { icon: Award, title: "World-class craft", description: "Every pixel, animation and line of code held to the standard of Stripe, Linear and Vercel." },
@@ -120,7 +122,10 @@ function Hero() {
           >
             <MagneticButton strength={0.4} radius={50}>
               <Button
-                onClick={() => navigate("contact")}
+                onClick={() => {
+                  track("cta_click", { label: "Start a project", location: "hero" });
+                  navigate("contact");
+                }}
                 size="lg"
                 className="group h-12 rounded-full bg-primary px-7 text-primary-foreground hover:bg-hover"
               >
@@ -164,13 +169,15 @@ function Hero() {
 }
 
 function HeroDashboard() {
+  const { ref, y } = useParallax(60);
   return (
     <motion.div
+      ref={ref}
       initial={{ opacity: 0, y: 40, rotateX: 12 }}
       animate={{ opacity: 1, y: 0, rotateX: 0 }}
       transition={{ duration: 0.8, delay: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }}
       className="relative mx-auto mt-16 max-w-5xl"
-      style={{ perspective: 1200 }}
+      style={{ perspective: 1200, y }}
     >
       <div className="absolute -inset-4 rounded-[2rem] bg-gradient-to-r from-primary/20 via-primary/5 to-transparent blur-2xl" />
       <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-card/80 shadow-premium-lg backdrop-blur-xl">
@@ -365,7 +372,7 @@ function ServicesPreview() {
           {services.slice(0, 6).map((s) => (
             <StaggerItem key={s.slug}>
               <Card
-                className="group relative h-full overflow-hidden border-white/5 bg-card/40 p-6 backdrop-blur transition-all hover:border-primary/30 hover:bg-card/60 cursor-pointer"
+                className="card-premium group relative h-full overflow-hidden border-white/5 bg-card/40 p-6 backdrop-blur hover:border-primary/30 hover:bg-card/60 cursor-pointer"
                 onClick={() => navigate("services")}
               >
                 <div className={`absolute inset-0 bg-gradient-to-br ${s.accent} opacity-0 transition-opacity group-hover:opacity-100`} />
@@ -416,7 +423,7 @@ function WhyBranify() {
         <Stagger className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {whyFeatures.map((f) => (
             <StaggerItem key={f.title}>
-              <div className="group h-full rounded-2xl border border-white/5 bg-card/40 p-6 backdrop-blur transition-all hover:border-primary/30 hover:bg-card/60">
+              <div className="card-premium group h-full rounded-2xl border border-white/5 bg-card/40 p-6 backdrop-blur hover:border-primary/30 hover:bg-card/60">
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary transition-transform group-hover:scale-110">
                   <f.icon className="h-5 w-5" />
                 </div>
@@ -454,7 +461,7 @@ function ProductsPreview() {
           {products.slice(0, 4).map((p) => (
             <StaggerItem key={p.slug}>
               <Card
-                className="group h-full overflow-hidden border-white/5 bg-card/40 backdrop-blur transition-all hover:border-primary/30 hover:bg-card/60 cursor-pointer"
+                className="card-premium group flex h-full flex-col overflow-hidden border-white/5 bg-card/40 backdrop-blur hover:border-primary/30 hover:bg-card/60 cursor-pointer"
                 onClick={() => navigate("product-detail", { slug: p.slug })}
               >
                 <GradientCover variant={p.preview} className="h-40">
@@ -660,7 +667,7 @@ function TestimonialsSection() {
         <Stagger className="mt-12 columns-1 gap-4 sm:columns-2 lg:columns-3 [&>*]:mb-4">
           {testimonials.map((t) => (
             <StaggerItem key={t.name}>
-              <Card className="break-inside-avoid border-white/5 bg-card/40 p-6 backdrop-blur">
+              <Card className="card-premium break-inside-avoid border-white/5 bg-card/40 p-6 backdrop-blur hover:border-primary/30 hover:bg-card/60">
                 <div className="flex items-center justify-between">
                   <div className="flex gap-0.5">
                     {Array.from({ length: t.rating }).map((_, i) => (

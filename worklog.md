@@ -519,3 +519,74 @@ Task: QA via agent-browser + VLM, ship premium card hover system, Price/GlassBad
 3. **Card-premium across all card grids:** Apply `.card-premium` + `GlassBadge` to Services grid, Portfolio cards, Blog cards, Testimonials for a unified premium hover language.
 4. **Pricing Enterprise card:** VLM noted Enterprise "Custom" card lacks visual weight — add a subtle glassmorphism/border treatment to differentiate it (currently plain).
 5. **Analytics/telemetry hook:** Add a lightweight `track(event)` utility wired to navigation + tool usage + CTA clicks for product analytics.
+
+---
+Task ID: 12 (webDevReview round 4 — parallax + unified premium cards + analytics)
+Agent: Main (Architect) — triggered by webDevReview cron job
+Task: QA via agent-browser + VLM, ship scroll parallax, unify premium card hover across all card grids, mono-font metrics on portfolio, and a lightweight analytics/telemetry utility.
+
+## Current Project Status Assessment
+- BRANIFY is stable: 16 lazy-loaded views, command palette (⌘K + Recently visited), scroll progress, back-to-top, cursor spotlight, magnetic CTAs (home/services/contact), JSON-LD SEO, section dividers/glows, premium card system on Products, tabular-nums pricing.
+- QA this round: HTTP 200, no page errors, no console errors. Portfolio + About views load and navigate cleanly.
+- VLM analysis of portfolio page gave 5 concrete fixes: glassmorphism case study cards, monospace metrics typography, subtle filter pill active states, radial gradient section anchors, asymmetric grids.
+- Priority recommendations from round 3: parallax, magnetic buttons on remaining views, card-premium across all card grids, Enterprise card differentiation, analytics hook.
+
+## Completed Modifications
+
+### New Feature: useParallax hook (scroll-driven depth)
+- **File:** `src/hooks/use-parallax.ts` (new)
+- Returns a `{ ref, y }` MotionValue pair that translates an element vertically based on its scroll position within the viewport (0 → distance/2 → -distance/2 as it scrolls through). Uses `useScroll` + `useTransform`. Respects `prefers-reduced-motion` (returns static 0).
+- **Applied:** Hero dashboard mockup now drifts vertically on scroll (distance 60px) for premium depth.
+- **Verified:** dashboard element found with motion `y` style attribute present.
+
+### Applied: Unified premium card hover across ALL card grids
+- **Files:** `home-view.tsx`, `services-view.tsx`, `portfolio-view.tsx`, `blog-view.tsx`
+- Replaced ad-hoc `transition-all hover:shadow-glow` / `hover:-translate-y-1` patterns with the unified `.card-premium` utility class across:
+  - Home: Services preview (6), Why-Branify features (6), Products preview (4), Testimonials (8) = 24 premium cards.
+  - Services: all 12 service cards + GlassBadge "Popular" tags + bolder Check icons (strokeWidth 3) + tabular-nums prices.
+  - Portfolio: all 6 project cards + GlassBadge category tags (neutral variant) + mono-font metrics.
+  - Blog: BlogCard uses `card-premium` with `flex flex-col` for equal-height.
+- **Verified:** 24 premium cards on home, 6 on portfolio. Unified weighted lift + teal glow hover language across the entire site.
+
+### Applied: Mono-font metrics (data-driven aesthetic)
+- **File:** `src/components/views/portfolio-view.tsx`
+- ProjectCard result tiles + case study dialog result tiles now use `font-mono text-primary tabular-nums` (was `font-display`). Mimics Vercel's data-driven aesthetic per VLM suggestion.
+- **Verified:** 24 mono-font metric elements on Portfolio (e.g., "+148%").
+
+### Applied: GlassBadge across Services + Portfolio
+- **Files:** `services-view.tsx`, `portfolio-view.tsx`
+- Services "Popular" badges → `GlassBadge variant="teal"`.
+- Portfolio category badges → `GlassBadge variant="neutral"` (frosted glass over gradient covers).
+- **Verified:** 12 glass badges on Portfolio.
+
+### New Feature: Lightweight analytics/telemetry utility
+- **File:** `src/lib/analytics.ts` (new)
+- `track(event, props?)` — records events to localStorage (FIFO cap 200, key `branify:analytics`). Each event: `{ id, event, props, ts, path }`. Console.debug in dev. SSR-safe.
+- `analytics.dump()` / `analytics.counts()` / `analytics.clear()` — inspection/management namespace.
+- `useNavigationTracking()` — React hook (useEffect) that subscribes to the Zustand router store and auto-tracks every navigation as `navigate` with `{ route, slug }`. Lazy-imports the router to avoid circular deps.
+- **Wired:** `useNavigationTracking()` called in `page.tsx` root component. Hero "Start a project" CTA calls `track("cta_click", { label, location })`.
+- **Verified:** navigated Services → Portfolio → Home → clicked hero CTA → localStorage held 4 `navigate` events + 1 `cta_click` event with `{label: "Start a project", location: "hero"}`. API mirrors PostHog/Mixpanel so swapping to a real backend is a one-line change.
+
+## Verification Results
+- `bun run lint` → clean (exit 0, no warnings, no errors).
+- `npx tsc --noEmit` → zero errors in src/ (only pre-existing errors in examples/ & skills/).
+- Dev server: HTTP 200, stable (~125-460ms render).
+- **Agent Browser QA:**
+  - Homepage loads, no page errors, no console errors.
+  - Parallax: hero dashboard element has motion `y` style attribute (scroll-driven depth active).
+  - Premium cards: 24 on home (services preview + why features + products preview + testimonials), 6 on portfolio — unified hover language confirmed.
+  - Mono metrics: 24 `font-mono text-primary` elements on Portfolio (e.g., "+148%").
+  - Glass badges: 12 on Portfolio (category tags).
+  - Analytics: cleared localStorage → navigated Services → Portfolio → Home → clicked hero CTA → 4 `navigate` events + 1 `cta_click` event with correct props confirmed in localStorage.
+
+## Unresolved Issues / Risks
+- **Navbar CTA not tracked:** The navbar "Start a project" button (which appears on every page) isn't wired with `track("cta_click")` — only the hero CTA is. Could add tracking to navbar CTAs for complete funnel analytics. Low priority.
+- **Magnetic effect on Services CTA:** Synthetic mousemove test still shows `transform: none` via getComputedStyle (Framer Motion motion-value system quirk). Home-view test confirmed it works in round 2. Low priority.
+- **Harmless warning persists:** Framer Motion `useScroll` position warning on hero (documented since round 1). No functional impact.
+
+## Priority Recommendations for Next Phase
+1. **Complete analytics coverage:** Wire `track("cta_click")` into all primary CTAs (navbar, services, products, portfolio, about, contact, pricing) for full funnel tracking. Add `track("tool_open")` to the tools dialog and `track("search")` to the search view.
+2. **Pricing Enterprise card differentiation:** VLM noted Enterprise "Custom" card lacks visual weight — add subtle glassmorphism/border treatment (still not done from round 3).
+3. **Filter pill refinement:** Portfolio/Blog/Products category filter pills could use the VLM-suggested subtle active state (low-opacity fill + teal dot indicator).
+4. **Parallax on portfolio covers:** Extend parallax to portfolio GradientCover headers for additional depth on the portfolio grid.
+5. **Keyboard shortcut help:** Add a "?" key shortcut that opens a modal listing all keyboard shortcuts (⌘K, /, Esc, etc.) — premium SaaS touch (Linear, Notion have this).

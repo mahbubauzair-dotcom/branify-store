@@ -9,6 +9,7 @@ import { ScrollProgress } from "@/components/layout/scroll-progress";
 import { CommandPalette } from "@/components/layout/command-palette";
 import { BackToTop } from "@/components/layout/back-to-top";
 import { useRouterStore } from "@/lib/router";
+import { useNavigationTracking } from "@/lib/analytics";
 import { HomeView } from "@/components/views/home-view";
 
 // Code-split non-home views so the initial bundle only ships the homepage.
@@ -86,6 +87,9 @@ function ViewSkeleton() {
 export default function Home() {
   const route = useRouterStore((s) => s.route);
   const slug = useRouterStore((s) => s.slug);
+
+  // Auto-track every navigation as an analytics event.
+  useNavigationTracking();
 
   const view = useMemo(() => {
     switch (route) {

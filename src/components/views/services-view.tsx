@@ -29,6 +29,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { Reveal, Stagger, StaggerItem, GradientTextTeal } from "@/components/shared/reveal";
 import { AuroraBackground } from "@/components/shared/gradient-cover";
 import { MagneticButton } from "@/components/shared/magnetic-button";
+import { GlassBadge } from "@/components/shared/glass-badge";
 import { useCountUp, useInViewOnce } from "@/hooks/use-count-up";
 
 const processIconMap: Record<string, LucideIcon> = {
@@ -131,7 +132,7 @@ function ServicesGrid() {
         <Stagger className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {services.map((s) => (
             <StaggerItem key={s.slug}>
-              <Card className="group relative flex h-full flex-col overflow-hidden rounded-2xl border-white/5 bg-card/40 p-6 backdrop-blur transition-all hover:border-primary/30 hover:bg-card/60">
+              <Card className="card-premium group relative flex h-full flex-col overflow-hidden rounded-2xl border-white/5 bg-card/40 p-6 backdrop-blur hover:border-primary/30 hover:bg-card/60">
                 <div
                   className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${s.accent} opacity-0 transition-opacity group-hover:opacity-100`}
                 />
@@ -141,9 +142,9 @@ function ServicesGrid() {
                       <s.icon className="h-6 w-6" />
                     </div>
                     {s.popular && (
-                      <Badge className="bg-primary/15 text-primary hover:bg-primary/20">
-                        <Sparkles className="mr-1 h-3 w-3" /> Popular
-                      </Badge>
+                      <GlassBadge variant="teal">
+                        <Sparkles className="h-3 w-3" /> Popular
+                      </GlassBadge>
                     )}
                   </div>
                   <h3 className="mt-5 font-display text-xl font-semibold text-white">
@@ -157,7 +158,7 @@ function ServicesGrid() {
                   <div className="mt-5 space-y-2">
                     {s.features.map((f) => (
                       <div key={f} className="flex items-start gap-2 text-sm text-white/85">
-                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" strokeWidth={3} />
                         <span>{f}</span>
                       </div>
                     ))}
@@ -185,7 +186,7 @@ function ServicesGrid() {
                     <p className="text-[11px] uppercase tracking-wider text-muted-foreground">
                       Starting at
                     </p>
-                    <p className="font-display text-2xl font-bold text-white">
+                    <p className="font-display text-2xl font-bold text-white tabular-nums">
                       ${s.startingPrice.toLocaleString()}
                     </p>
                   </div>
