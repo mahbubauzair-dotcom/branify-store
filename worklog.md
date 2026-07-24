@@ -1100,3 +1100,31 @@ Task: Integrate the user-uploaded BRANIFY logo PNG into the site, replacing the 
 ## Notes
 - The uploaded logo is a stacked lockup (icon + wordmark + tagline), which is taller than the previous horizontal inline-SVG lockup. At navbar size (36px) the tagline is small but legible; at footer size (64px) it reads clearly.
 - The old `/public/logo.svg` file remains but is no longer referenced anywhere (metadata, JSON-LD, and the Logo component all point to `/branify-logo.png`). Could be removed in a cleanup pass.
+
+---
+Task ID: 21 (Push to GitHub)
+Agent: Main (Architect)
+Task: Push the BRANIFY project to the GitHub repository https://github.com/mahbubauzair-dotcom/branify-store.git
+
+## Completed
+
+### Security preparation (critical)
+- Discovered `.env` (containing the Neon PostgreSQL password) was tracked in the existing git history. Pushing as-is would have leaked DB credentials to a public repo.
+- Untracked `.env` from the git index (kept the local file).
+- Created `.env.example` with a placeholder DATABASE_URL for documentation.
+- Added `!.env.example` exception to `.gitignore` so the example is committed while real `.env*` stays ignored.
+- Created a clean orphan commit (no history) so the password in old commits never reaches GitHub.
+
+### Push
+- Added remote `origin` → `https://github.com/mahbubauzair-dotcom/branify-store.git`.
+- Pushed with `--force` to set `main` to the clean single commit (HEAD `7b033e3`).
+- Remote `main` SHA matches local HEAD exactly → verified.
+- 182 files in the tree. `.env` confirmed excluded from the pushed tree. `.env.example` included.
+
+### What's on GitHub
+- Complete BRANIFY platform: 17 views, 10 tools, command palette, scroll progress, back-to-top, cursor spotlight, magnetic CTAs, premium card system, parallax, full SEO schemas (Organization/WebSite/ProfessionalService/Service/Product/BlogPosting/BreadcrumbList), DB-backed API routes (/api/newsletter, /api/contact) on PostgreSQL (Neon), analytics utility, keyboard shortcuts, custom BRANIFY logo PNG, code-splitting, accessibility.
+- Stack: Next.js 16, React 19, TypeScript 5, Tailwind CSS 4, Framer Motion, shadcn/ui, Prisma 6, PostgreSQL (Neon), Zustand, React Hook Form, Zod.
+- Single descriptive commit message documenting all features.
+
+## Security note
+The local git history (pre-cleanup) contained `.env` with the Neon DB password. The pushed repo has a clean history with no secrets. As an extra precaution, rotating the Neon DB password is recommended (the old password was only ever in the local sandbox git, never pushed).
