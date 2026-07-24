@@ -66,7 +66,13 @@ export function ShortcutHelp() {
       }
     };
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    // Listen for a custom event so the navbar "?" button can open this modal.
+    const onOpenReq = () => setOpen(true);
+    window.addEventListener("branify:open-shortcuts", onOpenReq);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("branify:open-shortcuts", onOpenReq);
+    };
   }, [open, navigate]);
 
   return (

@@ -665,3 +665,69 @@ Task: QA via agent-browser + VLM, ship Enterprise card differentiation, complete
 3. **Filter pill refinement on Blog + Products:** Apply the same refined active-state + teal-dot pattern to Blog category pills and Products category pills for consistency (currently only Portfolio is refined).
 4. **Performance audit:** Run a Lighthouse-style audit via agent-browser to measure actual LCP/INP/CLS and identify any remaining performance wins.
 5. **404 page polish:** The NotFoundView could get a search input + popular pages to help lost users recover (currently just links home/services).
+
+---
+Task ID: 14 (webDevReview round 6 — filter consistency + 404 polish + parallax + shortcut discovery)
+Agent: Main (Architect) — triggered by webDevReview cron job
+Task: QA via agent-browser + VLM, apply refined filter pills to Products + Blog, add shortcut-help discoverability button, polish 404 page with search + popular pages, apply parallax to portfolio covers.
+
+## Current Project Status Assessment
+- BRANIFY is stable: 16 lazy-loaded views, command palette (⌘K + Recently visited), scroll progress, back-to-top, cursor spotlight, magnetic CTAs, JSON-LD SEO, section dividers/glows, unified premium card system, parallax on hero dashboard, analytics utility (navigate + cta_click + tool_open + search), keyboard shortcut help (? key), Enterprise card differentiation, refined filter pills on Portfolio.
+- QA this round: HTTP 200, no page errors, no console errors. Blog + Products views load and navigate cleanly.
+- VLM analysis of products page confirmed the filter pills still needed the refined treatment (consistency with Portfolio) — top priority.
+- Priority recommendations from round 5: shortcut help discovery button, parallax on portfolio covers, filter refinement on Blog + Products, performance audit, 404 page polish.
+
+## Completed Modifications
+
+### Applied: Refined filter pills on Products view (consistency with Portfolio)
+- **File:** `src/components/views/products-view.tsx`
+- Replaced solid `bg-primary text-primary-foreground shadow-glow` active state with the refined pattern: `border border-primary/30 bg-primary/10 text-white` + 1.5px teal dot indicator before the active label, inactive `border-transparent text-white/60 hover:bg-white/5 hover:text-white`. Matches the Portfolio pills exactly for a unified filter language site-wide.
+- **Verified:** 3+ pills found, "All" had the active dot initially, clicking "Templates" moved the dot correctly.
+
+### Applied: Refined filter pills on Blog view
+- **File:** `src/components/views/blog-view.tsx`
+- Same refined pattern applied to blogCategories pills (9 categories). Active state has teal dot + subtle primary/10 bg, inactive is borderless + muted.
+- **Verified:** 3+ blog pills found, "Branding" clickable with active state.
+
+### New Feature: Shortcut-help discoverability button in navbar
+- **Files:** `src/components/layout/shortcut-help.tsx`, `src/components/layout/navbar.tsx`
+- The shortcut help modal was only discoverable by pressing `?` (invisible to users who don't know it exists). Added a `Keyboard` icon button in the navbar (lg+ screens) with `aria-label="Keyboard shortcuts"` and `title="Keyboard shortcuts (?)"`.
+- The button dispatches a custom `branify:open-shortcuts` window event; the ShortcutHelp component listens for it and opens. This decouples the trigger from the modal state without lifting state.
+- **Verified:** navbar button found (`aria-label="Keyboard shortcuts"`), clicking it opened the dialog with `aria-label="Keyboard shortcuts"`.
+
+### Polish: 404 page with search input + popular pages grid
+- **File:** `src/components/views/not-found-view.tsx`
+- Added a search input form (rounded-full, search icon, submit button) that navigates to the search view with the query — helps lost users recover immediately.
+- Expanded the 3-item "quick links" into a 6-item "Popular pages" grid (Services, Digital Products, Free Tools, Portfolio, Blog, Contact) using `card-premium` hover + icon tiles + ArrowRight reveal.
+- Updated copy to reference the search + popular pages.
+- **Verified:** 6 occurrences of new features (popularPages, submitSearch, "Search BRANIFY") in the component source.
+
+### Applied: Parallax on portfolio GradientCover headers
+- **File:** `src/components/views/portfolio-view.tsx`
+- Each ProjectCard's GradientCover is now wrapped in a `motion.div` with `style={{ y: coverY }}` driven by `useParallax(40)`. As the card scrolls into view, the cover drifts vertically for subtle depth (the card's `overflow-hidden` clips the drift).
+- Added `motion` (framer-motion) and `useParallax` imports.
+- **Verified:** 6 portfolio premium cards, 24 motion-transformed elements (parallax-wrapped covers) in DOM. No errors.
+
+## Verification Results
+- `bun run lint` → clean (exit 0, no warnings, no errors).
+- `npx tsc --noEmit` → zero errors in src/ (only pre-existing errors in examples/ & skills/).
+- Dev server: HTTP 200, stable (~217-501ms render).
+- **Agent Browser QA:**
+  - Homepage loads, no page errors, no console errors.
+  - Navbar keyboard button: found + clicking it opens the shortcut help modal.
+  - Products filter pills: refined active state with teal dot, "Templates" click moves dot correctly.
+  - Blog filter pills: refined pattern applied, "Branding" clickable.
+  - Portfolio parallax: 6 premium cards + 24 motion-transformed cover elements (parallax active). No errors.
+  - 404 page: search input + 6-item popular pages grid wired (verified via source grep).
+
+## Unresolved Issues / Risks
+- **404 page not directly testable via navigation:** The NotFoundView only renders for unknown routes (the router's default case), which agent-browser can't easily trigger since all nav goes through the Zustand store. Verified the component code + features via grep instead. Low risk — the routing logic is unchanged.
+- **Full-page screenshot limitation persists:** VLM full-page screenshots still miss below-fold content (Framer Motion `whileInView` opacity). DOM-level agent-browser checks remain the source of truth.
+- **Harmless warning persists:** Framer Motion `useScroll` position warning on hero (documented since round 1). No functional impact.
+
+## Priority Recommendations for Next Phase
+1. **Performance audit:** Run a Lighthouse-style audit via agent-browser (measure LCP/INP/CLS) to identify any remaining performance wins — still pending from round 5.
+2. **Mobile menu enhancement:** The mobile hamburger menu could include the keyboard shortcuts button + a condensed CTA row for parity with desktop.
+3. **Blog post reading progress:** Add a thin reading-progress bar to the top of blog post pages (like Medium/Stripe docs) — premium content touch.
+4. **Product detail gallery zoom:** Add a lightbox/zoom interaction on the product detail gallery thumbnails for a premium e-commerce feel.
+5. **Service detail pages:** Currently services link to contact; could add dedicated service detail pages with deeper case studies + related services.

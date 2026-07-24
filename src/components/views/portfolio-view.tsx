@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { motion } from "framer-motion";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -33,6 +34,7 @@ import {
 } from "@/data/portfolio";
 import { testimonials, stats } from "@/data/testimonials";
 import { PageHeader } from "@/components/shared/page-header";
+import { useParallax } from "@/hooks/use-parallax";
 import { SectionHeading } from "@/components/shared/section-heading";
 import {
   Reveal,
@@ -162,13 +164,17 @@ function FilterableGrid() {
 /* PROJECT CARD                                                        */
 /* ------------------------------------------------------------------ */
 function ProjectCard({ project, onOpen }: { project: Project; onOpen: () => void }) {
+  // Subtle parallax on the cover for depth as the card scrolls into view.
+  const { ref: coverRef, y: coverY } = useParallax(40);
   return (
     <Card
       onClick={onOpen}
       className="card-premium group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border-white/5 bg-card/40 backdrop-blur hover:border-primary/30 hover:bg-card/60"
     >
-      <GradientCover variant={project.cover} className="h-56" pattern="grid">
-        <div className="flex h-full flex-col justify-between p-5">
+      <div ref={coverRef} className="relative">
+        <motion.div style={{ y: coverY }}>
+          <GradientCover variant={project.cover} className="h-56" pattern="grid">
+            <div className="flex h-full flex-col justify-between p-5">
           <div className="flex items-center justify-between">
             <GlassBadge variant="neutral">{project.category}</GlassBadge>
             <span className="rounded-full bg-black/30 px-2.5 py-1 text-xs font-medium text-white/80 backdrop-blur">
@@ -190,6 +196,8 @@ function ProjectCard({ project, onOpen }: { project: Project; onOpen: () => void
           </div>
         </div>
       </GradientCover>
+        </motion.div>
+      </div>
 
       <div className="flex flex-1 flex-col p-6">
         <h3 className="font-display text-xl font-semibold text-white transition-colors group-hover:text-primary">

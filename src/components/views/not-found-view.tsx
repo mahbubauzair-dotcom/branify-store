@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import {
   Home,
@@ -10,10 +11,15 @@ import {
   Mail,
   Sparkles,
   Unlink,
+  Package,
+  Wrench,
+  Briefcase,
+  BookOpen,
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { useNavigate } from "@/lib/router";
 import { siteConfig } from "@/config/site";
 import {
@@ -22,14 +28,23 @@ import {
 } from "@/components/shared/gradient-cover";
 import { GradientTextTeal } from "@/components/shared/reveal";
 
-const quickRoutes: { label: string; icon: LucideIcon; route: Parameters<ReturnType<typeof useNavigate>>[0]; hint: string }[] = [
+const popularPages: { label: string; icon: LucideIcon; route: Parameters<ReturnType<typeof useNavigate>>[0]; hint: string }[] = [
   { label: "Services", icon: Code2, route: "services", hint: "12 premium offerings" },
-  { label: "Search", icon: SearchIcon, route: "search", hint: "Find anything fast" },
-  { label: "Home", icon: Home, route: "home", hint: "Back to the start" },
+  { label: "Digital Products", icon: Package, route: "products", hint: "Templates & kits" },
+  { label: "Free Tools", icon: Wrench, route: "tools", hint: "10 generators" },
+  { label: "Portfolio", icon: Briefcase, route: "portfolio", hint: "Case studies" },
+  { label: "Blog", icon: BookOpen, route: "blog", hint: "Insights & guides" },
+  { label: "Contact", icon: Mail, route: "contact", hint: "Start a project" },
 ];
 
 export function NotFoundView() {
   const navigate = useNavigate();
+  const [searchValue, setSearchValue] = useState("");
+
+  const submitSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    navigate("search", searchValue.trim() ? { query: searchValue.trim() } : undefined);
+  };
 
   return (
     <div className="relative flex min-h-[88vh] items-center justify-center overflow-hidden">
@@ -109,15 +124,39 @@ export function NotFoundView() {
           className="mx-auto mt-4 max-w-xl text-base text-muted-foreground leading-relaxed"
         >
           The link may be broken, the page may have been renamed, or you may
-          have followed an old bookmark. Don&apos;t worry — the rest of BRANIFY
-          is just a click away.
+          have followed an old bookmark. Search for what you need or jump to a
+          popular page below.
         </motion.p>
 
-        <motion.div
+        {/* Search input */}
+        <motion.form
+          onSubmit={submitSearch}
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.34 }}
-          className="mt-8 flex flex-wrap items-center justify-center gap-3"
+          className="mx-auto mt-8 flex max-w-md items-center gap-2"
+        >
+          <div className="relative flex-1">
+            <SearchIcon className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              placeholder="Search BRANIFY…"
+              className="h-12 rounded-full border-white/10 bg-card/50 pl-10 text-white placeholder:text-muted-foreground/70 backdrop-blur focus-visible:border-primary/40"
+              aria-label="Search BRANIFY"
+            />
+          </div>
+          <Button type="submit" size="icon" className="h-12 w-12 shrink-0 rounded-full bg-primary text-primary-foreground hover:bg-hover" aria-label="Search">
+            <ArrowRight className="h-4 w-4" />
+          </Button>
+        </motion.form>
+
+        {/* Primary CTAs */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="mt-6 flex flex-wrap items-center justify-center gap-3"
         >
           <Button
             onClick={() => navigate("home")}
@@ -134,39 +173,45 @@ export function NotFoundView() {
           </Button>
         </motion.div>
 
-        {/* Quick links */}
+        {/* Popular pages grid */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.42 }}
-          className="mt-12 grid gap-3 sm:grid-cols-3"
+          transition={{ duration: 0.6, delay: 0.46 }}
+          className="mt-12"
         >
-          {quickRoutes.map((q) => (
-            <button
-              key={q.route}
-              onClick={() => navigate(q.route)}
-              className="group flex items-center gap-3 rounded-2xl border border-white/5 bg-card/40 p-4 text-left backdrop-blur transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:bg-card/60"
-            >
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary">
-                <q.icon className="h-5 w-5" />
-              </span>
-              <div className="min-w-0">
-                <p className="text-sm font-medium text-white group-hover:text-primary">
-                  {q.label}
-                </p>
-                <p className="truncate text-xs text-muted-foreground">
-                  {q.hint}
-                </p>
-              </div>
-            </button>
-          ))}
+          <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Popular pages
+          </p>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {popularPages.map((p) => (
+              <button
+                key={p.route}
+                onClick={() => navigate(p.route)}
+                className="card-premium group flex items-center gap-3 rounded-2xl border border-white/5 bg-card/40 p-4 text-left backdrop-blur hover:border-primary/30 hover:bg-card/60"
+              >
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary transition-transform group-hover:scale-110">
+                  <p.icon className="h-5 w-5" />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-white group-hover:text-primary">
+                    {p.label}
+                  </p>
+                  <p className="truncate text-xs text-muted-foreground">
+                    {p.hint}
+                  </p>
+                </div>
+                <ArrowRight className="ml-auto h-4 w-4 shrink-0 text-muted-foreground opacity-0 transition-all group-hover:translate-x-0.5 group-hover:opacity-100" />
+              </button>
+            ))}
+          </div>
         </motion.div>
 
         {/* Need help card */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
+          transition={{ duration: 0.6, delay: 0.54 }}
           className="mt-8"
         >
           <GradientCover

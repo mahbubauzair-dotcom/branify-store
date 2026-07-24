@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ArrowRight, Search, ChevronRight } from "lucide-react";
+import { Menu, X, ArrowRight, Search, ChevronRight, Keyboard } from "lucide-react";
 import { Logo } from "@/components/shared/logo";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -102,6 +102,14 @@ export function Navbar() {
             <kbd className="hidden rounded border border-white/10 bg-white/5 px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground/80 lg:inline">
               ⌘K
             </kbd>
+          </button>
+          <button
+            onClick={() => window.dispatchEvent(new Event("branify:open-shortcuts"))}
+            aria-label="Keyboard shortcuts"
+            title="Keyboard shortcuts (?)"
+            className="hidden h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-white/5 hover:text-white lg:flex"
+          >
+            <Keyboard className="h-4 w-4" />
           </button>
           <Button
             onClick={() => {

@@ -192,12 +192,15 @@ function Catalog() {
                     key={cat}
                     onClick={() => setActiveCategory(cat)}
                     className={
-                      "rounded-full px-4 py-1.5 text-sm font-medium transition-all " +
+                      "inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium transition-all " +
                       (active
-                        ? "bg-primary text-primary-foreground shadow-glow"
-                        : "border border-white/10 bg-white/5 text-white/70 hover:border-primary/30 hover:bg-white/10 hover:text-white")
+                        ? "border border-primary/30 bg-primary/10 text-white"
+                        : "border border-transparent text-white/60 hover:bg-white/5 hover:text-white")
                     }
                   >
+                    {active && (
+                      <span className="h-1.5 w-1.5 rounded-full bg-primary" aria-hidden="true" />
+                    )}
                     {cat}
                   </button>
                 );
