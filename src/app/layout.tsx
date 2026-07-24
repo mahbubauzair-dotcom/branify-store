@@ -101,8 +101,8 @@ export default function RootLayout({
                   description:
                     "Premium digital agency crafting world-class websites, brand identities, AI solutions and digital products.",
                   foundingDate: "2019",
-                  email: "hello@branify.store",
-                  telephone: "+1-415-555-0148",
+                  email: "admin@branify.store",
+                  telephone: "+92-334-1079333",
                   address: {
                     "@type": "PostalAddress",
                     streetAddress: "548 Market Street",
@@ -137,7 +137,7 @@ export default function RootLayout({
                   image: `${siteUrl}/branify-logo.png`,
                   "@id": `${siteUrl}/#professional-service`,
                   url: siteUrl,
-                  telephone: "+1-415-555-0148",
+                  telephone: "+92-334-1079333",
                   priceRange: "$$-$$$$",
                   address: { "@id": `${siteUrl}/#organization` },
                   areaServed: "Worldwide",

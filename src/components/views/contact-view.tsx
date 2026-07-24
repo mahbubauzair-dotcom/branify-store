@@ -334,7 +334,7 @@ function ContactInfoColumn() {
     {
       icon: MessageCircle,
       label: "WhatsApp",
-      value: "+1 (415) 555-0148",
+      value: siteConfig.phone,
       href: siteConfig.whatsapp,
       external: true,
       accent: true,

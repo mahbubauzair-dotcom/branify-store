@@ -79,7 +79,7 @@ const productFaqs = [
   },
   {
     q: "What if it's not for me?",
-    a: "We offer a 30-day no-questions-asked money-back guarantee. If the product doesn't fit your needs, email hello@branify.store and we'll refund you in full.",
+    a: "We offer a 30-day no-questions-asked money-back guarantee. If the product doesn't fit your needs, email admin@branify.store and we'll refund you in full.",
   },
 ];
 

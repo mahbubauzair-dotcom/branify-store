@@ -22,7 +22,7 @@ const plusDaysISO = (days: number) => {
 
 export function InvoiceGenerator() {
   const [fromName, setFromName] = useState("BRANIFY Studio");
-  const [fromEmail, setFromEmail] = useState("hello@branify.store");
+  const [fromEmail, setFromEmail] = useState("admin@branify.store");
   const [toName, setToName] = useState("");
   const [toEmail, setToEmail] = useState("");
   const [invoiceNo, setInvoiceNo] = useState("INV-0001");

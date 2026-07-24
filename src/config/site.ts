@@ -5,9 +5,9 @@ export const siteConfig = {
   tagline: "Brands that feel like a million dollars.",
   description:
     "BRANIFY is a premium digital agency crafting world-class websites, brand identities, AI solutions, and digital products.",
-  email: "hello@branify.store",
-  phone: "+1 (415) 555-0148",
-  whatsapp: "https://wa.me/14155550148",
+  email: "admin@branify.store",
+  phone: "+92 334 1079333",
+  whatsapp: "https://wa.me/923341079333",
   address: "548 Market Street, San Francisco, CA 94104",
   social: {
     twitter: "https://twitter.com/branify",
