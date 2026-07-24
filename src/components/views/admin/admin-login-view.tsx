@@ -64,6 +64,8 @@ export function AdminLoginView() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: email.trim(), password }),
+        // Login takes ~2s due to scrypt hashing — give it room.
+        signal: AbortSignal.timeout(15000),
       });
       const data = await res.json().catch(() => null);
       if (!res.ok || !data?.ok) {
@@ -73,8 +75,15 @@ export function AdminLoginView() {
       }
       toast.success("Welcome back");
       navigate("admin-dashboard");
-    } catch {
-      toast.error("Network error. Please try again.");
+    } catch (err) {
+      // Distinguish timeout/network errors from server errors.
+      if (err instanceof DOMException && err.name === "TimeoutError") {
+        toast.error("The server took too long to respond. Please try again.");
+      } else if (err instanceof TypeError) {
+        toast.error("Cannot reach the server. Please check your connection and try again.");
+      } else {
+        toast.error("Network error. Please try again.");
+      }
     } finally {
       setSubmitting(false);
     }

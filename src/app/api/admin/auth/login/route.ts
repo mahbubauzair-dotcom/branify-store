@@ -51,8 +51,9 @@ export async function POST(request: Request) {
     return res;
   } catch (err) {
     console.error("[admin/auth/login] error", err);
+    const msg = err instanceof Error ? err.message : "Unknown error";
     return NextResponse.json(
-      { ok: false, error: "Something went wrong. Please try again." },
+      { ok: false, error: `Login failed: ${msg}. Please try again.` },
       { status: 500 },
     );
   }
