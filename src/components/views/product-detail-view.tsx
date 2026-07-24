@@ -57,6 +57,7 @@ import {
   GradientCover,
   AuroraBackground,
 } from "@/components/shared/gradient-cover";
+import { JsonLd, buildBreadcrumbSchema } from "@/components/shared/json-ld";
 import { toast } from "sonner";
 
 const productFaqs = [
@@ -139,10 +140,18 @@ function NotFoundState() {
 function Breadcrumbs({ product }: { product: Product }) {
   const navigate = useNavigate();
   return (
-    <nav
-      className="flex items-center gap-1.5 text-sm text-muted-foreground"
-      aria-label="Breadcrumb"
-    >
+    <>
+      <JsonLd
+        data={buildBreadcrumbSchema([
+          { name: "Home", url: siteConfig.url },
+          { name: "Digital Products", url: `${siteConfig.url}/#products` },
+          { name: product.name, url: `${siteConfig.url}/#products/${product.slug}` },
+        ])}
+      />
+      <nav
+        className="flex items-center gap-1.5 text-sm text-muted-foreground"
+        aria-label="Breadcrumb"
+      >
       <button
         onClick={() => navigate("home")}
         className="hover:text-primary transition-colors"
@@ -161,6 +170,7 @@ function Breadcrumbs({ product }: { product: Product }) {
         {product.name}
       </span>
     </nav>
+    </>
   );
 }
 

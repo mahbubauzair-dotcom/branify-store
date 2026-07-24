@@ -36,6 +36,7 @@ import {
   GradientCover,
   AuroraBackground,
 } from "@/components/shared/gradient-cover";
+import { JsonLd, buildBreadcrumbSchema } from "@/components/shared/json-ld";
 import { ReadingProgress } from "@/components/shared/reading-progress";
 import { TableOfContents, type TocItem } from "@/components/shared/table-of-contents";
 import { cn } from "@/lib/utils";
@@ -131,10 +132,18 @@ function NotFoundState() {
 function Breadcrumbs({ post }: { post: BlogPost }) {
   const navigate = useNavigate();
   return (
-    <nav
-      className="flex items-center gap-1.5 text-sm text-muted-foreground"
-      aria-label="Breadcrumb"
-    >
+    <>
+      <JsonLd
+        data={buildBreadcrumbSchema([
+          { name: "Home", url: siteConfig.url },
+          { name: "Blog", url: `${siteConfig.url}/#blog` },
+          { name: post.title, url: `${siteConfig.url}/#blog/${post.slug}` },
+        ])}
+      />
+      <nav
+        className="flex items-center gap-1.5 text-sm text-muted-foreground"
+        aria-label="Breadcrumb"
+      >
       <button
         onClick={() => navigate("home")}
         className="hover:text-primary transition-colors"
@@ -153,6 +162,7 @@ function Breadcrumbs({ post }: { post: BlogPost }) {
         {post.title}
       </span>
     </nav>
+    </>
   );
 }
 
@@ -517,51 +527,52 @@ function RelatedArticles({ post }: { post: BlogPost }) {
         />
 
         <Stagger className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {related.map((p) => (
-            <StaggerItem key={p.slug}>
-              <Card
-                onClick={() => navigate("blog-post", { slug: p.slug })}
-                className="group h-full cursor-pointer overflow-hidden rounded-2xl border-white/5 bg-card/40 backdrop-blur transition-all hover:border-primary/30 hover:bg-card/60 hover:shadow-glow"
-              >
-                <GradientCover variant={p.cover} className="h-40">
-                  <div className="flex h-full items-center justify-center">
-                    <span className="font-display text-5xl font-bold text-white/15 transition-transform duration-300 group-hover:scale-110">
-                      {p.category.slice(0, 2).toUpperCase()}
-                    </span>
+          {related.map((p, i) => {
+            const featured = i === 0;
+            return (
+              <StaggerItem key={p.slug} className={featured ? "sm:col-span-2 lg:col-span-1" : ""}>
+                <Card
+                  onClick={() => navigate("blog-post", { slug: p.slug })}
+                  className="card-premium group relative h-full cursor-pointer overflow-hidden rounded-2xl border-white/5 bg-card/40 backdrop-blur hover:border-primary/30 hover:bg-card/60"
+                >
+                  <GradientCover variant={p.cover} className={featured ? "h-56" : "h-44"} pattern="grid">
+                    {/* dark gradient overlay for the magazine-cover title */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    <div className="absolute right-3 top-3">
+                      <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-white opacity-0 backdrop-blur-sm transition-all group-hover:bg-primary group-hover:text-primary-foreground group-hover:opacity-100">
+                        <ArrowUpRight className="h-4 w-4" />
+                      </span>
+                    </div>
+                    {/* overlaid title at the bottom of the cover */}
+                    <div className="absolute inset-x-0 bottom-0 p-5">
+                      <Badge className="mb-2 border border-white/10 bg-black/40 text-white backdrop-blur-sm hover:bg-black/50">
+                        {p.category}
+                      </Badge>
+                      <h3 className="font-display text-lg font-semibold leading-snug text-white drop-shadow-md transition-colors group-hover:text-primary">
+                        {p.title}
+                      </h3>
+                    </div>
+                  </GradientCover>
+                  <div className="flex flex-1 flex-col p-5">
+                    <p className="text-sm leading-relaxed text-muted-foreground line-clamp-2">
+                      {p.excerpt}
+                    </p>
+                    <div className="mt-4 flex items-center gap-3 border-t border-white/5 pt-3 text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        {formatDate(p.date)}
+                      </span>
+                      <span className="h-3 w-px bg-white/10" />
+                      <span className="flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        {p.readingTime}m read
+                      </span>
+                    </div>
                   </div>
-                  <div className="absolute left-3 top-3">
-                    <Badge className="bg-black/40 text-white backdrop-blur-sm hover:bg-black/50">
-                      {p.category}
-                    </Badge>
-                  </div>
-                  <div className="absolute right-3 top-3">
-                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-white opacity-0 backdrop-blur-sm transition-all group-hover:bg-primary group-hover:text-primary-foreground group-hover:opacity-100">
-                      <ArrowUpRight className="h-4 w-4" />
-                    </span>
-                  </div>
-                </GradientCover>
-                <div className="flex flex-1 flex-col p-5">
-                  <h3 className="font-display text-base font-semibold leading-snug text-white transition-colors group-hover:text-primary">
-                    {p.title}
-                  </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground line-clamp-2">
-                    {p.excerpt}
-                  </p>
-                  <div className="mt-4 flex items-center gap-3 border-t border-white/5 pt-3 text-xs text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="h-3 w-3" />
-                      {formatDate(p.date)}
-                    </span>
-                    <span className="h-3 w-px bg-white/10" />
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      {p.readingTime}m
-                    </span>
-                  </div>
-                </div>
-              </Card>
-            </StaggerItem>
-          ))}
+                </Card>
+              </StaggerItem>
+            );
+          })}
         </Stagger>
 
         <Reveal className="mt-10 flex justify-center">

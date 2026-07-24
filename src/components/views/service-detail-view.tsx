@@ -44,6 +44,7 @@ import {
   GradientCover,
   AuroraBackground,
 } from "@/components/shared/gradient-cover";
+import { JsonLd, buildBreadcrumbSchema } from "@/components/shared/json-ld";
 import { track } from "@/lib/analytics";
 
 const processIconMap: Record<string, LucideIcon> = {
@@ -103,6 +104,7 @@ export function ServiceDetailView() {
       <ServiceDeliverables service={service} />
       <ServiceProcess />
       <ServiceResults service={service} />
+      <ServiceFaq service={service} />
       <RelatedServices services={relatedServices} />
       <ServiceCta service={service} />
     </div>
@@ -118,6 +120,13 @@ function ServiceHero({ service }: { service: Service }) {
     <section className="relative overflow-hidden border-b border-white/5">
       <AuroraBackground />
       <div className="absolute inset-0 bg-grid opacity-20" />
+      <JsonLd
+        data={buildBreadcrumbSchema([
+          { name: "Home", url: siteConfig.url },
+          { name: "Services", url: `${siteConfig.url}/#services` },
+          { name: service.title, url: `${siteConfig.url}/#services/${service.slug}` },
+        ])}
+      />
       <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
         {/* Breadcrumbs */}
         <nav className="mb-8 flex items-center gap-1.5 text-sm text-muted-foreground" aria-label="Breadcrumb">
@@ -404,6 +413,61 @@ function ServiceResults({ service }: { service: Service }) {
             </div>
           </Reveal>
         </div>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* SERVICE FAQ                                                         */
+/* ------------------------------------------------------------------ */
+function ServiceFaq({ service }: { service: Service }) {
+  // Service-specific FAQ — generated from the service's properties so every
+  // service page gets relevant, contextual Q&As without manual data entry.
+  const faqs = [
+    {
+      q: `How much does ${service.title} cost?`,
+      a: `Our ${service.title} service starts at $${service.startingPrice.toLocaleString()}. The final price depends on scope, complexity, and timeline. Book a free call and we'll give you a clear, fixed quote within 24 hours — no surprises.`,
+    },
+    {
+      q: "How long does it take?",
+      a: `Timelines vary by scope. Most ${service.title} engagements take 1–4 weeks. We ship weekly milestones so you always see progress, and we hit the delivery dates we quote.`,
+    },
+    {
+      q: "How many revisions are included?",
+      a: "Starter includes 2 rounds of revisions. Professional and Premium plans include unlimited revisions during the design phase. A 'round' is consolidated feedback, which keeps things efficient for both sides.",
+    },
+    {
+      q: "Will I own the final files and code?",
+      a: "Yes, 100%. Upon final payment, you own all source files, code, and assets. We transfer all accounts and credentials to you. No lock-in, ever.",
+    },
+    {
+      q: "Do you offer ongoing support after launch?",
+      a: "Yes. We offer monthly maintenance plans starting at $199/mo that include updates, backups, monitoring, and a set number of edit hours. Premium plans include priority support and a dedicated PM.",
+    },
+  ];
+
+  return (
+    <section className="relative overflow-hidden border-y border-white/5 py-20 sm:py-28">
+      <div className="absolute inset-0 bg-dots opacity-30" />
+      <div className="relative mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+        <SectionHeading
+          eyebrow={`About ${service.title}`}
+          title={<>Common <GradientTextTeal>questions</GradientTextTeal></>}
+          description={`Everything you need to know about working with BRANIFY on ${service.title.toLowerCase()}.`}
+        />
+        <Accordion type="single" collapsible className="mt-10 space-y-3">
+          {faqs.map((f, i) => (
+            <AccordionItem key={i} value={`item-${i}`} className="rounded-xl border border-white/5 bg-card/40 px-5 backdrop-blur">
+              <AccordionTrigger className="text-left text-white hover:no-underline">
+                {f.q}
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground leading-relaxed">
+                {f.a}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
       </div>
     </section>
   );

@@ -125,7 +125,7 @@ export function CommandPalette() {
       group: "Services",
       icon: s.icon,
       keywords: s.tagline,
-      action: () => go("services"),
+      action: () => go("service-detail", { slug: s.slug }),
     }));
 
     const prod: CommandItem[] = products.slice(0, 6).map((p) => ({

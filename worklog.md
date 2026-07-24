@@ -852,3 +852,72 @@ Task: QA via agent-browser, build dedicated service detail pages (long-pending),
 3. **Command palette service-detail entries:** Add service-detail entries (with slugs) to the command palette so users can jump directly to a specific service.
 4. **Service detail FAQ:** Add a service-specific FAQ accordion (e.g., timeline, revisions, payment) to the service-detail page.
 5. **Breadcrumb structured data:** Add BreadcrumbList JSON-LD schema to service-detail + product-detail + blog-post pages for Google rich results.
+
+---
+Task ID: 17 (webDevReview round 9 — related articles upgrade + command palette services + service FAQ + breadcrumb JSON-LD)
+Agent: Main (Architect) — triggered by webDevReview cron job
+Task: QA via agent-browser + VLM, upgrade blog related articles, add service-detail to command palette, add service FAQ, add breadcrumb JSON-LD to detail pages.
+
+## Current Project Status Assessment
+- BRANIFY is stable: 17 lazy-loaded views (incl. service-detail), command palette, scroll progress, back-to-top, cursor spotlight, magnetic CTAs, JSON-LD SEO (Organization + WebSite + ProfessionalService), unified premium card system, parallax (hero + portfolio), analytics, keyboard shortcuts, Enterprise card differentiation, refined filter pills, 404 search + popular pages, blog reading progress + ToC, product detail lightbox, service detail pages.
+- QA this round: HTTP 200, no page errors, no console errors. Blog post + Services views load cleanly.
+- VLM analysis of blog post related articles gave 3 concrete fixes: glassmorphism overlay titles, lift & glow hover, asymmetric grid.
+- Priority recommendations from round 8: performance audit, related articles thumbnails, command palette service-detail entries, service detail FAQ, breadcrumb JSON-LD.
+
+## Completed Modifications
+
+### Upgrade: Blog related articles to premium magazine-style cards
+- **File:** `src/components/views/blog-post-view.tsx` (RelatedArticles)
+- Replaced the text-below-image layout with a magazine-cover style per VLM:
+  - **Card-premium hover:** `card-premium` class adds the weighted lift + teal glow on hover (was generic `hover:shadow-glow`).
+  - **Overlay title:** article title now sits overlaid at the bottom of the gradient cover with a `bg-gradient-to-t from-black/80 via-black/20 to-transparent` dark overlay + `drop-shadow-md` for readability.
+  - **Featured card:** the first related article uses `h-56` cover (taller) + `sm:col-span-2 lg:col-span-1` for asymmetric grid rhythm.
+  - **Hover affordance:** ArrowUpRight circle appears on hover (top-right).
+  - Body below cover shows excerpt + date/reading-time meta.
+- **Verified:** 3 premium cards with 3 overlay titles confirmed.
+
+### New Feature: Command palette service-detail entries
+- **File:** `src/components/layout/command-palette.tsx`
+- Service commands now navigate to `service-detail` with the service slug (was `services` list). Users can jump directly to a specific service from ⌘K.
+- **Verified:** typed "website" in palette → clicked "Website Development" → navigated to service-detail page (h1 "Website Development").
+
+### New Feature: Service-specific FAQ accordion
+- **File:** `src/components/views/service-detail-view.tsx` (new ServiceFaq component)
+- Added a 5-question FAQ accordion to every service detail page, with context-aware copy generated from the service's properties:
+  1. "How much does {service} cost?" (uses startingPrice)
+  2. "How long does it take?" (references the service)
+  3. "How many revisions are included?" (Starter/Professional/Premium tiers)
+  4. "Will I own the final files and code?" (ownership)
+  5. "Do you offer ongoing support after launch?" (maintenance plans)
+- Positioned between ServiceResults and RelatedServices. Premium accordion styling (rounded-xl, card/40 bg, backdrop-blur).
+- **Verified:** "Common questions" section present on service detail.
+
+### New Feature: BreadcrumbList JSON-LD structured data
+- **File:** `src/components/shared/json-ld.tsx` (new) — reusable `<JsonLd data={...} />` component + `buildBreadcrumbSchema(crumbs)` helper.
+- **File:** `src/components/views/service-detail-view.tsx` — ServiceHero injects a BreadcrumbList schema (Home → Services → {service.title}).
+- **File:** `src/components/views/product-detail-view.tsx` — Breadcrumbs component injects BreadcrumbList (Home → Digital Products → {product.name}).
+- **File:** `src/components/views/blog-post-view.tsx` — Breadcrumbs component injects BreadcrumbList (Home → Blog → {post.title}).
+- **Verified:** service-detail page has 2 LD scripts (site Organization + BreadcrumbList), breadcrumb confirmed. Blog post breadcrumb confirmed.
+
+## Verification Results
+- `bun run lint` → clean (exit 0, no warnings, no errors).
+- `npx tsc --noEmit` → zero errors in src/ (only pre-existing errors in examples/ & skills/).
+- Dev server: HTTP 200, stable (~284-493ms render).
+- **Agent Browser QA:**
+  - Command palette: "website" search → "Website Development" click → navigated to service-detail (h1 confirmed). No errors.
+  - Service detail FAQ: "Common questions" section present with accordion. No errors.
+  - Service detail breadcrumb JSON-LD: 2 LD scripts, BreadcrumbList present.
+  - Blog related articles: 3 premium cards with 3 overlay titles (magazine style). No errors.
+  - Blog post breadcrumb JSON-LD: present.
+
+## Unresolved Issues / Risks
+- **Full-page screenshot limitation persists:** VLM full-page screenshots still miss below-fold content (Framer Motion `whileInView` opacity). DOM-level agent-browser checks remain the source of truth.
+- **Harmless warning persists:** Framer Motion `useScroll` position warning on hero (documented since round 1). No functional impact.
+- **Service detail related-project matching is loose:** Heuristic match by category keyword (documented round 8). Low priority.
+
+## Priority Recommendations for Next Phase
+1. **Performance audit:** Run a Lighthouse-style audit via agent-browser (LCP/INP/CLS) — still pending from round 5. Now that all 17 views + features are stable, a real perf measurement is the highest-value next step.
+2. **Service schema JSON-LD:** Add `Service` schema.org type to service-detail pages (beyond BreadcrumbList) with offers, provider, areaServed for richer Google service results.
+3. **Article schema JSON-LD:** Add `Article`/`BlogPosting` schema to blog posts with author, datePublished, headline for rich news results.
+4. **Product schema JSON-LD:** Add `Product` schema to product-detail with offers, aggregateRating, brand for rich commerce results.
+5. **Reading time estimation:** Add a more accurate reading-time calculation (currently stored in data) — could compute from content word count dynamically.
