@@ -101,14 +101,14 @@ export function AdminLayout({
     <div className="min-h-screen bg-background text-foreground">
       {/* Top bar */}
       <header className="sticky top-0 z-40 border-b border-white/5 bg-card/40 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-[1600px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-4">
+        <div className="mx-auto flex h-14 max-w-[1600px] items-center justify-between gap-2 px-3 sm:h-16 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-2 sm:gap-4">
             <Logo size="sm" />
             <span className="hidden rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-primary sm:inline-flex">
               Admin
             </span>
           </div>
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3">
             <span className="hidden text-sm text-muted-foreground md:inline">
               Signed in as <span className="font-medium text-foreground">{adminName}</span>
             </span>
@@ -118,8 +118,8 @@ export function AdminLayout({
               onClick={() => navigate("home")}
               className="text-muted-foreground hover:text-foreground"
             >
-              <Store className="mr-1.5 h-4 w-4" />
-              View store
+              <Store className="h-4 w-4 sm:mr-1.5" />
+              <span className="hidden sm:inline">View store</span>
             </Button>
             <Button
               variant="outline"
@@ -127,14 +127,14 @@ export function AdminLayout({
               onClick={handleLogout}
               className="border-white/10 bg-transparent text-muted-foreground hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive"
             >
-              <LogOut className="mr-1.5 h-4 w-4" />
-              Logout
+              <LogOut className="h-4 w-4 sm:mr-1.5" />
+              <span className="hidden sm:inline">Logout</span>
             </Button>
           </div>
         </div>
       </header>
 
-      <div className="mx-auto flex max-w-[1600px] gap-6 px-4 py-6 sm:px-6 lg:px-8">
+      <div className="mx-auto flex max-w-[1600px] gap-6 px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
         {/* Sidebar (desktop) */}
         <aside className="hidden w-60 shrink-0 lg:block">
           <nav className="sticky top-24 space-y-1">
@@ -174,8 +174,8 @@ export function AdminLayout({
 
         {/* Mobile horizontal nav */}
         <div className="lg:hidden">
-          <div className="fixed inset-x-0 top-16 z-30 border-b border-white/5 bg-background/80 backdrop-blur-xl">
-            <div className="flex gap-1 overflow-x-auto px-4 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="fixed inset-x-0 top-14 z-30 border-b border-white/5 bg-background/80 backdrop-blur-xl sm:top-16">
+            <div className="flex gap-1 overflow-x-auto px-3 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {NAV.map((item) => {
                 const isActive = active === item.key;
                 const Icon = item.icon;
@@ -200,7 +200,7 @@ export function AdminLayout({
         </div>
 
         {/* Main content */}
-        <main className="min-w-0 flex-1 pt-14 lg:pt-0">
+        <main className="min-w-0 flex-1 pt-12 lg:pt-0">
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { motion } from "framer-motion";
-import { Mail, Lock, ArrowRight, ArrowLeft, Loader2, ShieldCheck, Sparkles } from "lucide-react";
+import { Mail, Lock, ArrowRight, ArrowLeft, Loader2, ShieldCheck } from "lucide-react";
 import { Logo } from "@/components/shared/logo";
 import { AuroraBackground } from "@/components/shared/gradient-cover";
 import { Button } from "@/components/ui/button";
@@ -12,9 +12,6 @@ import { Label } from "@/components/ui/label";
 import { useNavigate } from "@/lib/router";
 import { toast } from "sonner";
 
-const HINT_EMAIL = "admin@branify.store";
-const HINT_PASSWORD = "branify123";
-
 /**
  * AdminLoginView — centered login card over an AuroraBackground.
  *
@@ -22,6 +19,9 @@ const HINT_PASSWORD = "branify123";
  * already authenticated, redirects to the dashboard. On submit, POSTs
  * credentials to /api/admin/auth/login and navigates to the dashboard on
  * success.
+ *
+ * NOTE: No demo credentials are shown on the page — the admin keeps their
+ * email/password secret. Placeholders use neutral hints, not real values.
  */
 export function AdminLoginView() {
   const navigate = useNavigate();
@@ -89,7 +89,7 @@ export function AdminLoginView() {
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4 py-12">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4 py-8 sm:py-12">
       <AuroraBackground />
       <div className="absolute inset-0 bg-grid opacity-[0.07]" />
 
@@ -99,13 +99,13 @@ export function AdminLoginView() {
         transition={{ duration: 0.5, ease: [0.21, 0.47, 0.32, 0.98] }}
         className="relative z-10 w-full max-w-md"
       >
-        <div className="mb-8 flex flex-col items-center text-center">
-          <Logo size="md" />
-          <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
+        <div className="mb-6 flex flex-col items-center text-center sm:mb-8">
+          <Logo size="sm" />
+          <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary sm:mt-6">
             <ShieldCheck className="h-3.5 w-3.5" />
             Admin Console
           </div>
-          <h1 className="mt-4 font-display text-3xl font-bold tracking-tight text-white">
+          <h1 className="mt-3 font-display text-2xl font-bold tracking-tight text-white sm:mt-4 sm:text-3xl">
             Sign in to BRANIFY
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -113,8 +113,8 @@ export function AdminLoginView() {
           </p>
         </div>
 
-        <Card className="border-white/5 bg-card/40 p-6 backdrop-blur-xl sm:p-8">
-          <form onSubmit={onSubmit} className="space-y-5">
+        <Card className="border-white/5 bg-card/40 p-5 backdrop-blur-xl sm:p-8">
+          <form onSubmit={onSubmit} className="space-y-4 sm:space-y-5">
             <div className="space-y-2">
               <Label htmlFor="admin-email">Email</Label>
               <div className="relative">
@@ -123,11 +123,12 @@ export function AdminLoginView() {
                   id="admin-email"
                   type="email"
                   autoComplete="email"
-                  placeholder={HINT_EMAIL}
+                  placeholder="you@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="pl-9"
+                  className="h-11 pl-9"
                   disabled={submitting}
+                  required
                 />
               </div>
             </div>
@@ -140,11 +141,12 @@ export function AdminLoginView() {
                   id="admin-password"
                   type="password"
                   autoComplete="current-password"
-                  placeholder={HINT_PASSWORD}
+                  placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-9"
+                  className="h-11 pl-9"
                   disabled={submitting}
+                  required
                 />
               </div>
             </div>
@@ -152,7 +154,7 @@ export function AdminLoginView() {
             <Button
               type="submit"
               disabled={submitting}
-              className="w-full bg-primary text-primary-foreground hover:bg-hover"
+              className="h-11 w-full bg-primary text-primary-foreground hover:bg-hover"
             >
               {submitting ? (
                 <>
@@ -167,18 +169,9 @@ export function AdminLoginView() {
               )}
             </Button>
           </form>
-
-          <div className="mt-6 flex items-start gap-2.5 rounded-lg border border-primary/20 bg-primary/5 p-3 text-xs text-muted-foreground">
-            <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
-            <p>
-              Demo credentials:{" "}
-              <span className="font-mono text-foreground">{HINT_EMAIL}</span> /{" "}
-              <span className="font-mono text-foreground">{HINT_PASSWORD}</span>
-            </p>
-          </div>
         </Card>
 
-        <div className="mt-6 flex justify-center">
+        <div className="mt-5 flex justify-center sm:mt-6">
           <button
             type="button"
             onClick={() => navigate("home")}
