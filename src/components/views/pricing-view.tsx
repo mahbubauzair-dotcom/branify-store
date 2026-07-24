@@ -209,7 +209,7 @@ function PlanCard({
         {/* Price */}
         <div className="mt-6">
           <div className="flex items-baseline gap-1.5">
-            <span className="font-display text-4xl font-bold text-white">
+            <span className="font-display text-4xl font-bold text-white tabular-nums">
               {priceLabel}
             </span>
             <span className="text-sm text-muted-foreground">{cycleLabel}</span>
@@ -346,17 +346,17 @@ function ComparisonSection() {
 function ComparisonValue({ value }: { value: string | boolean }) {
   if (typeof value === "boolean") {
     return value ? (
-      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/15">
-        <Check className="h-3.5 w-3.5 text-primary" />
+      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/15 ring-1 ring-primary/30">
+        <Check className="h-3.5 w-3.5 text-primary" strokeWidth={3} />
       </span>
     ) : (
-      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/5">
-        <X className="h-3.5 w-3.5 text-muted-foreground/60" />
+      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/[0.03] ring-1 ring-white/5">
+        <X className="h-3 w-3 text-muted-foreground/40" strokeWidth={2.5} />
       </span>
     );
   }
   return (
-    <span className="text-sm font-medium text-white/85">{value}</span>
+    <span className="text-sm font-medium text-white/85 tabular-nums">{value}</span>
   );
 }
 

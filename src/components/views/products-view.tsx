@@ -33,6 +33,8 @@ import {
 } from "@/data/products";
 import { PageHeader } from "@/components/shared/page-header";
 import { SectionHeading } from "@/components/shared/section-heading";
+import { GlassBadge } from "@/components/shared/glass-badge";
+import { Price } from "@/components/shared/price";
 import {
   Reveal,
   Stagger,
@@ -286,7 +288,7 @@ function ProductCard({ product }: { product: Product }) {
   return (
     <Card
       onClick={() => navigate("product-detail", { slug: product.slug })}
-      className="group relative h-full cursor-pointer overflow-hidden rounded-2xl border-white/5 bg-card/40 backdrop-blur transition-all hover:border-primary/30 hover:bg-card/60 hover:shadow-glow"
+      className="card-premium group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border-white/5 bg-card/40 backdrop-blur hover:border-primary/30 hover:bg-card/60"
     >
       <GradientCover variant={product.preview} className="h-44">
         <div className="flex h-full items-center justify-center">
@@ -296,26 +298,22 @@ function ProductCard({ product }: { product: Product }) {
         </div>
         <div className="absolute left-3 top-3 flex gap-1.5">
           {product.popular && (
-            <Badge className="bg-primary/90 text-primary-foreground hover:bg-primary">
-              <Sparkles className="mr-1 h-3 w-3" /> Popular
-            </Badge>
+            <GlassBadge variant="teal">
+              <Sparkles className="h-3 w-3" /> Popular
+            </GlassBadge>
           )}
           {product.new && (
-            <Badge className="bg-emerald-500/90 text-emerald-50 hover:bg-emerald-500">
-              New
-            </Badge>
+            <GlassBadge variant="emerald">New</GlassBadge>
           )}
         </div>
         {discount > 0 && (
           <div className="absolute right-3 top-3">
-            <Badge className="bg-rose-500/90 text-white hover:bg-rose-500">
-              -{discount}%
-            </Badge>
+            <GlassBadge variant="rose">-{discount}%</GlassBadge>
           </div>
         )}
       </GradientCover>
 
-      <div className="flex flex-1 flex-col p-5">
+      <div className="flex flex-1 flex-col p-5 pb-7">
         <p className="text-[11px] font-semibold uppercase tracking-wider text-primary/80">
           {product.category}
         </p>
@@ -326,7 +324,7 @@ function ProductCard({ product }: { product: Product }) {
           {product.tagline}
         </p>
 
-        <div className="mt-3 flex items-center gap-3 text-xs text-muted-foreground">
+        <div className="mt-3 flex items-center gap-3 text-xs text-muted-foreground tabular-nums">
           <span className="flex items-center gap-1">
             <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
             <span className="font-medium text-white/80">{product.rating}</span>
@@ -337,16 +335,7 @@ function ProductCard({ product }: { product: Product }) {
         </div>
 
         <div className="mt-auto flex items-end justify-between pt-5">
-          <div className="flex items-baseline gap-2">
-            <span className="font-display text-2xl font-bold text-white">
-              ${product.price}
-            </span>
-            {product.originalPrice && (
-              <span className="text-sm text-muted-foreground line-through">
-                ${product.originalPrice}
-              </span>
-            )}
-          </div>
+          <Price value={product.price} original={product.originalPrice} size="sm" />
           <span className="flex items-center gap-1 text-xs font-medium text-primary opacity-0 transition-all group-hover:translate-x-0.5 group-hover:opacity-100">
             View <ArrowRight className="h-3.5 w-3.5" />
           </span>

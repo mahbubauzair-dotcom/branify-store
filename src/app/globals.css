@@ -294,4 +294,34 @@
     from { background-position: 200% 0; }
     to { background-position: -200% 0; }
   }
+
+  /* Premium card hover — weighted lift + teal glow + surface brighten.
+     Use on interactive cards: add `card-premium` + a base surface bg. */
+  .card-premium {
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+  }
+  .card-premium:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 24px 50px -16px rgba(0, 0, 0, 0.55),
+                0 0 40px -12px rgba(20, 184, 166, 0.22);
+  }
+
+  /* Tabular figures for aligned numeric columns (prices, stats, tables) */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+
+  /* Glass badge — frosted, low-opacity, backdrop-blurred */
+  .glass-badge {
+    background: rgba(20, 184, 166, 0.1);
+    color: #2dd4bf;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(20, 184, 166, 0.2);
+  }
 }

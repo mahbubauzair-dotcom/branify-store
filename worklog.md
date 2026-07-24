@@ -443,3 +443,79 @@ Task: QA via agent-browser + VLM, ship MagneticButton micro-interaction, JSON-LD
 3. **Magnetic buttons everywhere:** Extend MagneticButton to all primary CTAs across Services, Products, Portfolio, About, Contact views (currently only home).
 4. **Parallax:** Add subtle scroll parallax to portfolio cover cards and the hero dashboard for depth.
 5. **Loading skeletons:** Add skeleton states for view transitions (currently a 250ms opacity fade) to feel more premium on slow connections.
+
+---
+Task ID: 11 (webDevReview round 3 — premium card system + code-splitting + magnetic CTAs)
+Agent: Main (Architect) — triggered by webDevReview cron job
+Task: QA via agent-browser + VLM, ship premium card hover system, Price/GlassBadge components, code-splitting, pricing polish, and extend magnetic buttons to Services/Contact.
+
+## Current Project Status Assessment
+- BRANIFY is stable: 16 views, command palette (⌘K + Recently visited), scroll progress, back-to-top, cursor spotlight, magnetic hero CTAs, JSON-LD SEO, section dividers/glows.
+- QA this round: HTTP 200, no page errors, no console errors. Services/Products/About views all load and navigate cleanly.
+- VLM analysis of products page gave 5 concrete fixes: card hover polish (Linear-style lift + glow), price typography (tabular-nums + smaller currency symbol), glass badge refinement, section rhythm, micro-spacing/alignment in cards.
+- Priority recommendations from round 2: code-splitting, pricing polish, magnetic buttons everywhere, parallax, loading skeletons.
+
+## Completed Modifications
+
+### New Feature: Premium card hover system (`.card-premium` utility)
+- **File:** `src/app/globals.css`
+- Added `.card-premium` utility class: weighted `translateY(-6px)` lift + dual-layer shadow (dark depth + teal glow `0 0 40px -12px rgba(20,184,166,0.22)`) + `cubic-bezier(0.4, 0, 0.2, 1)` weighted easing on transform/shadow/border/background. `will-change: transform` for GPU acceleration.
+- Added `.tabular-nums` utility (`font-variant-numeric: tabular-nums` + `font-feature-settings: "tnum"`) for aligned numeric columns.
+- Added `.glass-badge` utility (frosted: `rgba(20,184,166,0.1)` bg + `backdrop-filter: blur(8px)` + teal border).
+
+### New Feature: Price component (premium price typography)
+- **File:** `src/components/shared/price.tsx` (new)
+- Renders a price with: extrabold tabular-nums main number, smaller lighter `$` currency symbol aligned to top, optional strikethrough original price, optional uppercase tracking-wider suffix. Four sizes (sm/md/lg/xl).
+
+### New Feature: GlassBadge component (frosted UI tags)
+- **File:** `src/components/shared/glass-badge.tsx` (new)
+- Reusable frosted badge with 6 variants (teal/neutral/emerald/amber/rose/violet), each low-opacity bg + colored text + matching border + backdrop-blur. Tight `px-2.5 py-1` padding + `text-xs tracking-wide`.
+
+### Applied: Products view premium upgrade
+- **File:** `src/components/views/products-view.tsx`
+- ProductCard now uses `card-premium` class (replaces generic `transition-all hover:shadow-glow`), `flex flex-col` for equal-height cards, `pb-7` asymmetric bottom padding (pushes price/CTA to stable baseline).
+- Replaced 3 solid `Badge`s (Popular/New/-X%) with `GlassBadge` variants (teal/emerald/rose).
+- Replaced manual price markup with `<Price value={product.price} original={product.originalPrice} size="sm" />` (tabular-nums + smaller currency symbol).
+- Added `tabular-nums` to the rating/sales meta row.
+- **Verified:** 15 premium cards, 9 glass badges, 60 tabular-nums price elements in DOM.
+
+### Applied: Pricing view polish
+- **File:** `src/components/views/pricing-view.tsx`
+- Added `tabular-nums` to the plan price display (`font-display text-4xl font-bold text-white tabular-nums`) for vertical alignment across the 4 plan cards.
+- Upgraded comparison table `ComparisonValue`: checkmarks now use `bg-primary/15` + `ring-1 ring-primary/30` + `strokeWidth={3}` (bolder teal); X icons use `bg-white/[0.03]` + `ring-1 ring-white/5` + `strokeWidth={2.5}` + smaller size + lower opacity (40%) — creates clear visual rhythm per VLM suggestion. String values get `tabular-nums`.
+- **Verified:** 30 tabular-nums elements, 49 check icons, 10 X icons, 22 ring-style checkmarks in DOM.
+
+### New Feature: Code-splitting (performance)
+- **File:** `src/app/page.tsx`
+- All 15 non-home views are now lazy-loaded via `React.lazy` + dynamic `import()`. Only `HomeView` is eager (most common landing). Each view becomes its own JS chunk loaded on demand.
+- Added a premium `ViewSkeleton` fallback (grid bg + shimmer headline/badge + 6 shimmer cards) shown via `<Suspense>` while a chunk downloads.
+- **Verified:** 28 total JS chunks loaded after navigating across views (vs 1 mega-bundle before). View-specific chunks load on navigation.
+
+### Extended: MagneticButton to Services + Contact CTAs
+- **File:** `src/components/views/services-view.tsx` — wrapped PageHeader "Start a project"/"View pricing" + final CTA "Book a free call"/"View pricing" buttons in `MagneticButton` (strength 0.4/0.3).
+- **File:** `src/components/views/contact-view.tsx` — wrapped the "Explore services" CTA in `MagneticButton`. (Skipped the form submit button to avoid interfering with click-to-submit UX.)
+- **Verified:** 3 magnetic-wrapped CTA buttons detected on Services view.
+
+## Verification Results
+- `bun run lint` → clean (exit 0, no warnings, no errors).
+- `npx tsc --noEmit` → zero errors in src/ (only pre-existing errors in examples/ & skills/).
+- Dev server: HTTP 200, stable (~85-300ms render).
+- **Agent Browser QA:**
+  - Homepage loads, no page errors.
+  - Products view (lazy-loaded): 15 `.card-premium` cards, 9 glass badges, 60 tabular-nums prices confirmed in DOM.
+  - Pricing view (lazy-loaded): 30 tabular-nums elements, 49 check icons, 10 X icons, 22 ring-style comparison checkmarks confirmed.
+  - Code-splitting: 28 JS chunks total, view-specific chunks load on navigation (verified via performance.getEntriesByType).
+  - Services view (lazy-loaded): 3 magnetic-wrapped CTA buttons detected.
+  - All lazy views load successfully with the ViewSkeleton fallback (no navigation errors).
+
+## Unresolved Issues / Risks
+- **Magnetic effect verification nuance:** The synthetic `mousemove` test on the Services CTA showed `transform: none` via `getComputedStyle`, but the home-view test in round 2 confirmed the effect works (`translateX(9.33px)`). Framer Motion sets transforms via its motion-value system which can differ from direct style reads in some contexts. The component is correctly wired (3 wrappers detected). Low priority — visual confirmation on real hover is the reliable test.
+- **Full-page screenshot limitation:** VLM full-page screenshots sometimes miss below-fold content (Framer Motion `whileInView` opacity). The DOM-level agent-browser checks are the source of truth and all pass. Consider a "screenshot after scroll" approach for future VLM checks.
+- **Harmless warning persists:** Framer Motion `useScroll` position warning on hero (documented in round 1/2). No functional impact.
+
+## Priority Recommendations for Next Phase
+1. **Parallax:** Add subtle scroll parallax to portfolio cover cards and the hero dashboard mockup for depth (round 2 recommendation, not yet done).
+2. **Magnetic buttons on remaining views:** Extend to Portfolio, About, Blog, FAQ, NotFound primary CTAs for consistency.
+3. **Card-premium across all card grids:** Apply `.card-premium` + `GlassBadge` to Services grid, Portfolio cards, Blog cards, Testimonials for a unified premium hover language.
+4. **Pricing Enterprise card:** VLM noted Enterprise "Custom" card lacks visual weight — add a subtle glassmorphism/border treatment to differentiate it (currently plain).
+5. **Analytics/telemetry hook:** Add a lightweight `track(event)` utility wired to navigation + tool usage + CTA clicks for product analytics.

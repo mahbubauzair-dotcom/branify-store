@@ -28,6 +28,7 @@ import { SectionHeading } from "@/components/shared/section-heading";
 import { PageHeader } from "@/components/shared/page-header";
 import { Reveal, Stagger, StaggerItem, GradientTextTeal } from "@/components/shared/reveal";
 import { AuroraBackground } from "@/components/shared/gradient-cover";
+import { MagneticButton } from "@/components/shared/magnetic-button";
 import { useCountUp, useInViewOnce } from "@/hooks/use-count-up";
 
 const processIconMap: Record<string, LucideIcon> = {
@@ -79,21 +80,25 @@ export function ServicesView() {
         description="From a single logo to a full AI-powered platform — BRANIFY covers the entire digital journey under one roof. Twelve focused services, one premium standard."
       >
         <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <Button
-            onClick={() => navigate("contact")}
-            size="lg"
-            className="h-12 rounded-full bg-primary px-7 text-primary-foreground hover:bg-hover"
-          >
-            Start a project <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
-          <Button
-            onClick={() => navigate("pricing")}
-            size="lg"
-            variant="outline"
-            className="h-12 rounded-full border-white/15 bg-white/5 px-7 hover:bg-white/10"
-          >
-            View pricing
-          </Button>
+          <MagneticButton strength={0.4} radius={50}>
+            <Button
+              onClick={() => navigate("contact")}
+              size="lg"
+              className="h-12 rounded-full bg-primary px-7 text-primary-foreground hover:bg-hover"
+            >
+              Start a project <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </MagneticButton>
+          <MagneticButton strength={0.3} radius={40}>
+            <Button
+              onClick={() => navigate("pricing")}
+              size="lg"
+              variant="outline"
+              className="h-12 rounded-full border-white/15 bg-white/5 px-7 hover:bg-white/10"
+            >
+              View pricing
+            </Button>
+          </MagneticButton>
         </div>
       </PageHeader>
 
@@ -346,21 +351,25 @@ function CtaSection() {
                 brand to the next level — no pressure, no jargon.
               </p>
               <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-                <Button
-                  onClick={() => navigate("contact")}
-                  size="lg"
-                  className="h-12 rounded-full bg-primary px-7 text-primary-foreground hover:bg-hover"
-                >
-                  Book a free call <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-                <Button
-                  onClick={() => navigate("pricing")}
-                  size="lg"
-                  variant="outline"
-                  className="h-12 rounded-full border-white/15 bg-white/5 px-7 hover:bg-white/10"
-                >
-                  View pricing
-                </Button>
+                <MagneticButton strength={0.4} radius={50}>
+                  <Button
+                    onClick={() => navigate("contact")}
+                    size="lg"
+                    className="h-12 rounded-full bg-primary px-7 text-primary-foreground hover:bg-hover"
+                  >
+                    Book a free call <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </MagneticButton>
+                <MagneticButton strength={0.3} radius={40}>
+                  <Button
+                    onClick={() => navigate("pricing")}
+                    size="lg"
+                    variant="outline"
+                    className="h-12 rounded-full border-white/15 bg-white/5 px-7 hover:bg-white/10"
+                  >
+                    View pricing
+                  </Button>
+                </MagneticButton>
               </div>
               <p className="mt-6 text-sm text-muted-foreground/70">
                 Or email us at{" "}

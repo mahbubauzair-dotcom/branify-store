@@ -52,6 +52,7 @@ import {
   AuroraBackground,
   GradientCover,
 } from "@/components/shared/gradient-cover";
+import { MagneticButton } from "@/components/shared/magnetic-button";
 
 const projectTypes = ["Website", "Branding", "AI", "Product", "Other"];
 const budgetOptions = ["< $2k", "$2k – $5k", "$5k – $10k", "$10k+", "Custom"];
@@ -552,12 +553,14 @@ function PromiseBanner() {
                   we can deliver something we&apos;re proud of.
                 </p>
                 <div className="mt-6 flex flex-wrap gap-3">
-                  <Button
-                    onClick={() => navigate("services")}
-                    className="bg-primary text-primary-foreground hover:bg-hover"
-                  >
-                    Explore services <ArrowRight className="ml-1.5 h-4 w-4" />
-                  </Button>
+                  <MagneticButton strength={0.4} radius={45}>
+                    <Button
+                      onClick={() => navigate("services")}
+                      className="bg-primary text-primary-foreground hover:bg-hover"
+                    >
+                      Explore services <ArrowRight className="ml-1.5 h-4 w-4" />
+                    </Button>
+                  </MagneticButton>
                   <Button
                     asChild
                     variant="outline"
