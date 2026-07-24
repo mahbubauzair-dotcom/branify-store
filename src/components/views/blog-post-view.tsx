@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { forwardRef, useMemo, useRef, useState } from "react";
 import {
   ArrowRight,
   ArrowLeft,
@@ -36,8 +36,20 @@ import {
   GradientCover,
   AuroraBackground,
 } from "@/components/shared/gradient-cover";
+import { ReadingProgress } from "@/components/shared/reading-progress";
+import { TableOfContents, type TocItem } from "@/components/shared/table-of-contents";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+
+/** Slugify a heading string into a URL-safe id. */
+function slugify(s: string) {
+  return s
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .trim();
+}
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", {
@@ -54,6 +66,16 @@ export function BlogPostView() {
   const slug = useRouterStore((s) => s.slug);
   const found = blogPosts.find((p) => p.slug === slug);
   const post = found ?? blogPosts[0];
+  const articleRef = useRef<HTMLElement>(null);
+
+  // Build ToC items from the post's heading blocks.
+  const tocItems = useMemo<TocItem[]>(
+    () =>
+      post.content
+        .filter((b) => b.heading)
+        .map((b) => ({ id: slugify(b.heading!), label: b.heading! })),
+    [post],
+  );
 
   if (!found) {
     return <NotFoundState />;
@@ -61,8 +83,9 @@ export function BlogPostView() {
 
   return (
     <div className="relative">
+      <ReadingProgress targetRef={articleRef} />
       <ArticleHero post={post} />
-      <ArticleBody post={post} />
+      <ArticleBody post={post} ref={articleRef} tocItems={tocItems} />
       <AuthorBio post={post} />
       <RelatedArticles post={post} />
       <NewsletterSignup />
@@ -226,46 +249,56 @@ function ArticleHero({ post }: { post: BlogPost }) {
 /* ------------------------------------------------------------------ */
 /* ARTICLE BODY                                                        */
 /* ------------------------------------------------------------------ */
-function ArticleBody({ post }: { post: BlogPost }) {
+const ArticleBody = forwardRef<HTMLElement, { post: BlogPost; tocItems: TocItem[] }>(
+  function ArticleBody({ post, tocItems }, ref) {
   return (
-    <section className="relative py-12 sm:py-16">
-      <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-        <Reveal>
-          <article className="space-y-2">
-            {post.content.map((block, i) => {
-              const isFirstBody = i === 0 && !block.heading;
-              if (block.heading) {
-                return (
-                  <h2
-                    key={i}
-                    className="mt-10 font-display text-2xl font-semibold text-white sm:text-3xl"
-                  >
-                    {block.heading}
-                  </h2>
-                );
-              }
-              return (
-                <p
-                  key={i}
-                  className={cn(
-                    "text-lg leading-relaxed text-muted-foreground",
-                    isFirstBody &&
-                      "first-letter:float-left first-letter:mr-3 first-letter:font-display first-letter:text-6xl first-letter:font-bold first-letter:leading-[0.85] first-letter:text-primary",
-                  )}
-                >
-                  {block.body}
-                </p>
-              );
-            })}
-          </article>
-        </Reveal>
+    <section ref={ref} className="relative scroll-mt-24 py-12 sm:py-16">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_220px] lg:gap-12">
+          <div className="mx-auto max-w-3xl lg:mx-0">
+            <Reveal>
+              <article className="space-y-2">
+                {post.content.map((block, i) => {
+                  const isFirstBody = i === 0 && !block.heading;
+                  if (block.heading) {
+                    const id = slugify(block.heading);
+                    return (
+                      <h2
+                        key={i}
+                        id={id}
+                        className="mt-10 scroll-mt-28 font-display text-2xl font-semibold text-white sm:text-3xl"
+                      >
+                        {block.heading}
+                      </h2>
+                    );
+                  }
+                  return (
+                    <p
+                      key={i}
+                      className={cn(
+                        "text-lg leading-relaxed text-muted-foreground",
+                        isFirstBody &&
+                          "first-letter:float-left first-letter:mr-3 first-letter:font-display first-letter:text-6xl first-letter:font-bold first-letter:leading-[0.85] first-letter:text-primary",
+                      )}
+                    >
+                      {block.body}
+                    </p>
+                  );
+                })}
+              </article>
+            </Reveal>
 
-        <ShareRow post={post} />
-        <TagsChips post={post} />
+            <ShareRow post={post} />
+            <TagsChips post={post} />
+          </div>
+          <aside className="hidden lg:block">
+            <TableOfContents items={tocItems} />
+          </aside>
+        </div>
       </div>
     </section>
   );
-}
+});
 
 /* ------------------------------------------------------------------ */
 /* SHARE ROW                                                           */

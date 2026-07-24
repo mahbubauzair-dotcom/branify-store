@@ -194,6 +194,16 @@ export function Navbar() {
                 <Button onClick={() => handleNav("search")} variant="outline" className="justify-start">
                   <Search className="mr-2 h-4 w-4" /> Search
                 </Button>
+                <Button
+                  onClick={() => {
+                    setMobileOpen(false);
+                    window.dispatchEvent(new Event("branify:open-shortcuts"));
+                  }}
+                  variant="outline"
+                  className="justify-start"
+                >
+                  <Keyboard className="mr-2 h-4 w-4" /> Keyboard shortcuts
+                </Button>
                 <Button onClick={() => handleNav("contact")} className="bg-primary text-primary-foreground hover:bg-hover">
                   Start a project <ArrowRight className="ml-1.5 h-4 w-4" />
                 </Button>

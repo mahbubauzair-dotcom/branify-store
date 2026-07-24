@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowRight,
   ArrowLeft,
@@ -20,6 +21,8 @@ import {
   Home,
   ChevronRight,
   PackageOpen,
+  ZoomIn,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -167,6 +170,7 @@ function Breadcrumbs({ product }: { product: Product }) {
 function ProductHero({ product }: { product: Product }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   const galleryVariants = useMemo(
     () => (product.gallery.length > 0 ? product.gallery : [product.preview]),
@@ -192,28 +196,38 @@ function ProductHero({ product }: { product: Product }) {
           {/* LEFT: gallery */}
           <Reveal>
             <div className="lg:sticky lg:top-24">
-              <GradientCover
-                variant={activeVariant}
-                className="aspect-[4/3] w-full rounded-3xl border border-white/10"
-              >
-                <div className="flex h-full items-center justify-center p-8">
-                  <div className="flex h-24 w-24 items-center justify-center rounded-3xl bg-white/10 backdrop-blur-sm">
-                    <product.icon className="h-12 w-12 text-white" />
+              <div className="group relative">
+                <GradientCover
+                  variant={activeVariant}
+                  className="aspect-[4/3] w-full rounded-3xl border border-white/10"
+                >
+                  <div className="flex h-full items-center justify-center p-8">
+                    <div className="flex h-24 w-24 items-center justify-center rounded-3xl bg-white/10 backdrop-blur-sm">
+                      <product.icon className="h-12 w-12 text-white" />
+                    </div>
                   </div>
-                </div>
-                <div className="absolute left-4 top-4 flex gap-2">
-                  {product.popular && (
-                    <Badge className="bg-primary/90 text-primary-foreground">
-                      <Sparkles className="mr-1 h-3 w-3" /> Popular
-                    </Badge>
-                  )}
-                  {product.new && (
-                    <Badge className="bg-emerald-500/90 text-emerald-50">
-                      New
-                    </Badge>
-                  )}
-                </div>
-              </GradientCover>
+                  <div className="absolute left-4 top-4 flex gap-2">
+                    {product.popular && (
+                      <Badge className="bg-primary/90 text-primary-foreground">
+                        <Sparkles className="mr-1 h-3 w-3" /> Popular
+                      </Badge>
+                    )}
+                    {product.new && (
+                      <Badge className="bg-emerald-500/90 text-emerald-50">
+                        New
+                      </Badge>
+                    )}
+                  </div>
+                </GradientCover>
+                {/* Zoom button overlay */}
+                <button
+                  onClick={() => setLightboxOpen(true)}
+                  aria-label="Zoom image"
+                  className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-black/40 text-white opacity-0 backdrop-blur transition-all hover:bg-black/60 group-hover:opacity-100"
+                >
+                  <ZoomIn className="h-4 w-4" />
+                </button>
+              </div>
 
               {/* Thumbnails */}
               <div className="mt-4 grid grid-cols-3 gap-3">
@@ -402,6 +416,48 @@ function ProductHero({ product }: { product: Product }) {
           </Reveal>
         </div>
       </div>
+
+      {/* Lightbox modal — full-screen zoom view of the active gallery image */}
+      <AnimatePresence>
+        {lightboxOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[75] flex items-center justify-center p-4 sm:p-8"
+            onClick={() => setLightboxOpen(false)}
+          >
+            <div className="absolute inset-0 bg-background/90 backdrop-blur-md" />
+            <button
+              onClick={() => setLightboxOpen(false)}
+              aria-label="Close zoom"
+              className="absolute right-5 top-5 flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition-colors hover:bg-white/10"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            <motion.div
+              initial={{ scale: 0.92, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.92, opacity: 0 }}
+              transition={{ duration: 0.22, ease: [0.21, 0.47, 0.32, 0.98] }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative w-full max-w-4xl"
+            >
+              <GradientCover
+                variant={activeVariant}
+                className="aspect-[4/3] w-full rounded-3xl border border-white/15 shadow-premium-lg"
+              >
+                <div className="flex h-full items-center justify-center p-12">
+                  <div className="flex h-32 w-32 items-center justify-center rounded-3xl bg-white/10 backdrop-blur-sm">
+                    <product.icon className="h-16 w-16 text-white" />
+                  </div>
+                </div>
+              </GradientCover>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

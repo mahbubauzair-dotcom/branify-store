@@ -731,3 +731,62 @@ Task: QA via agent-browser + VLM, apply refined filter pills to Products + Blog,
 3. **Blog post reading progress:** Add a thin reading-progress bar to the top of blog post pages (like Medium/Stripe docs) — premium content touch.
 4. **Product detail gallery zoom:** Add a lightbox/zoom interaction on the product detail gallery thumbnails for a premium e-commerce feel.
 5. **Service detail pages:** Currently services link to contact; could add dedicated service detail pages with deeper case studies + related services.
+
+---
+Task ID: 15 (webDevReview round 7 — blog reading progress + ToC + product lightbox + mobile shortcuts)
+Agent: Main (Architect) — triggered by webDevReview cron job
+Task: QA via agent-browser + VLM, ship blog post reading progress bar, sticky table of contents, product detail gallery lightbox, and mobile menu keyboard shortcuts button.
+
+## Current Project Status Assessment
+- BRANIFY is stable: 16 lazy-loaded views, command palette (⌘K + Recently visited), scroll progress, back-to-top, cursor spotlight, magnetic CTAs, JSON-LD SEO, unified premium card system, parallax (hero + portfolio), analytics (navigate + cta_click + tool_open + search), keyboard shortcut help (? key + navbar button), Enterprise card differentiation, refined filter pills (Portfolio/Products/Blog), 404 page with search + popular pages.
+- QA this round: HTTP 200, no page errors, no console errors. Blog + Blog post views load and navigate cleanly.
+- VLM analysis of blog post page gave 4 concrete fixes: reading progress bar, sticky ToC sidebar, typography refinement, upgraded share/related elements.
+- Priority recommendations from round 6: performance audit, mobile menu enhancement, blog reading progress, product gallery zoom, service detail pages.
+
+## Completed Modifications
+
+### New Feature: ReadingProgress component (blog post reading bar)
+- **File:** `src/components/shared/reading-progress.tsx` (new)
+- A 4px (h-1) teal→emerald gradient bar fixed to the top of the viewport (z-55) that fills via `useScroll` (scoped to a target ref) + `useSpring`. Taller + more prominent than the global 2px ScrollProgress bar. Scoped to the article body via `targetRef`.
+- **Applied:** BlogPostView renders `<ReadingProgress targetRef={articleRef} />` at the top.
+- **Verified:** 2 fixed top bars on blog posts — 2px (global ScrollProgress) + 4px (ReadingProgress).
+
+### New Feature: TableOfContents component (sticky sidebar + active tracking)
+- **File:** `src/components/shared/table-of-contents.tsx` (new)
+- A sticky sidebar (lg+ only) listing article section headings with an active-section indicator that tracks scroll via IntersectionObserver (rootMargin `-100px 0px -70% 0px`). Active item gets a `border-primary` left border + white text; inactive are muted with hover. Smooth-scrolls on click. `scroll-mt-28` on headings offsets the sticky navbar.
+- **Applied:** BlogPostView builds ToC items from `post.content` heading blocks (slugified), passes them to ArticleBody which renders the ToC in a right-side `<aside>`. ArticleBody is now a `forwardRef` component accepting the article ref + tocItems. Layout uses `lg:grid-cols-[minmax(0,1fr)_220px]`.
+- Added `slugify()` helper + heading `id` attributes on all `<h2>` blocks.
+- **Verified:** ToC found with 4 items; after scrolling, "Consistency compounds" highlighted as active.
+
+### New Feature: Product detail gallery lightbox (zoom)
+- **File:** `src/components/views/product-detail-view.tsx`
+- Added a zoom button overlay (ZoomIn icon, top-right of main gallery image, appears on group-hover) that opens a full-screen lightbox modal.
+- Lightbox: fixed inset-0 z-75, bg-background/90 backdrop-blur, close button (X, top-right), centered max-w-4xl GradientCover with the active variant + larger icon (h-32 w-32 tile, h-16 icon). AnimatePresence enter/exit (scale + opacity). Click backdrop to close; click image stops propagation.
+- Added `motion`/`AnimatePresence` (framer-motion) + `ZoomIn`/`X` (lucide) imports.
+- **Verified:** zoom button found, clicking opens lightbox (Close zoom button confirmed), closing works.
+
+### New Feature: Mobile menu keyboard shortcuts button
+- **File:** `src/components/layout/navbar.tsx`
+- Added a "Keyboard shortcuts" button (Keyboard icon + label) to the mobile hamburger menu's action row (between Search and Start a project). Closes the mobile menu first, then dispatches the `branify:open-shortcuts` event to open the shortcut help modal.
+- **Verified:** button found in mobile menu (390×844 viewport), clicking it opened the shortcut help dialog.
+
+## Verification Results
+- `bun run lint` → clean (exit 0, no warnings, no errors).
+- `npx tsc --noEmit` → zero errors in src/ (only pre-existing errors in examples/ & skills/).
+- Dev server: HTTP 200, stable (~103-417ms render).
+- **Agent Browser QA:**
+  - Blog post: reading progress bar present (4px, distinct from 2px global bar). ToC sidebar present with 4 items. ToC active-section tracking works ("Consistency compounds" highlighted after scroll). No errors.
+  - Product detail: zoom button present on gallery, clicking opens lightbox, close button works. No errors.
+  - Mobile menu (390×844): keyboard shortcuts button present, clicking opens shortcut help dialog. No errors.
+
+## Unresolved Issues / Risks
+- **ReadingProgress + ScrollProgress overlap:** Both bars render on blog post pages (the 2px global ScrollProgress at z-60 + the 4px ReadingProgress at z-55). Visually they stack but it's a minor redundancy. Low priority — could hide the global bar on blog-post routes, but the stacking is subtle and acceptable.
+- **Full-page screenshot limitation persists:** VLM full-page screenshots still miss below-fold content (Framer Motion `whileInView` opacity). DOM-level agent-browser checks remain the source of truth.
+- **Harmless warning persists:** Framer Motion `useScroll` position warning on hero (documented since round 1). No functional impact.
+
+## Priority Recommendations for Next Phase
+1. **Service detail pages:** Currently services link to contact; add dedicated service detail pages (route `service-detail` with slug) with deeper case studies, deliverables, related services, and a "Start this service" CTA — still pending from round 6.
+2. **Performance audit:** Run a Lighthouse-style audit via agent-browser (LCP/INP/CLS) — still pending from round 5.
+3. **Blog typography refinement:** VLM suggested increasing body line-height to 1.7-1.8, constraining measure to ~680-720px, and using off-white (#e2e8f0) instead of pure white for body text to reduce dark-mode eye strain.
+4. **Hide global ScrollProgress on blog posts:** To avoid the double-bar overlap with ReadingProgress.
+5. **Related articles thumbnails:** VLM suggested upgrading related posts to cards with high-quality gradient thumbnails + hover scale (currently text-focused).
