@@ -1,20 +1,35 @@
 "use client";
 
+import { useEffect } from "react";
+
 /**
- * JsonLd — injects a JSON-LD structured-data script into the document head
- * for SEO rich results. Renders a `<script type="application/ld+json">` that
- * Next.js hydrates client-side. Use for BreadcrumbList, Service, Product,
- * Article schemas on detail pages.
+ * JsonLd — injects a JSON-LD structured-data script into the document HEAD
+ * for SEO rich results. Because this is rendered from a client component,
+ * we use a useEffect to append the script to `document.head` after mount
+ * (React doesn't reliably insert `<script>` with dangerouslySetInnerHTML
+ * during client hydration).
  *
  *   <JsonLd data={{ "@context": "https://schema.org", "@type": "BreadcrumbList", ... }} />
  */
 export function JsonLd({ data }: { data: Record<string, unknown> }) {
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
-    />
-  );
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.type = "application/ld+json";
+    script.textContent = JSON.stringify(data);
+    // Use a data attribute so we can dedupe on re-renders.
+    const hash = `${data["@type"] ?? "jsonld"}-${data["name"] ?? data["headline"] ?? ""}`;
+    script.setAttribute("data-branify-ld", hash);
+    // Remove any existing script with the same hash to avoid duplicates.
+    document.head
+      .querySelector(`script[data-branify-ld="${hash}"]`)
+      ?.remove();
+    document.head.appendChild(script);
+    return () => {
+      script.remove();
+    };
+  }, [data]);
+
+  return null;
 }
 
 /** Build a BreadcrumbList schema from an array of { name, url } crumbs. */

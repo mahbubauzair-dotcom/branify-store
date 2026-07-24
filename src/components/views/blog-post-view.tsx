@@ -174,6 +174,28 @@ function ArticleHero({ post }: { post: BlogPost }) {
     <section className="relative overflow-hidden border-b border-white/5">
       <AuroraBackground />
       <div className="absolute inset-0 bg-grid opacity-20" />
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "BlogPosting",
+          headline: post.title,
+          description: post.excerpt,
+          datePublished: post.date,
+          author: {
+            "@type": "Person",
+            name: post.author.name,
+            jobTitle: post.author.role,
+          },
+          publisher: {
+            "@type": "Organization",
+            name: siteConfig.name,
+            url: siteConfig.url,
+          },
+          articleSection: post.category,
+          keywords: post.tags.join(", "),
+          wordCount: post.content.reduce((n, b) => n + b.body.split(/\s+/).length, 0),
+        }}
+      />
       <div className="relative mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8 lg:py-20">
         <Reveal>
           <Breadcrumbs post={post} />

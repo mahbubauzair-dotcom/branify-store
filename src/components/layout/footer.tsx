@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Mail, Phone, MapPin, Twitter, Instagram, Linkedin, Dribbble, Github, Send, Check } from "lucide-react";
+import { ArrowRight, Mail, Phone, MapPin, Twitter, Instagram, Linkedin, Dribbble, Github, Send, Check, Keyboard, ArrowUp } from "lucide-react";
 import { Logo } from "@/components/shared/logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -158,9 +158,28 @@ export function Footer() {
 
         {/* Bottom bar */}
         <div className="mt-8 flex flex-col items-center justify-between gap-4 border-t border-white/5 pt-8 sm:flex-row">
-          <p className="text-xs text-muted-foreground/70">
-            © {new Date().getFullYear()} {siteConfig.name}. All rights reserved. · {siteConfig.domain}
-          </p>
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:justify-start">
+            <p className="text-xs text-muted-foreground/70">
+              © {new Date().getFullYear()} {siteConfig.name}. All rights reserved. · {siteConfig.domain}
+            </p>
+            <button
+              onClick={() => window.dispatchEvent(new Event("branify:open-shortcuts"))}
+              className="inline-flex items-center gap-1.5 rounded-md border border-white/10 bg-white/5 px-2 py-1 text-[11px] text-muted-foreground transition-colors hover:border-primary/30 hover:text-primary"
+              title="Keyboard shortcuts"
+            >
+              <Keyboard className="h-3 w-3" />
+              Shortcuts
+              <kbd className="rounded bg-white/5 px-1 text-[9px]">?</kbd>
+            </button>
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              className="inline-flex items-center gap-1 text-[11px] text-muted-foreground transition-colors hover:text-primary"
+              title="Back to top"
+            >
+              <ArrowUp className="h-3 w-3" />
+              Top
+            </button>
+          </div>
           <div className="flex items-center gap-1">
             {[
               { icon: Twitter, href: siteConfig.social.twitter, label: "Twitter" },

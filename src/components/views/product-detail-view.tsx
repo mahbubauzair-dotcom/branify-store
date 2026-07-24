@@ -197,6 +197,30 @@ function ProductHero({ product }: { product: Product }) {
     <section className="relative overflow-hidden border-b border-white/5">
       <AuroraBackground />
       <div className="absolute inset-0 bg-grid opacity-20" />
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "Product",
+          name: product.name,
+          description: product.description,
+          category: product.category,
+          brand: {
+            "@type": "Brand",
+            name: siteConfig.name,
+          },
+          offers: {
+            "@type": "Offer",
+            price: product.price,
+            priceCurrency: "USD",
+            availability: "https://schema.org/InStock",
+          },
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: product.rating,
+            reviewCount: product.reviews,
+          },
+        }}
+      />
       <div className="relative mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-16">
         <Reveal>
           <Breadcrumbs product={product} />

@@ -127,6 +127,27 @@ function ServiceHero({ service }: { service: Service }) {
           { name: service.title, url: `${siteConfig.url}/#services/${service.slug}` },
         ])}
       />
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "Service",
+          name: service.title,
+          description: service.description,
+          serviceType: service.title,
+          provider: {
+            "@type": "Organization",
+            name: siteConfig.name,
+            url: siteConfig.url,
+          },
+          areaServed: "Worldwide",
+          offers: {
+            "@type": "Offer",
+            price: service.startingPrice,
+            priceCurrency: "USD",
+            availability: "https://schema.org/InStock",
+          },
+        }}
+      />
       <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
         {/* Breadcrumbs */}
         <nav className="mb-8 flex items-center gap-1.5 text-sm text-muted-foreground" aria-label="Breadcrumb">

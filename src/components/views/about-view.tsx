@@ -254,12 +254,12 @@ function MissionVisionValues() {
         <Stagger className="mt-12 grid gap-4 md:grid-cols-3">
           {values.map((v) => (
             <StaggerItem key={v.title}>
-              <div className="group h-full rounded-2xl border border-white/5 bg-card/40 p-7 backdrop-blur transition-all hover:border-primary/30 hover:bg-card/60">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-transform group-hover:scale-110">
+              <div className="card-premium group h-full rounded-2xl border border-white/5 bg-card/40 p-7 backdrop-blur hover:border-primary/30 hover:bg-card/60">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-transform duration-300 group-hover:scale-110">
                   <v.icon className="h-6 w-6" />
                 </div>
-                <h3 className="mt-5 font-display text-2xl font-semibold text-white">{v.title}</h3>
-                <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
+                <h3 className="mt-5 font-display text-2xl font-semibold tracking-tight text-white">{v.title}</h3>
+                <p className="mt-3 text-sm text-slate-400 leading-relaxed">
                   {v.description}
                 </p>
               </div>
@@ -485,17 +485,17 @@ function TeamSection() {
         <Stagger className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {team.map((member) => (
             <StaggerItem key={member.name}>
-              <Card className="group overflow-hidden rounded-2xl border-white/5 bg-card/40 backdrop-blur transition-all hover:border-primary/30 hover:bg-card/60">
+              <Card className="card-premium group overflow-hidden rounded-2xl border-white/5 bg-card/40 backdrop-blur hover:border-primary/30 hover:bg-card/60">
                 <GradientCover variant={member.accent} className="h-32">
                   <div className="flex h-full items-center justify-center">
-                    <div className="flex h-20 w-20 items-center justify-center rounded-full border-4 border-white/10 bg-background/60 font-display text-2xl font-bold text-white backdrop-blur transition-transform group-hover:scale-105">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-full border-4 border-white/10 bg-background/60 font-display text-2xl font-bold text-white backdrop-blur transition-transform duration-300 group-hover:scale-110">
                       {member.initials}
                     </div>
                   </div>
                 </GradientCover>
                 <div className="px-6 pb-6 pt-4">
-                  <h3 className="font-display text-lg font-semibold text-white">{member.name}</h3>
-                  <p className="mt-1 text-sm text-primary">{member.role}</p>
+                  <h3 className="font-display text-lg font-semibold tracking-tight text-white">{member.name}</h3>
+                  <p className="mt-1 text-sm font-medium text-primary">{member.role}</p>
                 </div>
               </Card>
             </StaggerItem>

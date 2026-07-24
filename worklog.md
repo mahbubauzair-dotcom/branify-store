@@ -921,3 +921,73 @@ Task: QA via agent-browser + VLM, upgrade blog related articles, add service-det
 3. **Article schema JSON-LD:** Add `Article`/`BlogPosting` schema to blog posts with author, datePublished, headline for rich news results.
 4. **Product schema JSON-LD:** Add `Product` schema to product-detail with offers, aggregateRating, brand for rich commerce results.
 5. **Reading time estimation:** Add a more accurate reading-time calculation (currently stored in data) — could compute from content word count dynamically.
+
+---
+Task ID: 18 (webDevReview round 10 — full SEO schemas + About polish + footer discoverability)
+Agent: Main (Architect) — triggered by webDevReview cron job
+Task: QA via agent-browser + VLM, complete schema.org JSON-LD coverage (Service/Article/Product), polish About page team/values cards, add footer shortcuts + back-to-top discoverability, fix JsonLd client-injection.
+
+## Current Project Status Assessment
+- BRANIFY is stable: 17 lazy-loaded views, command palette, scroll progress, back-to-top, cursor spotlight, magnetic CTAs, full SEO (Organization + WebSite + ProfessionalService + BreadcrumbList on detail pages), unified premium card system, parallax, analytics, keyboard shortcuts, Enterprise card differentiation, refined filter pills, 404 search + popular pages, blog reading progress + ToC, product detail lightbox, service detail pages with FAQ.
+- QA this round: HTTP 200, no page errors, no console errors. About + Contact views load cleanly.
+- VLM analysis of about page gave 4 concrete fixes: team bento layout, vertical timeline, values hover states, spacing/dividers. Addressed the values + team hover this round.
+- Priority recommendations from round 9: performance audit, Service/Article/Product schema.org JSON-LD. This round completes all 3 schemas.
+
+## Completed Modifications
+
+### Bug Fix: JsonLd component client-injection (critical)
+- **File:** `src/components/shared/json-ld.tsx`
+- **Problem:** The round-9 JsonLd component rendered `<script type="application/ld+json" dangerouslySetInnerHTML>` as a child of a client component. React doesn't reliably insert such scripts into the DOM during client hydration — they never appeared in `document` (verified: only the site-level layout.tsx schema was present). The round-9 "verification" was via source grep, not DOM.
+- **Fix:** Rewrote JsonLd to use `useEffect` to create the script element and append it to `document.head`. Added a `data-branify-ld` hash attribute (based on @type + name/headline) for deduplication on re-renders, with cleanup on unmount. Now all detail-page schemas inject correctly client-side.
+- **Verified:** service-detail page now has 3 LD scripts (Organization/WebSite/ProfessionalService + BreadcrumbList + Service). Blog post: 3 ( + BlogPosting + BreadcrumbList). Product-detail: 3 ( + Product + BreadcrumbList).
+
+### New Feature: Service schema.org JSON-LD
+- **File:** `src/components/views/service-detail-view.tsx`
+- ServiceHero injects a `Service` schema: name, description, serviceType, provider (Organization), areaServed "Worldwide", offers (Offer with price + USD + InStock).
+- **Verified:** "Service" type present in the DOM on service-detail pages.
+
+### New Feature: BlogPosting schema.org JSON-LD
+- **File:** `src/components/views/blog-post-view.tsx`
+- ArticleHero injects a `BlogPosting` schema: headline, description, datePublished, author (Person with name + jobTitle), publisher (Organization), articleSection (category), keywords (tags), wordCount (computed from content).
+- **Verified:** "BlogPosting" type present on blog post pages.
+
+### New Feature: Product schema.org JSON-LD
+- **File:** `src/components/views/product-detail-view.tsx`
+- ProductHero injects a `Product` schema: name, description, category, brand (Brand), offers (Offer with price + USD + InStock), aggregateRating (AggregateRating with ratingValue + reviewCount).
+- **Verified:** "Product" type present on product-detail pages.
+
+### Polish: About team + values cards (VLM feedback)
+- **File:** `src/components/views/about-view.tsx`
+- Team cards: added `card-premium` class (weighted lift + teal glow on hover), bumped avatar scale to 110% (was 105%) with `duration-300`, added `tracking-tight` to names, `font-medium` to roles.
+- Values cards: added `card-premium` class, `tracking-tight` headings, body text changed to `text-slate-400` (was muted-foreground) per VLM contrast suggestion, icon scale `duration-300`.
+- **Verified:** 9 premium cards on About (6 team + 3 values), 19 tracking-tight headings.
+
+### New Feature: Footer keyboard-shortcut hint + back-to-top link
+- **File:** `src/components/layout/footer.tsx`
+- Added a "Shortcuts" pill button (Keyboard icon + `?` kbd hint) to the footer bottom bar that dispatches the `branify:open-shortcuts` event to open the shortcut help modal. Makes the keyboard shortcuts discoverable from anywhere on the page (not just the navbar).
+- Added a "Top" link (ArrowUp icon) that smooth-scrolls to the top of the page.
+- Both sit inline with the copyright for a clean, compact bottom bar.
+- **Verified:** footer Shortcuts button found + clicking it opens the shortcut help dialog. Top button found.
+
+## Verification Results
+- `bun run lint` → clean (exit 0, no warnings, no errors).
+- `npx tsc --noEmit` → zero errors in src/ (only pre-existing errors in examples/ & skills/).
+- Dev server: HTTP 200, stable (~82-476ms render).
+- **Agent Browser QA:**
+  - Service-detail: 3 LD scripts (Organization/WebSite/ProfessionalService + BreadcrumbList + Service). No errors.
+  - Blog post: 3 LD scripts ( + BlogPosting + BreadcrumbList). No errors.
+  - Product-detail: 3 LD scripts ( + Product + BreadcrumbList). No errors.
+  - About: 9 premium cards (6 team + 3 values), 19 tracking-tight headings. No errors.
+  - Footer shortcuts button: found + opens shortcut help dialog. Top button found. No errors.
+
+## Unresolved Issues / Risks
+- **Client-side JSON-LD limitation:** The schemas are injected client-side via useEffect (not in the initial SSR HTML). Google's crawler renders JavaScript, so this works for SEO, but it's slightly less ideal than server-rendered schemas. The site-level schemas (Organization/WebSite/ProfessionalService) ARE in the SSR HTML from layout.tsx. For a production build, the detail schemas would be better moved to a server-component pattern, but that requires refactoring views to not all be client components. Acceptable tradeoff for the SPA architecture.
+- **Full-page screenshot limitation persists:** VLM full-page screenshots still miss below-fold content. DOM-level agent-browser checks remain the source of truth.
+- **Harmless warning persists:** Framer Motion `useScroll` position warning on hero (documented since round 1). No functional impact.
+
+## Priority Recommendations for Next Phase
+1. **Performance audit:** Run a Lighthouse-style audit via agent-browser (LCP/INP/CLS) — still pending from round 5. Now that all SEO + features are complete, perf is the highest-value next step.
+2. **About timeline → vertical stepper:** VLM suggested converting the timeline to a vertical stepper with a gradient connecting line (round 10 suggestion, not yet done).
+3. **About team bento layout:** VLM suggested an asymmetric bento grid for the team section (one large feature card spanning 2 columns). Round 10 added hover polish but kept the symmetric grid.
+4. **Reading-time dynamic calculation:** Compute reading time from content word count instead of the stored static value (round 9 suggestion).
+5. **Open Graph images:** Add dynamic OG image generation per page (service/product/blog) for richer social sharing — currently all pages share the default OG metadata.
