@@ -78,7 +78,7 @@ export function Footer() {
         <div className="grid gap-12 lg:grid-cols-12">
           {/* Brand + newsletter */}
           <div className="lg:col-span-4">
-            <Logo />
+            <Logo size="lg" />
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted-foreground">
               {siteConfig.description} We help ambitious brands look, feel and perform like a million dollars.
             </p>

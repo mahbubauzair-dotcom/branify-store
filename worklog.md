@@ -1051,3 +1051,52 @@ Task: Migrate BRANIFY from SQLite to PostgreSQL using the user-provided Neon con
 3. **Email notifications:** Wire the contact + newsletter routes to actually send emails via Resend (installed in package.json but unused) — e.g., notify the team on new contact, send a welcome email to new subscribers.
 4. **Prisma migrations:** Switch from `db push` to `prisma migrate dev` for versioned migration history before production.
 5. **Rate limiting:** Add basic rate limiting to the POST routes (e.g., per-IP) to prevent spam/abuse.
+
+---
+Task ID: 20 (Brand logo integration — uploaded PNG)
+Agent: Main (Architect)
+Task: Integrate the user-uploaded BRANIFY logo PNG into the site, replacing the inline SVG logo.
+
+## Completed Modifications
+
+### Logo image processing
+- **Source:** `/home/z/my-project/upload/branify logo.png` (1536×1024, 1.1MB, no alpha channel, solid black background).
+- **VLM analysis** confirmed the logo: cyan-gradient "B" icon (diagonal negative-space cut) + "BRANIFY" wordmark (white, bold sans-serif) + "BUILD. BRAND. GROW." tagline (cyan, flanked by horizontal rules). Stacked lockup, 3:2 landscape ratio.
+- **Chroma-key transparency:** the PNG had no alpha (black bg baked in). Wrote a sharp script that loads raw RGB, sets near-black pixels (R+G+B < 60) to alpha 0, and outputs RGBA PNG. This removes the black background while preserving the cyan icon, white wordmark, and cyan tagline — so the logo blends seamlessly with the dark theme (#0B1120) with no visible rectangle edge.
+- **Optimization:** resized 1536×1024 → 480×320, compressed. Final: 10KB (down from 1.1MB — 99% reduction).
+- **Output:** `public/branify-logo.png` (480×320, hasAlpha: true, 10KB).
+
+### Logo component rewrite
+- **File:** `src/components/shared/logo.tsx`
+- Replaced the inline SVG (teal "B" mark + text wordmark) with a Next.js `<Image>` rendering the uploaded PNG.
+- Added a `size` prop: `"sm"` (h-9, 36px — navbar), `"md"` (h-12, default), `"lg"` (h-16, 64px — footer/hero).
+- Alt text: "BRANIFY — Build. Brand. Grow." (the brand tagline, for accessibility).
+- `priority` flag set for LCP (navbar logo is above the fold).
+- Kept the `showWordmark` prop for backward API compatibility (no-op now since the uploaded logo always includes the wordmark).
+
+### Layout integration
+- **Navbar:** `<Logo />` (sm size, h-9) — compact for the sticky header.
+- **Footer:** `<Logo size="lg" />` (lg size, h-16) — larger where space allows the tagline to be legible.
+
+### Metadata + SEO updates
+- **File:** `src/app/layout.tsx`
+- Favicon/shortcut icon: `/logo.svg` → `/branify-logo.png`.
+- JSON-LD Organization schema `logo` field: `/logo.svg` → `/branify-logo.png`.
+- JSON-LD ProfessionalService schema `image` field: `/logo.svg` → `/branify-logo.png`.
+
+## Verification Results
+- `bun run lint` → clean (exit 0).
+- `npx tsc --noEmit` → zero errors in src/.
+- **Agent Browser QA:**
+  - 2 logo images render (navbar + footer), both via Next.js Image optimization (`/_next/image?url=%2Fbranify-logo.png`).
+  - Alt text: "BRANIFY — Build. Brand. Grow."
+  - Navbar logo height: 36px (h-9 sm). Footer logo height: 64px (h-16 lg). Both loaded (complete: true, naturalWidth: 128).
+  - No page errors.
+- **VLM verification** of navbar screenshot:
+  1. ✅ BRANIFY logo visible in top-left navbar.
+  2. ✅ Shows cyan 'B' icon + 'BRANIFY' wordmark + 'BUILD. BRAND. GROW.' tagline.
+  3. ✅ Blends seamlessly with the dark background — no visible black rectangle edges (chroma-key transparency successful).
+
+## Notes
+- The uploaded logo is a stacked lockup (icon + wordmark + tagline), which is taller than the previous horizontal inline-SVG lockup. At navbar size (36px) the tagline is small but legible; at footer size (64px) it reads clearly.
+- The old `/public/logo.svg` file remains but is no longer referenced anywhere (metadata, JSON-LD, and the Logo component all point to `/branify-logo.png`). Could be removed in a cleanup pass.

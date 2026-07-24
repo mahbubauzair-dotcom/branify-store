@@ -71,8 +71,8 @@ export const metadata: Metadata = {
     creator: "@branify",
   },
   icons: {
-    icon: "/logo.svg",
-    shortcut: "/logo.svg",
+    icon: "/branify-logo.png",
+    shortcut: "/branify-logo.png",
   },
   category: "technology",
 };
@@ -97,7 +97,7 @@ export default function RootLayout({
                   "@id": `${siteUrl}/#organization`,
                   name: "BRANIFY",
                   url: siteUrl,
-                  logo: `${siteUrl}/logo.svg`,
+                  logo: `${siteUrl}/branify-logo.png`,
                   description:
                     "Premium digital agency crafting world-class websites, brand identities, AI solutions and digital products.",
                   foundingDate: "2019",
@@ -134,7 +134,7 @@ export default function RootLayout({
                 {
                   "@type": "ProfessionalService",
                   name: "BRANIFY",
-                  image: `${siteUrl}/logo.svg`,
+                  image: `${siteUrl}/branify-logo.png`,
                   "@id": `${siteUrl}/#professional-service`,
                   url: siteUrl,
                   telephone: "+1-415-555-0148",
