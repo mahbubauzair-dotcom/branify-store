@@ -1,46 +1,19 @@
-import { PrismaClient } from "@prisma/client";
-import { readFileSync } from "fs";
-import { resolve } from "path";
-
 /**
- * Resolve the DATABASE_URL directly from the `.env` file.
+ * Prisma client singleton.
  *
- * Why: the auto-managed dev server is started with a stale DATABASE_URL
- * in its shell environment (the old SQLite path:
- * `file:/home/z/my-project/db/custom.db`). Next.js loads `.env` but does
- * NOT override existing `process.env` values, so Prisma would pick up the
- * wrong SQLite URL. Reading the file directly guarantees the correct
- * PostgreSQL value.
+ * IMPORTANT: The side-effect import "./db-env-fix" MUST come before
+ * @prisma/client. It reads the correct PostgreSQL URL from .env and
+ * overwrites the stale shell DATABASE_URL (the old SQLite path) in
+ * process.env BEFORE PrismaClient is imported.
  *
- * This MUST run before any PrismaClient is instantiated.
+ * Without this, the dev server's shell env (file:/.../custom.db) leaks
+ * into Prisma, causing "Cannot read properties of undefined (reading
+ * 'findUnique')" because the old SQLite schema lacks the new models.
  */
-function loadDatabaseUrl(): string {
-  // 1. If process.env already has a postgres URL, use it.
-  const env = process.env.DATABASE_URL;
-  if (env && env.startsWith("postgres")) return env;
+import "./db-env-fix";
+import { PrismaClient } from "@prisma/client";
 
-  // 2. Otherwise read it from the .env file at the project root.
-  try {
-    const envPath = resolve(process.cwd(), ".env");
-    const content = readFileSync(envPath, "utf-8");
-    const match = content.match(/^DATABASE_URL=(.+)$/m);
-    if (match) {
-      const url = match[1].trim().replace(/^["']|["']$/g, "");
-      if (url.startsWith("postgres")) return url;
-    }
-  } catch {
-    /* ignore */
-  }
-
-  // 3. Last resort — return whatever's in process.env (may be wrong).
-  return env ?? "";
-}
-
-const databaseUrl = loadDatabaseUrl();
-
-// CRITICAL: set process.env.DATABASE_URL so Prisma's internal connection
-// logic also uses the correct URL (not just the datasources override).
-process.env.DATABASE_URL = databaseUrl;
+const databaseUrl = process.env.DATABASE_URL!;
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
@@ -50,14 +23,12 @@ const globalForPrisma = globalThis as unknown as {
 /**
  * Invalidate the cached PrismaClient if the DATABASE_URL has changed
  * (e.g. after a server restart with a different .env). Without this,
- * a stale client from a previous run (with the old SQLite URL and the
- * old schema that lacked AdminUser/Product/Category models) would be
- * reused, causing "Cannot read properties of undefined (reading
- * 'findUnique')" errors.
+ * a stale client from a previous run (with the old SQLite URL and
+ * schema that lacked AdminUser/Product/Category models) would be reused.
  */
 if (globalForPrisma.prisma && globalForPrisma.__branifyDbUrl !== databaseUrl) {
   try {
-    globalForPrisma.prisma.$disconnect();
+    void globalForPrisma.prisma.$disconnect();
   } catch {
     /* ignore */
   }
