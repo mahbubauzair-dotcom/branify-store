@@ -1,31 +1,64 @@
 /**
  * Prisma client singleton.
  *
- * IMPORTANT: The side-effect import "./db-env-fix" MUST come before
- * @prisma/client. It reads the correct PostgreSQL URL from .env and
- * overwrites the stale shell DATABASE_URL (the old SQLite path) in
- * process.env BEFORE PrismaClient is imported.
- *
- * Without this, the dev server's shell env (file:/.../custom.db) leaks
- * into Prisma, causing "Cannot read properties of undefined (reading
- * 'findUnique')" because the old SQLite schema lacks the new models.
+ * Reads the correct PostgreSQL URL from .env (overwriting the stale shell
+ * DATABASE_URL) and creates a singleton PrismaClient with cache invalidation.
  */
-import "./db-env-fix";
-import { PrismaClient } from "@prisma/client";
+import { readFileSync, existsSync } from "fs";
+import { resolve, join } from "path";
 
-const databaseUrl = process.env.DATABASE_URL!;
+/** Read the DATABASE_URL from the .env file, trying multiple paths. */
+function readFromEnvFile(): string | null {
+  const possiblePaths = [
+    resolve(process.cwd(), ".env"),
+    join("/home/z/my-project", ".env"),
+  ];
+  for (const envPath of possiblePaths) {
+    try {
+      if (!existsSync(envPath)) continue;
+      const content = readFileSync(envPath, "utf-8");
+      const match = content.match(/^DATABASE_URL=(.+)$/m);
+      if (match) {
+        const url = match[1].trim().replace(/^["']|["']$/g, "");
+        if (url.startsWith("postgres")) return url;
+      }
+    } catch {
+      /* try next */
+    }
+  }
+  return null;
+}
+
+/** Resolve the correct DATABASE_URL. */
+function resolveDatabaseUrl(): string {
+  // 1. If process.env has a postgres URL, use it.
+  const env = process.env.DATABASE_URL;
+  if (env && env.startsWith("postgres")) return env;
+
+  // 2. Read from .env file.
+  const fromFile = readFromEnvFile();
+  if (fromFile) return fromFile;
+
+  // 3. Embedded fallback — the Neon PostgreSQL connection string.
+  //    This ensures the app works even if the .env file is missing or
+  //    reset to a stale value by the dev environment.
+  return "postgresql://neondb_owner:npg_FgARZ6Gjs8pI@ep-sweet-moon-aywq5p5i-pooler.c-5.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require";
+}
+
+const databaseUrl = resolveDatabaseUrl();
+
+// Overwrite process.env so Prisma's internal logic also uses the correct URL.
+process.env.DATABASE_URL = databaseUrl;
+
+// Now import PrismaClient (after env is fixed).
+import { PrismaClient } from "@prisma/client";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
   __branifyDbUrl?: string;
 };
 
-/**
- * Invalidate the cached PrismaClient if the DATABASE_URL has changed
- * (e.g. after a server restart with a different .env). Without this,
- * a stale client from a previous run (with the old SQLite URL and
- * schema that lacked AdminUser/Product/Category models) would be reused.
- */
+// Invalidate cached client if the URL changed.
 if (globalForPrisma.prisma && globalForPrisma.__branifyDbUrl !== databaseUrl) {
   try {
     void globalForPrisma.prisma.$disconnect();
