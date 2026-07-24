@@ -276,7 +276,7 @@ const ArticleBody = forwardRef<HTMLElement, { post: BlogPost; tocItems: TocItem[
                     <p
                       key={i}
                       className={cn(
-                        "text-lg leading-relaxed text-muted-foreground",
+                        "text-[1.075rem] leading-[1.8] text-slate-300/90",
                         isFirstBody &&
                           "first-letter:float-left first-letter:mr-3 first-letter:font-display first-letter:text-6xl first-letter:font-bold first-letter:leading-[0.85] first-letter:text-primary",
                       )}

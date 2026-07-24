@@ -373,7 +373,7 @@ function ServicesPreview() {
             <StaggerItem key={s.slug}>
               <Card
                 className="card-premium group relative h-full overflow-hidden border-white/5 bg-card/40 p-6 backdrop-blur hover:border-primary/30 hover:bg-card/60 cursor-pointer"
-                onClick={() => navigate("services")}
+                onClick={() => navigate("service-detail", { slug: s.slug })}
               >
                 <div className={`absolute inset-0 bg-gradient-to-br ${s.accent} opacity-0 transition-opacity group-hover:opacity-100`} />
                 <div className="relative">

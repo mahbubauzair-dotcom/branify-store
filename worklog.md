@@ -790,3 +790,65 @@ Task: QA via agent-browser + VLM, ship blog post reading progress bar, sticky ta
 3. **Blog typography refinement:** VLM suggested increasing body line-height to 1.7-1.8, constraining measure to ~680-720px, and using off-white (#e2e8f0) instead of pure white for body text to reduce dark-mode eye strain.
 4. **Hide global ScrollProgress on blog posts:** To avoid the double-bar overlap with ReadingProgress.
 5. **Related articles thumbnails:** VLM suggested upgrading related posts to cards with high-quality gradient thumbnails + hover scale (currently text-focused).
+
+---
+Task ID: 16 (webDevReview round 8 — service detail pages + progress bar fix + blog typography)
+Agent: Main (Architect) — triggered by webDevReview cron job
+Task: QA via agent-browser, build dedicated service detail pages (long-pending), fix double progress bar on blog posts, refine blog typography per VLM.
+
+## Current Project Status Assessment
+- BRANIFY is stable: 16 lazy-loaded views (+ service-detail this round), command palette, scroll progress, back-to-top, cursor spotlight, magnetic CTAs, JSON-LD SEO, unified premium card system, parallax (hero + portfolio), analytics, keyboard shortcuts, Enterprise card differentiation, refined filter pills, 404 search + popular pages, blog reading progress + ToC, product detail lightbox.
+- QA this round: HTTP 200, no page errors, no console errors. Services view loads cleanly.
+- Top priority (pending since round 6): service detail pages — service cards previously all linked to contact. This round ships dedicated per-service pages.
+- Also addressed: double progress bar on blog posts (round 7 risk), blog typography (round 7 VLM suggestion).
+
+## Completed Modifications
+
+### New Feature: Service detail pages (pending since round 6)
+- **File:** `src/lib/router.ts` — added `"service-detail"` to the `RouteName` union.
+- **File:** `src/app/page.tsx` — added lazy-loaded `ServiceDetailView` + `case "service-detail"` to the router switch.
+- **File:** `src/components/views/service-detail-view.tsx` (new, ~430 lines) — a complete dedicated page per service with 7 sections:
+  1. **ServiceHero** — breadcrumbs (Home / Services / {title}), gradient icon tile, popular badge, h1, tagline, description, starting price card, MagneticButton "Start this service" CTA (tracks `cta_click` with `{label, location: "service-detail-hero"}`), "View pricing" outline button, and a gradient cover visual.
+  2. **ServiceOverview** — "Key capabilities" grid of all service.features as numbered cards with Check icons + `card-premium` hover.
+  3. **ServiceDeliverables** — two-column: deliverables list (Check icons) + 3 trust tiles (Clock delivery, ShieldCheck ownership, Zap craft).
+  4. **ServiceProcess** — reuses the 5-step processSteps with icon map.
+  5. **ServiceResults** — "Proof of work": a related project card (matched by category keyword, with mono metrics) + 2 testimonial cards.
+  6. **RelatedServices** — 3 random other services as cards that navigate to their detail pages (cross-linking).
+  7. **ServiceCta** — gradient AuroraBackground card with MagneticButton CTA (tracks `cta_click` with `{label, location: "service-detail-cta"}`) + email link.
+- Graceful not-found state if slug doesn't match.
+- **Wired:** Services view "Explore" buttons + Home services preview cards now `navigate("service-detail", { slug: s.slug })` instead of `navigate("contact")`.
+- **Verified:** clicked a home service card → navigated to service-detail with "Website Development" h1 + breadcrumb. All 6 sections present (capabilities, deliverables, process, results, related, CTA). 3 related-service buttons present.
+
+### Fix: Double progress bar on blog posts (round 7 risk)
+- **File:** `src/app/page.tsx`
+- The global `ScrollProgress` (2px) was rendering alongside the blog-post `ReadingProgress` (4px), causing a visual stack. Now `ScrollProgress` is hidden when `route === "blog-post"` (`{!isBlogPost && <ScrollProgress />}`).
+- **Verified:** blog post pages now show 1 top bar (4px ReadingProgress), down from 2.
+
+### Polish: Blog typography refinement (round 7 VLM suggestion)
+- **File:** `src/components/views/blog-post-view.tsx`
+- Body paragraphs: changed from `text-lg leading-relaxed text-muted-foreground` to `text-[1.075rem] leading-[1.8] text-slate-300/90`.
+  - Line-height 1.8 (was ~1.625) for more breathing room per VLM.
+  - Off-white `slate-300/90` (was `muted-foreground`) to reduce dark-mode eye strain.
+  - Font-size 1.075rem (17.2px) for comfortable reading measure.
+- **Verified:** computed line-height 30.96px (≈1.8 × 17.2px), off-white oklab color, font-size 17.2px.
+
+## Verification Results
+- `bun run lint` → clean (exit 0, no warnings, no errors).
+- `npx tsc --noEmit` → zero errors in src/ (only pre-existing errors in examples/ & skills/).
+- Dev server: HTTP 200, stable (~103-616ms render).
+- **Agent Browser QA:**
+  - Service detail: home service card click → navigated to service-detail ("Website Development" h1 + breadcrumb). All 6 sections present (capabilities/deliverables/process/results/related/CTA). 3 related-service cross-links. No errors.
+  - Blog post progress bar: only 1 top bar (4px ReadingProgress) — double-bar fixed.
+  - Blog typography: line-height 30.96px (1.8 ratio), off-white slate-300/90 color, 17.2px font. No errors.
+
+## Unresolved Issues / Risks
+- **Full-page screenshot limitation persists:** VLM full-page screenshots still miss below-fold content (Framer Motion `whileInView` opacity). DOM-level agent-browser checks remain the source of truth.
+- **Harmless warning persists:** Framer Motion `useScroll` position warning on hero (documented since round 1). No functional impact.
+- **Service detail related-project matching is loose:** The `ServiceResults` section matches a project by checking if the service title includes the first word of the project's category. This is a heuristic and may not always be the most relevant project. Low priority — could add explicit `serviceSlug` references to projects data.
+
+## Priority Recommendations for Next Phase
+1. **Performance audit:** Run a Lighthouse-style audit via agent-browser (LCP/INP/CLS) — still pending from round 5. Now that all 17 views exist and are code-split, a real perf measurement would be valuable.
+2. **Related articles thumbnails:** VLM suggested upgrading blog related posts to cards with gradient thumbnails + hover scale (round 7 suggestion, still pending).
+3. **Command palette service-detail entries:** Add service-detail entries (with slugs) to the command palette so users can jump directly to a specific service.
+4. **Service detail FAQ:** Add a service-specific FAQ accordion (e.g., timeline, revisions, payment) to the service-detail page.
+5. **Breadcrumb structured data:** Add BreadcrumbList JSON-LD schema to service-detail + product-detail + blog-post pages for Google rich results.

@@ -191,7 +191,7 @@ function ServicesGrid() {
                     </p>
                   </div>
                   <Button
-                    onClick={() => navigate("contact")}
+                    onClick={() => navigate("service-detail", { slug: s.slug })}
                     size="sm"
                     className="h-9 rounded-full bg-white/5 text-white hover:bg-primary hover:text-primary-foreground"
                   >

@@ -5,6 +5,7 @@ import { create } from "zustand";
 export type RouteName =
   | "home"
   | "services"
+  | "service-detail"
   | "products"
   | "product-detail"
   | "tools"

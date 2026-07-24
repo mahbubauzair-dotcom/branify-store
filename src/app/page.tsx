@@ -18,6 +18,9 @@ import { HomeView } from "@/components/views/home-view";
 const ServicesView = lazy(() =>
   import("@/components/views/services-view").then((m) => ({ default: m.ServicesView })),
 );
+const ServiceDetailView = lazy(() =>
+  import("@/components/views/service-detail-view").then((m) => ({ default: m.ServiceDetailView })),
+);
 const ProductsView = lazy(() =>
   import("@/components/views/products-view").then((m) => ({ default: m.ProductsView })),
 );
@@ -96,6 +99,7 @@ export default function Home() {
     switch (route) {
       case "home": return <HomeView />;
       case "services": return <ServicesView />;
+      case "service-detail": return <ServiceDetailView />;
       case "products": return <ProductsView />;
       case "product-detail": return <ProductDetailView />;
       case "tools": return <ToolsView />;
@@ -115,12 +119,14 @@ export default function Home() {
   }, [route, slug]);
 
   // Home is eager (most common); all other views are lazy-loaded with a
-  // premium skeleton fallback.
+  // premium skeleton fallback. Hide the global ScrollProgress on blog posts
+  // where the dedicated ReadingProgress bar takes over (avoids double bars).
   const isHome = route === "home";
+  const isBlogPost = route === "blog-post";
 
   return (
     <div className="relative flex min-h-screen flex-col bg-background">
-      <ScrollProgress />
+      {!isBlogPost && <ScrollProgress />}
       <CommandPalette />
       <ShortcutHelp />
       <AnnouncementBar />
