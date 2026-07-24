@@ -29,9 +29,44 @@ export function CommandPalette() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
+  const [recent, setRecent] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const navigate = useRouterStore((s) => s.navigate);
+
+  // Load recently-visited routes from localStorage on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("branify:recent");
+      if (stored) setRecent(JSON.parse(stored).slice(0, 5));
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  // Subscribe to router changes so ANY navigation (navbar, footer, links,
+  // palette) is recorded as "recently visited" — not just palette clicks.
+  // Only track top-level routes that appear in the Navigation group.
+  useEffect(() => {
+    const navRoutes: RouteName[] = [
+      "home", "services", "products", "tools", "portfolio", "pricing", "blog",
+      "about", "contact", "faq",
+    ];
+    const unsub = useRouterStore.subscribe((state, prev) => {
+      if (state.route !== prev.route && navRoutes.includes(state.route)) {
+        setRecent((prevRec) => {
+          const next = [state.route, ...prevRec.filter((r) => r !== state.route)].slice(0, 5);
+          try {
+            localStorage.setItem("branify:recent", JSON.stringify(next));
+          } catch {
+            /* ignore */
+          }
+          return next;
+        });
+      }
+    });
+    return unsub;
+  }, []);
 
   const go = useCallback(
     (route: RouteName, opts?: { slug?: string; query?: string }) => {
@@ -139,8 +174,17 @@ export function CommandPalette() {
       { id: "legal-refund", label: "Refund Policy", group: "Legal", icon: RotateCcw, action: () => go("refund") },
     ];
 
-    return [...nav, ...svc, ...prod, ...tool, ...blog, ...proj, ...legal];
-  }, [go]);
+    // Build "Recently visited" group from localStorage history.
+    // Maps a route name back to its nav command (label/icon/hint) but overrides
+    // the group so it clusters at the top of the palette.
+    const navByRoute = new Map(nav.map((c) => [c.id.replace("nav-", "") as RouteName, c]));
+    const recentItems: CommandItem[] = recent
+      .map((r) => navByRoute.get(r as RouteName))
+      .filter((c): c is CommandItem => Boolean(c))
+      .map((c) => ({ ...c, id: `recent-${c.id}`, group: "Recently visited" }));
+
+    return [...recentItems, ...nav, ...svc, ...prod, ...tool, ...blog, ...proj, ...legal];
+  }, [go, recent]);
 
   // Filter by query
   const filtered = useMemo(() => {

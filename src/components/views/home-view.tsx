@@ -25,6 +25,8 @@ import { SectionHeading } from "@/components/shared/section-heading";
 import { Reveal, Stagger, StaggerItem, GradientTextTeal } from "@/components/shared/reveal";
 import { GradientCover, AuroraBackground } from "@/components/shared/gradient-cover";
 import { CursorSpotlight } from "@/components/shared/cursor-spotlight";
+import { MagneticButton } from "@/components/shared/magnetic-button";
+import { SectionDivider, SectionGlow } from "@/components/shared/section-divider";
 import { useCountUp, useInViewOnce } from "@/hooks/use-count-up";
 
 const whyFeatures = [
@@ -44,10 +46,13 @@ export function HomeView() {
       <Hero />
       <TrustedBrands />
       <StatsSection />
+      <SectionDivider />
       <ServicesPreview />
       <WhyBranify />
+      <SectionDivider />
       <ProductsPreview />
       <ToolsPreview />
+      <SectionDivider />
       <PortfolioPreview />
       <ProcessSection />
       <TestimonialsSection />
@@ -113,23 +118,27 @@ function Hero() {
             transition={{ duration: 0.6, delay: 0.24 }}
             className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row"
           >
-            <Button
-              onClick={() => navigate("contact")}
-              size="lg"
-              className="group h-12 rounded-full bg-primary px-7 text-primary-foreground hover:bg-hover"
-            >
-              Start a project
-              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-            </Button>
-            <Button
-              onClick={() => navigate("portfolio")}
-              size="lg"
-              variant="outline"
-              className="h-12 rounded-full border-white/15 bg-white/5 px-7 text-white backdrop-blur hover:bg-white/10"
-            >
-              <Play className="mr-2 h-4 w-4" />
-              View our work
-            </Button>
+            <MagneticButton strength={0.4} radius={50}>
+              <Button
+                onClick={() => navigate("contact")}
+                size="lg"
+                className="group h-12 rounded-full bg-primary px-7 text-primary-foreground hover:bg-hover"
+              >
+                Start a project
+                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              </Button>
+            </MagneticButton>
+            <MagneticButton strength={0.3} radius={40}>
+              <Button
+                onClick={() => navigate("portfolio")}
+                size="lg"
+                variant="outline"
+                className="h-12 rounded-full border-white/15 bg-white/5 px-7 text-white backdrop-blur hover:bg-white/10"
+              >
+                <Play className="mr-2 h-4 w-4" />
+                View our work
+              </Button>
+            </MagneticButton>
           </motion.div>
 
           <motion.div
@@ -690,6 +699,7 @@ function FaqPreview() {
   return (
     <section className="relative overflow-hidden border-y border-white/5 py-20 sm:py-28">
       <div className="absolute inset-0 bg-dots opacity-30" />
+      <SectionGlow side="top" color="rgba(20, 184, 166, 0.07)" size={560} />
       <div className="relative mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <SectionHeading
           eyebrow="FAQ"
@@ -741,12 +751,16 @@ function CtaSection() {
               Book a free 30-minute strategy call. We'll map out exactly how to take your brand to the next level — no pressure, no jargon.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Button onClick={() => navigate("contact")} size="lg" className="h-12 rounded-full bg-primary px-7 text-primary-foreground hover:bg-hover">
-                Book a free call <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-              <Button onClick={() => navigate("pricing")} size="lg" variant="outline" className="h-12 rounded-full border-white/15 bg-white/5 px-7 hover:bg-white/10">
-                View pricing
-              </Button>
+              <MagneticButton strength={0.4} radius={50}>
+                <Button onClick={() => navigate("contact")} size="lg" className="h-12 rounded-full bg-primary px-7 text-primary-foreground hover:bg-hover">
+                  Book a free call <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </MagneticButton>
+              <MagneticButton strength={0.3} radius={40}>
+                <Button onClick={() => navigate("pricing")} size="lg" variant="outline" className="h-12 rounded-full border-white/15 bg-white/5 px-7 hover:bg-white/10">
+                  View pricing
+                </Button>
+              </MagneticButton>
             </div>
             <p className="mt-6 text-sm text-muted-foreground/70">
               Or email us at{" "}

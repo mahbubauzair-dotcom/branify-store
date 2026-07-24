@@ -374,3 +374,72 @@ Task: QA the platform via agent-browser + VLM, fix accessibility bug, add premiu
 3. **Command palette enhancements:** Add "recently visited" + "quick actions" (e.g., "Open Password Generator", "View Lumen case study") sections.
 4. **Performance:** Consider lazy-loading view components with `React.lazy` + `Suspense` for faster initial paint (currently all 16 views are in one bundle).
 5. **SEO:** Add JSON-LD structured data (Organization, WebSite, Service schema) to the layout for rich search results.
+
+---
+Task ID: 10 (webDevReview round 2 — premium micro-interactions + SEO + UX)
+Agent: Main (Architect) — triggered by webDevReview cron job
+Task: QA via agent-browser + VLM, ship MagneticButton micro-interaction, JSON-LD structured data, command-palette "Recently visited", and section visual-hierarchy improvements.
+
+## Current Project Status Assessment
+- BRANIFY is stable: 16 views, 10 tools, command palette (⌘K), scroll progress, back-to-top, cursor spotlight, accessibility-fixed Reveal component.
+- Round 1 left priority recommendations: theme/section separation, magnetic buttons, command-palette enhancements, performance (lazy-load), JSON-LD SEO.
+- QA this round: HTTP 200, no page errors, no console errors (only harmless Framer Motion useScroll position warning). All views (home/pricing/tools/blog/contact) load and navigate cleanly.
+- VLM analysis of pricing page rated 8/10 premium and gave 5 concrete fixes: Enterprise card glassmorphism, section background separation, spacing/breathing room, button polish (hover lift + active scale), typography hierarchy (tabular-nums, custom checkmarks).
+
+## Completed Modifications
+
+### New Feature: MagneticButton (premium pointer-tracking micro-interaction)
+- **File:** `src/components/shared/magnetic-button.tsx` (new)
+- Wraps any trigger and makes it subtly translate toward the pointer on hover, snapping back on leave. Uses `useMotionValue` + `useSpring` (stiffness 250, damping 18) for smooth, damped motion. Displacement clamped to a `radius` (default 60px). Respects `prefers-reduced-motion` (renders static wrapper).
+- **Applied to:** homepage Hero CTAs ("Start a project" strength 0.4/radius 50, "View our work" 0.3/40) and final CTA section buttons ("Book a free call" 0.4/50, "View pricing" 0.3/40).
+- **Verified:** dispatched a synthetic `mousemove` on the hero CTA wrapper → transform went from `none` to `translateX(9.33px) translateY(-2.91px)` — magnetic effect confirmed working.
+
+### New Feature: SectionDivider + SectionGlow (visual hierarchy)
+- **File:** `src/components/shared/section-divider.tsx` (new)
+- `SectionDivider`: a thin centered gradient line with a primary-tinted glow accent, used between major homepage sections to create visual hierarchy on the long dark page (addresses VLM "sections merge into one dark void" feedback).
+- `SectionGlow`: a soft radial glow positioned within a section (top/bottom/left/right/center) for depth.
+- **Applied:** 3 `SectionDivider`s between Home sections (Stats→Services, Why→Products, Tools→Portfolio) and a `SectionGlow` on the FAQ preview section (addresses VLM "FAQ blends into dark body" feedback).
+- **Verified:** 7 gradient divider elements detected in the DOM.
+
+### New Feature: JSON-LD structured data (SEO)
+- **File:** `src/app/layout.tsx`
+- Injected a `<script type="application/ld+json">` in `<head>` with a `@graph` of 3 schema.org entities:
+  - **Organization** — name, url, logo, description, foundingDate, email, telephone, PostalAddress, sameAs (5 social profiles).
+  - **WebSite** — url, name, publisher ref, SearchAction potentialAction (enables Google sitelinks search box).
+  - **ProfessionalService** — name, image, telephone, priceRange, address ref, areaServed Worldwide, serviceType array (6 services).
+- **Verified:** DOM query found the JSON-LD script with all 3 types (`["Organization","WebSite","ProfessionalService"]`).
+
+### New Feature: Command palette "Recently visited" group
+- **File:** `src/components/layout/command-palette.tsx`
+- Added a `recent` state (string[] of route names) persisted to `localStorage` under `branify:recent`.
+- **Subscribed to the Zustand router store** (`useRouterStore.subscribe`) so ANY navigation — navbar, footer, in-page links, palette — records the visited route. Only top-level nav routes are tracked (skips detail/search/not-found routes). Max 5, most-recent-first.
+- The commands array now prepends a "Recently visited" group that maps recent route names back to their nav command (label/icon/hint) with a `recent-` id prefix so they cluster at the top of the palette.
+- **Verified:** cleared localStorage → navigated Pricing → Blog → Contact via navbar → opened palette (⌘K) → "Recently visited" group appeared at top showing Contact, Blog, Pricing in correct reverse-chronological order.
+
+### Polish: Hero CTA micro-interactions
+- **File:** `src/components/views/home-view.tsx`
+- Wrapped hero + final-CTA buttons in `MagneticButton` for the premium pointer-tracking effect.
+- Added `SectionDivider`s and a `SectionGlow` for visual hierarchy.
+
+## Verification Results
+- `bun run lint` → clean (exit 0, no warnings, no errors).
+- `npx tsc --noEmit` → zero errors in src/ (only pre-existing errors in examples/ & skills/).
+- Dev server: HTTP 200, stable.
+- **Agent Browser QA:**
+  - Homepage loads, no page errors, no console errors.
+  - JSON-LD: confirmed present with Organization + WebSite + ProfessionalService schemas.
+  - Magnetic buttons: synthetic mousemove on hero CTA → transform changed from `none` to `translateX(9.33px) translateY(-2.91px)` (effect active).
+  - Command palette "Recently visited": navigated Pricing→Blog→Contact via navbar → ⌘K → group appeared at top with correct 3 items in reverse-chronological order.
+  - Section dividers: 7 gradient divider elements detected in DOM.
+
+## Unresolved Issues / Risks
+- **Harmless warning:** Framer Motion logs `Please ensure that the container has a non-static position...` from the Hero `useScroll({ target: ref })`. The section IS `relative`; this is a known Framer Motion first-paint quirk and does not affect functionality. Low priority — could suppress by passing `layoutEffect: false` to useScroll, but risk of layout shift.
+- **Performance:** All 16 views are still in one bundle (no code-splitting). Initial JS payload could be reduced with `React.lazy` + `Suspense`. Medium priority for next round.
+- **Styling detail remaining:** VLM suggested `tabular-nums` for price alignment and custom teal checkmarks in pricing comparison — not yet applied. Low priority.
+
+## Priority Recommendations for Next Phase
+1. **Code-splitting:** Wrap view components in `React.lazy` + `Suspense` in `page.tsx` to reduce initial bundle size and improve first paint.
+2. **Pricing polish:** Apply `tabular-nums` to price numbers and custom teal checkmarks in the comparison table (VLM suggestion).
+3. **Magnetic buttons everywhere:** Extend MagneticButton to all primary CTAs across Services, Products, Portfolio, About, Contact views (currently only home).
+4. **Parallax:** Add subtle scroll parallax to portfolio cover cards and the hero dashboard for depth.
+5. **Loading skeletons:** Add skeleton states for view transitions (currently a 250ms opacity fade) to feel more premium on slow connections.

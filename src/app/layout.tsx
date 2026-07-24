@@ -84,6 +84,77 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
+      <head>
+        {/* JSON-LD structured data for rich search results */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@graph": [
+                {
+                  "@type": "Organization",
+                  "@id": `${siteUrl}/#organization`,
+                  name: "BRANIFY",
+                  url: siteUrl,
+                  logo: `${siteUrl}/logo.svg`,
+                  description:
+                    "Premium digital agency crafting world-class websites, brand identities, AI solutions and digital products.",
+                  foundingDate: "2019",
+                  email: "hello@branify.store",
+                  telephone: "+1-415-555-0148",
+                  address: {
+                    "@type": "PostalAddress",
+                    streetAddress: "548 Market Street",
+                    addressLocality: "San Francisco",
+                    addressRegion: "CA",
+                    postalCode: "94104",
+                    addressCountry: "US",
+                  },
+                  sameAs: [
+                    "https://twitter.com/branify",
+                    "https://instagram.com/branify",
+                    "https://linkedin.com/company/branify",
+                    "https://dribbble.com/branify",
+                    "https://github.com/branify",
+                  ],
+                },
+                {
+                  "@type": "WebSite",
+                  "@id": `${siteUrl}/#website`,
+                  url: siteUrl,
+                  name: "BRANIFY",
+                  publisher: { "@id": `${siteUrl}/#organization` },
+                  potentialAction: {
+                    "@type": "SearchAction",
+                    target: `${siteUrl}/?q={search_term_string}`,
+                    "query-input": "required name=search_term_string",
+                  },
+                },
+                {
+                  "@type": "ProfessionalService",
+                  name: "BRANIFY",
+                  image: `${siteUrl}/logo.svg`,
+                  "@id": `${siteUrl}/#professional-service`,
+                  url: siteUrl,
+                  telephone: "+1-415-555-0148",
+                  priceRange: "$$-$$$$",
+                  address: { "@id": `${siteUrl}/#organization` },
+                  areaServed: "Worldwide",
+                  serviceType: [
+                    "Website Development",
+                    "UI/UX Design",
+                    "Brand Identity",
+                    "Logo Design",
+                    "SEO",
+                    "AI Solutions",
+                  ],
+                },
+              ],
+            }),
+          }}
+        />
+      </head>
       <body
         className={`${poppins.variable} ${inter.variable} ${geistMono.variable} font-sans antialiased bg-background text-foreground`}
       >
