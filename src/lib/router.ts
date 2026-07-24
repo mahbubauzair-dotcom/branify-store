@@ -21,7 +21,15 @@ export type RouteName =
   | "refund"
   | "faq"
   | "search"
-  | "not-found";
+  | "not-found"
+  // Admin panel routes (admin SPA — no public navbar/footer)
+  | "admin-login"
+  | "admin-dashboard"
+  | "admin-products"
+  | "admin-product-edit"
+  | "admin-categories"
+  | "admin-builder"
+  | "storefront";
 
 interface RouterState {
   route: RouteName;
@@ -60,4 +68,18 @@ export const useRouterStore = create<RouterState>((set, get) => ({
 /** Helper hook to navigate imperatively */
 export function useNavigate() {
   return useRouterStore((s) => s.navigate);
+}
+
+/** Admin panel routes use their own chrome (sidebar + topbar) — no public navbar/footer. */
+export const ADMIN_ROUTES: RouteName[] = [
+  "admin-login",
+  "admin-dashboard",
+  "admin-products",
+  "admin-product-edit",
+  "admin-categories",
+  "admin-builder",
+];
+
+export function isAdminRoute(route: RouteName): boolean {
+  return ADMIN_ROUTES.includes(route);
 }

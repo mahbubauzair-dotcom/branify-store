@@ -1128,3 +1128,254 @@ Task: Push the BRANIFY project to the GitHub repository https://github.com/mahbu
 
 ## Security note
 The local git history (pre-cleanup) contained `.env` with the Neon DB password. The pushed repo has a clean history with no secrets. As an extra precaution, rotating the Neon DB password is recommended (the old password was only ever in the local sandbox git, never pushed).
+
+---
+
+## Task ID: API-ROUTES
+**Agent:** Sub-agent (general-purpose)
+**Task:** Build admin + public API routes for the BRANIFY admin panel.
+
+### Summary
+Created 12 Next.js App Router route handlers under `src/app/api/` — 10 admin-only
+endpoints (auth, products CRUD, categories CRUD, settings, upload, stats) and
+2 public storefront endpoints (products, categories). All guarded admin routes
+use the existing `requireAdmin()` helper from `@/lib/admin-auth`; the public
+endpoints require no auth and never expose draft products.
+
+### Files created
+- `src/app/api/admin/auth/login/route.ts` — POST: validates email/password
+  against `AdminUser`, calls `verifyPassword()`, mints a session token with
+  `createSessionToken()`, sets the cookie via `setSessionCookie()`, returns
+  `{ ok, admin: { id, email, name, role } }`. 401 on bad credentials.
+- `src/app/api/admin/auth/logout/route.ts` — POST: clears the session cookie.
+- `src/app/api/admin/auth/check/route.ts` — GET: returns `{ ok: true, admin }`
+  or `{ ok: false }` (always 200; this is a probe, not a guarded resource).
+- `src/app/api/admin/products/route.ts` — GET (list all, newest first, with
+  category) / POST (create with auto-unique slug, returns 201).
+- `src/app/api/admin/products/[id]/route.ts` — GET / PUT (partial update,
+  regenerates slug when name changes if slug not supplied) / DELETE.
+- `src/app/api/admin/categories/route.ts` — GET (sorted by sortOrder) /
+  POST (auto-unique slug from name).
+- `src/app/api/admin/categories/[id]/route.ts` — GET / PUT / DELETE.
+- `src/app/api/admin/settings/route.ts` — GET (returns flat `settings` map)
+  / PUT (upserts each key/value inside a `db.$transaction`).
+- `src/app/api/admin/upload/route.ts` — POST multipart/form-data: reads a
+  `file` field, validates size (≤5MB) and type (png/jpg/jpeg/webp/gif/svg),
+  returns `{ ok, url: "data:<mime>;base64,..." }` so the admin panel can
+  persist images directly in DB columns.
+- `src/app/api/admin/stats/route.ts` — GET: dashboard summary (total /
+  published / draft product counts, category count, active newsletter
+  subscribers, new contact messages, total sales value =
+  Σ `sales * price` over published products).
+- `src/app/api/products/route.ts` (PUBLIC) — GET: `?category=<slug>&search=<text>`
+  over published products only; ILIKE search on name + shortDescription +
+  description.
+- `src/app/api/categories/route.ts` (PUBLIC) — GET: active categories ordered
+  by sortOrder, each with a `productCount` of published products.
+
+### Implementation notes
+- All admin handlers (except `auth/login` and `auth/check`) start with
+  `await requireAdmin(request)`. `requireAdmin()` throws a `Response` on
+  failure, so every handler catches it with `if (err instanceof Response)
+  return err;` to propagate the 401 instead of converting it to a 500.
+- Next.js 16 `params` is a Promise — every `[id]` handler uses
+  `const { id } = await params` after the type signature
+  `{ params: Promise<{ id: string }> }`.
+- Slug uniqueness uses a small `ensureUniqueSlug()` helper per resource type
+  that appends `-2`, `-3`, … until the slug is free. On update, the existing
+  record's id is excluded so re-saving a record keeps its slug.
+- The public `/api/products` route always forces `status: "published"` —
+  it ignores any client-supplied `status` query param.
+- The public `/api/categories` route uses `_count` with a nested `where`
+  filter so `productCount` reflects only published products, and the result
+  is reshaped to expose `productCount` as a top-level field.
+- Upload MIME resolution prefers the file extension (mapped to a canonical
+  MIME) and falls back to `file.type` only if it's in the allow-list. SVG is
+  served as `image/svg+xml`.
+- Settings PUT only accepts `Record<string, string>` values; non-string
+  values are filtered out so the `@db.Text` column is never handed objects.
+
+### Verification
+- `bun run lint` — clean (0 errors, 0 warnings).
+- `npx tsc --noEmit` — clean (no errors).
+
+### Next actions for downstream agents
+- Frontend admin panel pages can now consume these endpoints. Recommended
+  fetch helper: `fetch("/api/admin/...")` with `credentials: "include"`
+  (cookies are same-origin, httpOnly, SameSite=Lax).
+- Consider adding `export const runtime = "nodejs"` to upload route if edge
+  runtime is ever needed for other handlers — current handlers are all
+  Node.js (use `Buffer`, `crypto`, Prisma).
+- The `stats.salesValue` is computed in JS by summing `sales * price` for
+  every published product — if product count grows large, switch to a
+  Prisma `aggregate` (`_sum`) or a materialised view.
+
+---
+Task ID: ADMIN-VIEWS
+Agent: general-purpose (Admin panel views)
+
+Task: Build the complete admin panel SPA — login, layout shell, dashboard,
+products list, product create/edit, categories, and website builder. All
+views render inside the single-route Zustand router but in their own chrome
+(no public Navbar/Footer/AnnouncementBar).
+
+### Router + page shell changes
+- Extended `src/lib/router.ts` `RouteName` with `admin-login`,
+  `admin-dashboard`, `admin-products`, `admin-product-edit`,
+  `admin-categories`, `admin-builder`, and `storefront` (alias for the
+  public home/store view — the "View store" target from the admin top bar).
+- Added an `isAdminRoute(route)` helper + `ADMIN_ROUTES` array exported from
+  the router module so `page.tsx` can detect admin routes and strip the
+  public chrome.
+- Rewrote `src/app/page.tsx`:
+  - Lazy-imports all six admin views (code-split, separate chunk).
+  - Adds cases for the six admin routes + `storefront` in the view switch.
+  - When `isAdminRoute(route)` is true, returns an early minimal shell
+    (just `bg-background` + the view) — no ScrollProgress, CommandPalette,
+    ShortcutHelp, AnnouncementBar, Navbar, Footer, or BackToTop.
+  - `isHome` now also treats `storefront` as eager (renders HomeView).
+
+### Files created (all start with `"use client";`)
+1. `src/components/views/admin/admin-layout.tsx` — `AdminLayout`
+   - Sticky top bar: `<Logo size="sm" />` + "Admin" pill + signed-in name +
+     "View store" (→ home) + "Logout" (POST /api/admin/auth/logout, then
+     navigate admin-login).
+   - Desktop sidebar (w-60, sticky) with 4 nav items (Dashboard, Products,
+     Categories, Website Builder) — active item gets `border-primary/30
+     bg-primary/10 text-primary` + an animated `layoutId` dot indicator.
+   - Mobile horizontal scroll nav (fixed below top bar, hidden on lg) with
+     the same 4 items.
+   - Auth guard on mount: GET /api/admin/auth/check → on `ok` renders
+     children, otherwise navigate("admin-login"). Shows a centered
+     `Loader2` spinner while checking.
+2. `src/components/views/admin/admin-login-view.tsx` — `AdminLoginView`
+   - Centered max-w-md card over `AuroraBackground` + `bg-grid` overlay.
+   - On mount: GET /api/admin/auth/check → if ok, navigate to dashboard.
+   - Email + password inputs (with Mail/Lock icons + placholders pre-filled
+     with `admin@branify.store` / `branify123`).
+   - Submit: POST /api/admin/auth/login → on ok toast.success + navigate
+     admin-dashboard; on error toast.error(msg).
+   - "Back to store" link at the bottom (→ home).
+3. `src/components/views/admin/admin-dashboard-view.tsx` —
+   `AdminDashboardView`
+   - Fetches GET /api/admin/stats on mount.
+   - 6 stat cards in a responsive grid (Total Products, Published, Drafts,
+     Categories, Newsletter Subs, New Messages) each with a colored icon
+     and staggered Framer Motion entrance.
+   - Highlighted full-width "Total Sales Value" accent card (gradient
+     from-primary/10) with currency formatting + "Manage products" CTA.
+   - 3 quick-action cards: Add Product (→ admin-product-edit slug=new),
+     Add Category (→ admin-categories), Edit Website (→ admin-builder).
+   - Contact-messages placeholder card showing the new-messages count with
+     a disabled "View messages (coming soon)" button.
+4. `src/components/views/admin/admin-products-view.tsx` —
+   `AdminProductsView`
+   - Fetches GET /api/admin/products.
+   - Header with total/published counts + "Add product" button.
+   - Search input (name/slug/category) + segmented status filter
+     (all/published/draft).
+   - Product rows: 14×14 image thumbnail (or ImageOff fallback), name +
+     status badge (emerald for published, amber for draft), slug · category
+     · price (+ strikethrough originalPrice), Edit + Delete actions.
+   - Delete uses shadcn AlertDialog for confirmation.
+   - Empty state (with "Add product" CTA when no filters are active) and
+     "Showing X of Y" footer count.
+5. `src/components/views/admin/admin-product-edit-view.tsx` —
+   `AdminProductEditView`
+   - Reads `slug` from router store; `slug === "new"` ⇒ create form,
+     otherwise fetches GET /api/admin/products/[id] and pre-fills.
+   - Organized into 4 Tabs (Basic info / Images / Features / SEO).
+   - Basic info: name, slug (auto-generated from name until manually
+     edited — tracked via `slugTouched`), short description, full
+     description (Textarea), pricing card (price + optional originalPrice),
+     organization card (category Select fetched from
+     /api/admin/categories + status Select draft/published), flags card
+     (Popular + Is New Switches).
+   - Images: main image upload (POST /api/admin/upload → data URL → preview
+     + remove); gallery multi-upload with thumbnail grid + per-image remove
+     + "Add more" tile. Upload spinners overlay the previews.
+   - Features + Format: reusable `DynamicList` component with add/remove
+     text inputs and animated entrance.
+   - SEO: SEO title (char counter, 60 max, turns destructive when over),
+     SEO description (160 max counter), SEO keywords (comma-separated), a
+     live Google-style search-result preview card, and an info note about
+     falling back to name/shortDescription.
+   - Save: validates name + price, POST (new) or PUT (edit), toasts
+     success, navigates back to admin-products. Cancel button navigates
+     back.
+6. `src/components/views/admin/admin-categories-view.tsx` —
+   `AdminCategoriesView`
+   - Fetches GET /api/admin/categories (includes `_count.products`).
+   - Inline animated form panel (AnimatePresence height expand) for
+     create/edit: name, lucide icon name, description, sortOrder, active
+     switch.
+   - Category rows: initial-letter tile, name + active/inactive badge +
+     product-count badge, slug · icon · sort order, inline active Switch
+     (optimistic update with rollback on error), Edit + Delete (AlertDialog
+     confirmation mentioning products will become uncategorized).
+7. `src/components/views/admin/admin-builder-view.tsx` — `AdminBuilderView`
+   - Fetches GET /api/admin/settings (flat key-value), merged over typed
+     DEFAULTS so every field always has a value.
+   - 4 Tabs (Hero / Colors / Announcement / Footer).
+   - Hero: headline, subheadline, primary/secondary CTA text + a live
+     preview card that re-renders the hero (eyebrow, headline, subheadline,
+     both CTAs) against the configured background color.
+   - Colors: 4 `ColorField` components (Primary, Hover, Background, Surface)
+     each with a native `<input type="color">` swatch + hex text input +
+     preview bar. Note that applying live requires wiring the public views
+     (future task).
+   - Announcement: text textarea + active switch + gradient preview bar.
+   - Footer: tagline input + preview block.
+   - Save button shows changed-count badge and only PUTs the diff
+     (`changedKeys` memo comparing `settings` to `original`). Revert button
+     restores last-saved values.
+
+### Design system adherence
+- Every card uses `border-white/5 bg-card/40 backdrop-blur` with
+  `hover:border-primary/30 hover:bg-card/60`.
+- Primary buttons: `bg-primary text-primary-foreground hover:bg-hover`.
+- Active nav / filters use `bg-primary/15 text-primary`.
+- Status badges: emerald (published/active), amber (draft), muted (inactive).
+- All entrance animations use Framer Motion with the shared
+  `[0.21, 0.47, 0.32, 0.98]` ease curve and short staggered delays.
+- Container widths: admin shell uses `max-w-[1600px]` (wider than public
+  `max-w-7xl`) to give the dashboard room for stat grids.
+
+### Notes / decisions
+- The admin SPA reuses the existing `@/lib/router` Zustand store instead of
+  introducing a nested router — admin routes are just more `RouteName`
+  values. `page.tsx` early-returns a chrome-less shell when
+  `isAdminRoute(route)` so no public layout wraps admin views.
+- Auth is checked in `AdminLayout` (covering dashboard/products/edit/
+  categories/builder). The login view does its own check (redirect to
+  dashboard if already authed) since it intentionally renders without the
+  layout.
+- The `storefront` route is an alias for the public `HomeView` — the
+  "View store" button uses `home` directly, but `storefront` is available
+  as a distinct route name for future use.
+- The builder stores settings under a `site.*` namespace
+  (`site.hero.headline`, `site.color.primary`, etc.). A future task will
+  wire the public views to read these settings and apply them live.
+- Used `lucide-react`'s `PanelBottom` icon for the Footer tab (no `Footer`
+  icon exists in lucide-react).
+- `<img>` tags are used directly for product images (data URLs / external)
+  rather than `next/image` — these are admin-managed base64 data URLs that
+  `next/image` can't optimize at build time, and the project's eslint
+  config doesn't enforce `@next/next/no-img-element`.
+
+### Verification
+- `bun run lint` — clean (0 errors, 0 warnings).
+- `npx tsc --noEmit` — clean (no errors).
+
+### Next actions for downstream agents
+- Wire the public storefront views (home hero, announcement bar, footer,
+  CSS color variables) to read from `/api/admin/settings` so the Website
+  Builder's changes actually take effect on the live site.
+- Add a contact-messages admin view (GET /api/admin/contact) and wire the
+  dashboard "View messages" button.
+- Consider an admin route guard in the router itself (not just in
+  AdminLayout) so deep-linking to `admin-*` routes when unauthenticated
+  always bounces to login — currently handled per-view, which is fine but
+  could be centralised.
+- Seed default `site.*` settings via `src/lib/seed.ts` so the builder has
+  canonical values on a fresh database.

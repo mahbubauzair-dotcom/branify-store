@@ -38,7 +38,7 @@ model ContactMessage {
   message     String
   status      String   @default("new") // new | read | replied | archived
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  updatedAt DateTime @updatedAt
 
   @@index([email])
   @@index([status])
@@ -46,8 +46,7 @@ model ContactMessage {
 }
 
 /* ------------------------------------------------------------------ */
-/* Analytics events — persisted product analytics (optional backend    */
-/* for the track() utility; the client currently uses localStorage)   */
+/* Analytics events                                                    */
 /* ------------------------------------------------------------------ */
 model AnalyticsEvent {
   id        String   @id @default(cuid())
@@ -58,4 +57,85 @@ model AnalyticsEvent {
 
   @@index([event])
   @@index([ts])
+}
+
+/* ------------------------------------------------------------------ */
+/* Admin users — admin panel authentication                           */
+/* ------------------------------------------------------------------ */
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         String   @default("admin") // admin | superadmin
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+/* ------------------------------------------------------------------ */
+/* Categories — storefront product categories (managed via admin)     */
+/* ------------------------------------------------------------------ */
+model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  icon        String?  // lucide icon name
+  sortOrder   Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  products    Product[]
+
+  @@index([slug])
+  @@index([active])
+}
+
+/* ------------------------------------------------------------------ */
+/* Products — storefront items (managed via admin panel)              */
+/* ------------------------------------------------------------------ */
+model Product {
+  id              String   @id @default(cuid())
+  name            String
+  slug            String   @unique
+  categoryId      String?
+  category        Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  price           Float
+  originalPrice   Float?
+  shortDescription String?
+  description     String   @db.Text
+  image           String?  // main image URL or base64
+  gallery         String[] // array of image URLs/base64
+  features        String[]
+  format          String[]
+  rating          Float    @default(5.0)
+  reviews         Int      @default(0)
+  sales           Int      @default(0)
+  popular         Boolean  @default(false)
+  isNew           Boolean  @default(true)
+  status          String   @default("draft") // draft | published
+  // SEO fields
+  seoTitle        String?
+  seoDescription  String?
+  seoKeywords     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([slug])
+  @@index([categoryId])
+  @@index([status])
+}
+
+/* ------------------------------------------------------------------ */
+/* Site settings — website builder key-value store                    */
+/* Stores design tokens, hero content, branding, etc.                 */
+/* ------------------------------------------------------------------ */
+model SiteSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String   @db.Text
+  updatedAt DateTime @updatedAt
+
+  @@index([key])
 }

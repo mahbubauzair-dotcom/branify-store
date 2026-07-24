@@ -9,7 +9,7 @@ import { ScrollProgress } from "@/components/layout/scroll-progress";
 import { CommandPalette } from "@/components/layout/command-palette";
 import { BackToTop } from "@/components/layout/back-to-top";
 import { ShortcutHelp } from "@/components/layout/shortcut-help";
-import { useRouterStore } from "@/lib/router";
+import { useRouterStore, isAdminRoute } from "@/lib/router";
 import { useNavigationTracking } from "@/lib/analytics";
 import { HomeView } from "@/components/views/home-view";
 
@@ -66,6 +66,28 @@ const TermsView = lazy(() =>
 const RefundView = lazy(() =>
   import("@/components/views/legal-views").then((m) => ({ default: m.RefundView })),
 );
+// Admin panel views — lazy-loaded, render in their own shell (no public chrome).
+const AdminLoginView = lazy(() =>
+  import("@/components/views/admin/admin-login-view").then((m) => ({ default: m.AdminLoginView })),
+);
+const AdminDashboardView = lazy(() =>
+  import("@/components/views/admin/admin-dashboard-view").then((m) => ({ default: m.AdminDashboardView })),
+);
+const AdminProductsView = lazy(() =>
+  import("@/components/views/admin/admin-products-view").then((m) => ({ default: m.AdminProductsView })),
+);
+const AdminProductEditView = lazy(() =>
+  import("@/components/views/admin/admin-product-edit-view").then((m) => ({ default: m.AdminProductEditView })),
+);
+const AdminCategoriesView = lazy(() =>
+  import("@/components/views/admin/admin-categories-view").then((m) => ({ default: m.AdminCategoriesView })),
+);
+const AdminBuilderView = lazy(() =>
+  import("@/components/views/admin/admin-builder-view").then((m) => ({ default: m.AdminBuilderView })),
+);
+const StorefrontView = lazy(() =>
+  import("@/components/views/storefront-view").then((m) => ({ default: m.StorefrontView })),
+);
 
 /** A premium loading skeleton shown while a lazy view chunk loads. */
 function ViewSkeleton() {
@@ -114,6 +136,15 @@ export default function Home() {
       case "privacy": return <PrivacyView />;
       case "terms": return <TermsView />;
       case "refund": return <RefundView />;
+      // Admin panel routes — render in their own shell (no public navbar/footer).
+      case "admin-login": return <AdminLoginView />;
+      case "admin-dashboard": return <AdminDashboardView />;
+      case "admin-products": return <AdminProductsView />;
+      case "admin-product-edit": return <AdminProductEditView />;
+      case "admin-categories": return <AdminCategoriesView />;
+      case "admin-builder": return <AdminBuilderView />;
+      // "storefront" — public DB-backed shop
+      case "storefront": return <StorefrontView />;
       default: return <NotFoundView />;
     }
   }, [route, slug]);
@@ -121,8 +152,29 @@ export default function Home() {
   // Home is eager (most common); all other views are lazy-loaded with a
   // premium skeleton fallback. Hide the global ScrollProgress on blog posts
   // where the dedicated ReadingProgress bar takes over (avoids double bars).
-  const isHome = route === "home";
+  const isHome = route === "home" || route === "storefront";
   const isBlogPost = route === "blog-post";
+  const isAdmin = isAdminRoute(route);
+
+  // Admin panel renders in its own shell — no public chrome (navbar, footer,
+  // announcement bar, scroll progress, command palette, etc.).
+  if (isAdmin) {
+    return (
+      <div className="relative min-h-screen bg-background">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={route + (slug ?? "")}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <Suspense fallback={<ViewSkeleton />}>{view}</Suspense>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    );
+  }
 
   return (
     <div className="relative flex min-h-screen flex-col bg-background">

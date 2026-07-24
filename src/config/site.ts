@@ -25,6 +25,7 @@ export type NavItem = {
     | "home"
     | "services"
     | "products"
+    | "storefront"
     | "tools"
     | "portfolio"
     | "pricing"
@@ -49,6 +50,7 @@ export const navItems: NavItem[] = [
     route: "products",
     mega: { title: "Ready-to-use assets", description: "Templates, kits & bundles to launch faster." },
   },
+  { label: "Store", route: "storefront" },
   {
     label: "Free Tools",
     route: "tools",
