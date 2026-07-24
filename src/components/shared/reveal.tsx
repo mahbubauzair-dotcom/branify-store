@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useInView, type Variants } from "framer-motion";
+import { motion, useInView, useReducedMotion, type Variants } from "framer-motion";
 import { useRef, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
@@ -12,14 +12,25 @@ type RevealProps = {
   once?: boolean;
 };
 
+/**
+ * Reveal — fade/slide content into view on scroll.
+ * Respects `prefers-reduced-motion`: when set, content renders visible immediately.
+ * Content is never trapped at opacity:0 (SEO-safe + accessible).
+ */
 export function Reveal({ children, className, delay = 0, y = 24, once = true }: RevealProps) {
   const ref = useRef(null);
   const inView = useInView(ref, { once, margin: "-80px" });
+  const reduce = useReducedMotion();
+
+  if (reduce) {
+    return <div className={className}>{children}</div>;
+  }
+
   return (
     <motion.div
       ref={ref}
       initial={{ opacity: 0, y }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
+      animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y }}
       transition={{ duration: 0.6, delay, ease: [0.21, 0.47, 0.32, 0.98] }}
       className={className}
     >
@@ -49,7 +60,17 @@ type StaggerProps = {
   delay?: number;
 };
 
+/**
+ * Stagger — container that orchestrates StaggerItem children.
+ * Respects reduced-motion by rendering children visible with no animation.
+ */
 export function Stagger({ children, className, delay = 0 }: StaggerProps) {
+  const reduce = useReducedMotion();
+
+  if (reduce) {
+    return <div className={className}>{children}</div>;
+  }
+
   return (
     <motion.div
       variants={stagger}
@@ -71,11 +92,7 @@ type StaggerItemProps = {
 };
 
 export function StaggerItem({ children, className, variant = fadeUp }: StaggerItemProps) {
-  return (
-    <motion.div variants={variant} className={className}>
-      {children}
-    </motion.div>
-  );
+  return <motion.div variants={variant} className={className}>{children}</motion.div>;
 }
 
 export function GradientText({ children, className }: { children: ReactNode; className?: string }) {

@@ -24,6 +24,7 @@ import { faqItems, processSteps } from "@/data/faq";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { Reveal, Stagger, StaggerItem, GradientTextTeal } from "@/components/shared/reveal";
 import { GradientCover, AuroraBackground } from "@/components/shared/gradient-cover";
+import { CursorSpotlight } from "@/components/shared/cursor-spotlight";
 import { useCountUp, useInViewOnce } from "@/hooks/use-count-up";
 
 const whyFeatures = [
@@ -71,7 +72,8 @@ function Hero() {
       <AuroraBackground />
       <div className="absolute inset-0 bg-grid opacity-30 mask-radial" />
 
-      <motion.div style={{ y, opacity }} className="relative mx-auto max-w-7xl px-4 pt-20 pb-24 sm:px-6 lg:px-8 lg:pt-32 lg:pb-32">
+      <CursorSpotlight className="relative">
+        <motion.div style={{ y, opacity }} className="relative mx-auto max-w-7xl px-4 pt-20 pb-24 sm:px-6 lg:px-8 lg:pt-32 lg:pb-32">
         <div className="mx-auto max-w-4xl text-center">
           <motion.div
             initial={{ opacity: 0, y: 12 }}
@@ -147,6 +149,7 @@ function Hero() {
 
         <HeroDashboard />
       </motion.div>
+      </CursorSpotlight>
     </section>
   );
 }
@@ -290,8 +293,8 @@ function TrustedBrands() {
         }}>
           <div className="flex w-max animate-marquee items-center gap-12">
             {list.map((brand, i) => (
-              <div key={i} className="flex items-center gap-2 text-2xl font-display font-bold text-white/30 transition-colors hover:text-white/70">
-                <div className="h-7 w-7 rounded-lg bg-white/5" />
+              <div key={i} className="flex items-center gap-2 text-2xl font-display font-bold text-white/50 transition-colors hover:text-white">
+                <div className="h-7 w-7 rounded-lg bg-white/10" />
                 {brand}
               </div>
             ))}

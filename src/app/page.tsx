@@ -20,6 +20,9 @@ import { FaqView } from "@/components/views/faq-view";
 import { SearchView } from "@/components/views/search-view";
 import { NotFoundView } from "@/components/views/not-found-view";
 import { PrivacyView, TermsView, RefundView } from "@/components/views/legal-views";
+import { ScrollProgress } from "@/components/layout/scroll-progress";
+import { CommandPalette } from "@/components/layout/command-palette";
+import { BackToTop } from "@/components/layout/back-to-top";
 
 export default function Home() {
   const route = useRouterStore((s) => s.route);
@@ -49,6 +52,8 @@ export default function Home() {
 
   return (
     <div className="relative flex min-h-screen flex-col bg-background">
+      <ScrollProgress />
+      <CommandPalette />
       <AnnouncementBar />
       <Navbar />
       <main className="flex-1">
@@ -65,6 +70,7 @@ export default function Home() {
         </AnimatePresence>
       </main>
       <Footer />
+      <BackToTop />
     </div>
   );
 }
