@@ -1,32 +1,61 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// BRANIFY Prisma schema — PostgreSQL (Neon)
+// Learn more: https://pris.ly/d/prisma-schema
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-model User {
+/* ------------------------------------------------------------------ */
+/* Newsletter subscribers — footer + section signup forms             */
+/* ------------------------------------------------------------------ */
+model NewsletterSubscriber {
   id        String   @id @default(cuid())
   email     String   @unique
-  name      String?
+  source    String   @default("footer") // footer | blog-post | home-cta
+  active    Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@index([createdAt])
 }
 
-model Post {
+/* ------------------------------------------------------------------ */
+/* Contact / lead submissions — the contact form                      */
+/* ------------------------------------------------------------------ */
+model ContactMessage {
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  company     String?
+  projectType String?  // Website | Branding | AI | Product | Other
+  budget      String?  // < $2k | $2k–$5k | $5k–$10k | $10k+ | Custom
+  message     String
+  status      String   @default("new") // new | read | replied | archived
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([email])
+  @@index([status])
+  @@index([createdAt])
+}
+
+/* ------------------------------------------------------------------ */
+/* Analytics events — persisted product analytics (optional backend    */
+/* for the track() utility; the client currently uses localStorage)   */
+/* ------------------------------------------------------------------ */
+model AnalyticsEvent {
   id        String   @id @default(cuid())
-  title     String
-  content   String?
-  published Boolean  @default(false)
-  authorId  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  event     String   // navigate | cta_click | tool_open | search
+  props     Json?
+  path      String?
+  ts        DateTime @default(now())
+
+  @@index([event])
+  @@index([ts])
 }

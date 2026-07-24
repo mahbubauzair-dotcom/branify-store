@@ -123,7 +123,7 @@ function ContactFormCard() {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!form.name || !form.email || !form.message) {
       toast.error("Please fill in your name, email, and a short message.");
@@ -134,14 +134,26 @@ function ContactFormCard() {
       return;
     }
     setSubmitting(true);
-    // Simulate an async submit.
-    setTimeout(() => {
-      setSubmitting(false);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.ok) {
+        toast.error(data.error ?? "Submission failed. Please try again.");
+        return;
+      }
       setForm(emptyForm);
       toast.success("Message sent — we'll reply within 24 hours.", {
         description: "Check your inbox (and spam folder, just in case).",
       });
-    }, 700);
+    } catch {
+      toast.error("Network error. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (

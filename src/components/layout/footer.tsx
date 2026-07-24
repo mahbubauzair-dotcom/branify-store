@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Mail, Phone, MapPin, Twitter, Instagram, Linkedin, Dribbble, Github, Send, Check, Keyboard, ArrowUp } from "lucide-react";
+import { ArrowRight, Mail, Phone, MapPin, Twitter, Instagram, Linkedin, Dribbble, Github, Send, Check, Keyboard, ArrowUp, Sparkles } from "lucide-react";
 import { Logo } from "@/components/shared/logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,14 +37,36 @@ export function Footer() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  const subscribe = (e: React.FormEvent) => {
+  const subscribe = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
-    setSubscribed(true);
-    toast.success("You're on the list! Check your inbox for a welcome email.");
-    setEmail("");
-    setTimeout(() => setSubscribed(false), 3000);
+    if (!email || submitting) return;
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, source: "footer" }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.ok) {
+        toast.error(data.error ?? "Subscription failed. Please try again.");
+        return;
+      }
+      setSubscribed(true);
+      toast.success(
+        data.isNew
+          ? "You're on the list! Check your inbox for a welcome email."
+          : "Welcome back — you're subscribed again!",
+      );
+      setEmail("");
+      setTimeout(() => setSubscribed(false), 3000);
+    } catch {
+      toast.error("Network error. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -74,8 +96,8 @@ export function Footer() {
                   placeholder="you@company.com"
                   className="bg-background/50 border-white/10"
                 />
-                <Button type="submit" size="icon" className="bg-primary text-primary-foreground hover:bg-hover shrink-0">
-                  {subscribed ? <Check className="h-4 w-4" /> : <Send className="h-4 w-4" />}
+                <Button type="submit" size="icon" disabled={submitting} className="bg-primary text-primary-foreground hover:bg-hover shrink-0">
+                  {subscribed ? <Check className="h-4 w-4" /> : submitting ? <Sparkles className="h-4 w-4 animate-pulse" /> : <Send className="h-4 w-4" />}
                 </Button>
               </div>
               <p className="mt-2 text-xs text-muted-foreground/70">

@@ -991,3 +991,63 @@ Task: QA via agent-browser + VLM, complete schema.org JSON-LD coverage (Service/
 3. **About team bento layout:** VLM suggested an asymmetric bento grid for the team section (one large feature card spanning 2 columns). Round 10 added hover polish but kept the symmetric grid.
 4. **Reading-time dynamic calculation:** Compute reading time from content word count instead of the stored static value (round 9 suggestion).
 5. **Open Graph images:** Add dynamic OG image generation per page (service/product/blog) for richer social sharing — currently all pages share the default OG metadata.
+
+---
+Task ID: 19 (Database migration to PostgreSQL (Neon) + DB-backed API routes)
+Agent: Main (Architect)
+Task: Migrate BRANIFY from SQLite to PostgreSQL using the user-provided Neon connection string; design BRANIFY-relevant schema, create DB-backed API routes, wire the newsletter + contact forms to persist real data.
+
+## Current Project Status Assessment
+- BRANIFY was a fully client-side SPA (17 views, all data in TypeScript files) with a placeholder SQLite Prisma schema (User/Post models) that the app never used.
+- The user provided a Neon PostgreSQL connection string, requesting migration to a real database.
+- This round: migrated datasource, designed a BRANIFY-relevant schema, pushed tables to Neon, created API routes, and wired the newsletter + contact forms to persist real submissions.
+
+## Completed Modifications
+
+### Database migration: SQLite → PostgreSQL (Neon)
+- **File:** `.env` — set `DATABASE_URL` to the Neon pooled connection string (postgresql://...neon.tech/neondb?sslmode=require&channel_binding=require).
+- **File:** `prisma/schema.prisma` — changed `provider` from `sqlite` to `postgresql`. Replaced placeholder User/Post models with 3 BRANIFY-relevant models:
+  - `NewsletterSubscriber` (id, email @unique, source, active, timestamps) + indexes on email/createdAt.
+  - `ContactMessage` (id, name, email, company?, projectType?, budget?, message, status, timestamps) + indexes on email/status/createdAt.
+  - `AnalyticsEvent` (id, event, props Json?, path?, ts) + indexes on event/ts.
+- **Pushed to Neon:** `prisma db push` created all 3 tables in 9.89s. Verified via `pg_tables`: NewsletterSubscriber, ContactMessage, AnalyticsEvent all exist in the `public` schema.
+
+### Robustness fix: db.ts reads .env directly
+- **File:** `src/lib/db.ts`
+- **Problem:** The auto-managed dev server's shell has a stale `DATABASE_URL` (old SQLite path). Next.js loads `.env` but does NOT override existing `process.env` values, so Prisma would pick up the wrong SQLite URL.
+- **Fix:** `db.ts` now resolves DATABASE_URL directly: (1) prefers an explicit postgres URL in process.env, (2) otherwise reads + parses the `.env` file via `fs.readFileSync`, (3) falls back to process.env. Sets `process.env.DATABASE_URL` + passes `datasources: { db: { url } }` to PrismaClient explicitly. Guaranteed correct URL regardless of shell environment.
+
+### New API routes (DB-backed)
+- **File:** `src/app/api/newsletter/route.ts` (new) — `POST /api/newsletter`. Body: `{ email, source? }`. Validates email regex, upserts (create or reactivate with `active:true`), returns `{ ok, email, isNew }` with 201 (new) / 200 (reactivated). Idempotent.
+- **File:** `src/app/api/contact/route.ts` (new) — `POST /api/contact`. Body: `{ name, email, company?, projectType?, budget?, message }`. Validates required fields + email + message length (≤5000). Creates a ContactMessage with `status:"new"`, returns `{ ok, id }` with 201.
+
+### Wired forms to DB-backed API
+- **File:** `src/components/layout/footer.tsx` — newsletter `subscribe()` now async: POSTs to `/api/newsletter` with `{ email, source: "footer" }`, handles loading state (Sparkles pulse icon + disabled), success toast (isNew-aware message), and error toast. Replaced the old simulated setTimeout.
+- **File:** `src/components/views/contact-view.tsx` — contact `handleSubmit()` now async: POSTs to `/api/contact` with the full form object, handles loading/error/success states. Replaced the old simulated setTimeout.
+
+## Verification Results
+- `bun run lint` → clean (exit 0).
+- `npx tsc --noEmit` → zero errors in src/.
+- **Neon DB connection:** verified — `pg_tables` returns the 3 BRANIFY tables in `public` schema.
+- **Newsletter API (curl):**
+  - New subscriber `sarah@lumen.io` → `{"ok":true,"isNew":true}` HTTP 201.
+  - Re-subscribe same email → `{"ok":true,"isNew":false}` HTTP 200 (idempotent reactivation).
+  - Invalid email `not-an-email` → `{"ok":false,"error":"A valid email is required."}` HTTP 400.
+  - Persisted to DB: NewsletterSubscriber table holds the rows (verified via Prisma count/findMany).
+- **Contact API (curl):**
+  - `Sarah Chen` / `sarah@lumenlabs.io` / Website / $5k–$10k → `{"ok":true,"id":"cmrys9hvi..."}` HTTP 201.
+  - `David Park` / `david@vertex.ai` / AI / $10k+ → `{"ok":true,"id":"cmryse96f..."}` HTTP 201.
+  - Persisted to DB: ContactMessage table holds both with status "new" (verified via Prisma findMany).
+- **Final DB state:** 2 NewsletterSubscriber rows + 2 ContactMessage rows confirmed in Neon.
+
+## Unresolved Issues / Risks
+- **Dev server instability:** The auto-managed `bun run dev` process dies after a few requests (a persistent environment issue across rounds). Browser-based form submission tests sometimes fail because the server dies mid-fetch. Direct curl tests (which run immediately after server start) consistently succeed and prove the full stack works. The form wiring is correct (verified via code review + the curl tests hitting the same endpoints).
+- **AnalyticsEvent table unused:** The AnalyticsEvent model exists in the schema but the client `track()` utility still writes to localStorage. Wiring `track()` to POST to a `/api/analytics` route is a future enhancement (the model + table are ready).
+- **No migrations:** Used `db push` (no migration history). For production, switch to `prisma migrate dev` to get versioned migrations. Acceptable for the current stage.
+
+## Priority Recommendations for Next Phase
+1. **Wire analytics to DB:** Create `POST /api/analytics` route + update `src/lib/analytics.ts` `track()` to fire-and-forget POST (with batching/debounce) so AnalyticsEvent rows populate.
+2. **Admin view:** A simple `/admin` (or hidden route) to view ContactMessage + NewsletterSubscriber lists — currently only queryable via DB. Could add basic auth.
+3. **Email notifications:** Wire the contact + newsletter routes to actually send emails via Resend (installed in package.json but unused) — e.g., notify the team on new contact, send a welcome email to new subscribers.
+4. **Prisma migrations:** Switch from `db push` to `prisma migrate dev` for versioned migration history before production.
+5. **Rate limiting:** Add basic rate limiting to the POST routes (e.g., per-IP) to prevent spam/abuse.
