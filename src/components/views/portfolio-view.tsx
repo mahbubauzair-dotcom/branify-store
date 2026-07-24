@@ -112,19 +112,22 @@ function FilterableGrid() {
                   key={cat}
                   onClick={() => setActiveCategory(cat)}
                   className={
-                    "inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium transition-all " +
+                    "inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium transition-all " +
                     (active
-                      ? "bg-primary text-primary-foreground shadow-glow"
-                      : "border border-white/10 bg-white/5 text-white/70 hover:border-primary/30 hover:bg-white/10 hover:text-white")
+                      ? "border border-primary/30 bg-primary/10 text-white"
+                      : "border border-transparent text-white/60 hover:bg-white/5 hover:text-white")
                   }
                 >
+                  {active && (
+                    <span className="h-1.5 w-1.5 rounded-full bg-primary" aria-hidden="true" />
+                  )}
                   {cat}
                   <span
                     className={
-                      "rounded-full px-1.5 py-0.5 text-[10px] font-semibold " +
+                      "rounded-full px-1.5 py-0.5 text-[10px] font-semibold tabular-nums " +
                       (active
-                        ? "bg-primary-foreground/20 text-primary-foreground"
-                        : "bg-white/10 text-white/60")
+                        ? "bg-primary/20 text-primary"
+                        : "bg-white/5 text-white/50")
                     }
                   >
                     {count}

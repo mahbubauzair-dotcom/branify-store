@@ -8,6 +8,7 @@ import { Footer } from "@/components/layout/footer";
 import { ScrollProgress } from "@/components/layout/scroll-progress";
 import { CommandPalette } from "@/components/layout/command-palette";
 import { BackToTop } from "@/components/layout/back-to-top";
+import { ShortcutHelp } from "@/components/layout/shortcut-help";
 import { useRouterStore } from "@/lib/router";
 import { useNavigationTracking } from "@/lib/analytics";
 import { HomeView } from "@/components/views/home-view";
@@ -121,6 +122,7 @@ export default function Home() {
     <div className="relative flex min-h-screen flex-col bg-background">
       <ScrollProgress />
       <CommandPalette />
+      <ShortcutHelp />
       <AnnouncementBar />
       <Navbar />
       <main className="flex-1">

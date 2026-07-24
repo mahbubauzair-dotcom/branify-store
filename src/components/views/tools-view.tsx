@@ -20,6 +20,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useNavigate } from "@/lib/router";
+import { track } from "@/lib/analytics";
 import { siteConfig } from "@/config/site";
 import { tools, type Tool } from "@/data/tools";
 import { PageHeader } from "@/components/shared/page-header";
@@ -147,7 +148,7 @@ function ToolsGrid() {
         <Stagger className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filtered.map((tool) => (
             <StaggerItem key={tool.slug}>
-              <ToolCard tool={tool} onOpen={() => setOpenTool(tool)} />
+              <ToolCard tool={tool} onOpen={() => { track("tool_open", { slug: tool.slug, name: tool.name }); setOpenTool(tool); }} />
             </StaggerItem>
           ))}
         </Stagger>

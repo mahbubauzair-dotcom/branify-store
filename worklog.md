@@ -590,3 +590,78 @@ Task: QA via agent-browser + VLM, ship scroll parallax, unify premium card hover
 3. **Filter pill refinement:** Portfolio/Blog/Products category filter pills could use the VLM-suggested subtle active state (low-opacity fill + teal dot indicator).
 4. **Parallax on portfolio covers:** Extend parallax to portfolio GradientCover headers for additional depth on the portfolio grid.
 5. **Keyboard shortcut help:** Add a "?" key shortcut that opens a modal listing all keyboard shortcuts (⌘K, /, Esc, etc.) — premium SaaS touch (Linear, Notion have this).
+
+---
+Task ID: 13 (webDevReview round 5 — Enterprise card + complete analytics + shortcuts + filter polish)
+Agent: Main (Architect) — triggered by webDevReview cron job
+Task: QA via agent-browser + VLM, ship Enterprise card differentiation, complete analytics coverage, keyboard shortcut help modal, and refined filter pills.
+
+## Current Project Status Assessment
+- BRANIFY is stable: 16 lazy-loaded views, command palette (⌘K + Recently visited), scroll progress, back-to-top, cursor spotlight, magnetic CTAs, JSON-LD SEO, section dividers/glows, unified premium card system, parallax, analytics utility with navigation tracking.
+- QA this round: HTTP 200, no page errors, no console errors. Pricing + Blog views load and navigate cleanly.
+- VLM analysis of pricing page confirmed the Enterprise "Custom" card still lacked visual weight (flagged since round 3) — this was the top priority fix.
+- Priority recommendations from round 4: complete analytics coverage, Enterprise card differentiation, filter pill refinement, parallax on portfolio covers, keyboard shortcut help modal.
+
+## Completed Modifications
+
+### Fixed: Pricing Enterprise card differentiation (flagged since round 3)
+- **File:** `src/components/views/pricing-view.tsx`
+- Enterprise card now has a distinct premium treatment:
+  - `.border-gradient` utility class (animated gradient border from globals.css) for a subtle teal edge.
+  - `bg-card/30` (slightly darker than the standard `bg-card/40`) with `hover:border-primary/40`.
+  - Glassmorphism gradient wash overlay (`from-white/[0.04] via-transparent to-primary/[0.04]`).
+  - "Most flexible" badge with a Crown icon (lucide), frosted glass style (`border-primary/30 bg-white/5 backdrop-blur`), positioned at the top center (same placement as the Professional "Most popular" badge).
+- Added `Crown` to the lucide-react imports.
+- **Verified:** 1 `.border-gradient` card, 1 `svg.lucide-crown` icon, "Most flexible" text present on the pricing page.
+
+### New Feature: Complete analytics coverage (round 4 priority)
+- **Navbar CTAs** (`src/components/layout/navbar.tsx`): "Sign in" and "Start a project" buttons now call `track("cta_click", { label, location: "navbar" })`.
+- **Tool opens** (`src/components/views/tools-view.tsx`): opening any tool dialog calls `track("tool_open", { slug, name })`.
+- **Search queries** (`src/components/views/search-view.tsx`): debounced (800ms) `track("search", { query })` fires after the user stops typing, avoiding per-keystroke spam.
+- **Verified:**
+  - Cleared localStorage → clicked navbar "Start a project" → 1 `cta_click` event with `{label: "Start a project", location: "navbar"}`.
+  - Opened Password Generator tool → 1 `tool_open` event with `{slug: "password-generator", name: "Password Generator"}`.
+- Analytics now covers: `navigate` (all route changes), `cta_click` (hero + navbar), `tool_open` (10 tools), `search` (debounced). Full funnel tracking ready for a backend swap.
+
+### New Feature: Keyboard shortcut help modal (? key)
+- **File:** `src/components/layout/shortcut-help.tsx` (new)
+- A glass modal listing all 6 keyboard shortcuts: ⌘K (command palette), ? (this help), / (focus search), ↑↓ (navigate palette), ↵ (select), Esc (close). Premium SaaS touch (Linear, Notion, Raycast all have this).
+- **Global key listeners** (all ignore typing in inputs/textareas/contenteditable):
+  - `?` (Shift+/) toggles the help modal.
+  - `/` navigates directly to the search view.
+  - `Escape` closes the modal.
+- UI: glass modal (bg-card/95 backdrop-blur-2xl), header with Command icon tile + title, shortcut list with icon + label + kbd keys, footer "Back to home" link.
+- **Wired:** `<ShortcutHelp />` added to the root layout in `page.tsx`.
+- **Verified:** dispatched `?` keydown → dialog with `aria-label="Keyboard shortcuts"` opened, all 6 shortcut labels present (Open command palette, Show this help, Focus search, Navigate palette items, Select palette item, Close dialog/palette). `/` keydown navigated to search ("Find anything across BRANIFY" h1 confirmed). Escape closed the modal.
+
+### Polish: Refined filter pills (VLM suggestion)
+- **File:** `src/components/views/portfolio-view.tsx`
+- Portfolio category filter pills redesigned per VLM feedback ("subtle active state + teal dot indicator"):
+  - **Active state:** `border border-primary/30 bg-primary/10 text-white` (was solid `bg-primary text-primary-foreground shadow-glow`) — softer, more refined.
+  - **Active dot:** a 1.5×1.5px teal dot (`bg-primary`) appears before the active category label.
+  - **Inactive state:** `border-transparent text-white/60 hover:bg-white/5 hover:text-white` (was bordered with bg) — cleaner, less visual noise.
+  - Count badge: active uses `bg-primary/20 text-primary`, inactive uses `bg-white/5 text-white/50`, both with `tabular-nums`.
+
+## Verification Results
+- `bun run lint` → clean (exit 0, no warnings, no errors).
+- `npx tsc --noEmit` → zero errors in src/ (only pre-existing errors in examples/ & skills/).
+- Dev server: HTTP 200, stable (~217-479ms render).
+- **Agent Browser QA:**
+  - Homepage loads, no page errors, no console errors.
+  - Keyboard shortcut help: `?` opens modal (aria-label confirmed), 6 shortcuts listed, `/` navigates to search, Escape closes.
+  - Enterprise card: 1 `.border-gradient` card, 1 Crown icon, "Most flexible" badge present.
+  - Navbar CTA tracking: `cta_click` with `{label, location: "navbar"}` recorded.
+  - Tool open tracking: `tool_open` with `{slug, name}` recorded for Password Generator.
+  - Filter pills: refined active/inactive states with teal dot indicator.
+
+## Unresolved Issues / Risks
+- **Full-page screenshot limitation persists:** VLM full-page screenshots still miss below-fold content (Framer Motion `whileInView` opacity). The DOM-level agent-browser checks remain the source of truth. A future round could implement a "scroll-to-load then screenshot" approach or use `loading="eager"` for above-the-fold sections.
+- **Harmless warning persists:** Framer Motion `useScroll` position warning on hero (documented since round 1). No functional impact.
+- **Analytics backend not connected:** The `track()` utility currently writes to localStorage. Swapping to PostHog/Mixpanel/Plausible is a one-line change in `src/lib/analytics.ts`, but no backend is wired yet. By design — localStorage works for dev/demo.
+
+## Priority Recommendations for Next Phase
+1. **Extend shortcut help discovery:** Add a small "?" hint button in the navbar or footer so users discover the keyboard shortcuts (currently only discoverable by pressing ?).
+2. **Parallax on portfolio covers:** Round 4 recommendation still pending — extend parallax to portfolio GradientCover headers for additional depth.
+3. **Filter pill refinement on Blog + Products:** Apply the same refined active-state + teal-dot pattern to Blog category pills and Products category pills for consistency (currently only Portfolio is refined).
+4. **Performance audit:** Run a Lighthouse-style audit via agent-browser to measure actual LCP/INP/CLS and identify any remaining performance wins.
+5. **404 page polish:** The NotFoundView could get a search input + popular pages to help lost users recover (currently just links home/services).

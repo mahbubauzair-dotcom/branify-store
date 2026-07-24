@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { navItems, siteConfig } from "@/config/site";
 import { useRouterStore, useNavigate, type RouteName } from "@/lib/router";
+import { track } from "@/lib/analytics";
 import { services } from "@/data/services";
 import { products, productCategories } from "@/data/products";
 import { tools } from "@/data/tools";
@@ -103,14 +104,20 @@ export function Navbar() {
             </kbd>
           </button>
           <Button
-            onClick={() => go("contact")}
+            onClick={() => {
+              track("cta_click", { label: "Sign in", location: "navbar" });
+              go("contact");
+            }}
             variant="ghost"
             className="hidden text-sm text-muted-foreground hover:text-white md:inline-flex"
           >
             Sign in
           </Button>
           <Button
-            onClick={() => go("contact")}
+            onClick={() => {
+              track("cta_click", { label: "Start a project", location: "navbar" });
+              go("contact");
+            }}
             size="sm"
             className="hidden bg-primary text-primary-foreground hover:bg-hover sm:inline-flex"
           >

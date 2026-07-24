@@ -22,6 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useNavigate, useRouterStore, type RouteName } from "@/lib/router";
+import { track } from "@/lib/analytics";
 import { services } from "@/data/services";
 import { products } from "@/data/products";
 import { blogPosts } from "@/data/blog";
@@ -100,6 +101,15 @@ export function SearchView() {
   const [query, setQuery] = useState(initialQuery);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+
+  // Track searches (debounced — only fires after the user stops typing for 800ms
+  // and has a non-empty query, to avoid spamming analytics on every keystroke).
+  useEffect(() => {
+    const q = query.trim();
+    if (!q) return;
+    const t = setTimeout(() => track("search", { query: q }), 800);
+    return () => clearTimeout(t);
+  }, [query]);
 
   // Autofocus on mount
   useEffect(() => {

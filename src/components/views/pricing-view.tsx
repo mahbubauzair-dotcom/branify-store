@@ -11,6 +11,7 @@ import {
   Zap,
   Clock,
   Mail,
+  Crown,
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -183,7 +184,9 @@ function PlanCard({
         "relative flex h-full flex-col overflow-hidden rounded-2xl p-6 backdrop-blur transition-all " +
         (highlighted
           ? "border-primary bg-card/60 shadow-glow lg:-translate-y-3 lg:scale-[1.03]"
-          : "border-white/5 bg-card/40 hover:border-primary/30 hover:bg-card/60")
+          : isEnterprise
+            ? "border-gradient bg-card/30 hover:border-primary/40 hover:bg-card/50"
+            : "border-white/5 bg-card/40 hover:border-primary/30 hover:bg-card/60")
       }
     >
       {highlighted && (
@@ -196,10 +199,21 @@ function PlanCard({
           </div>
         </>
       )}
+      {isEnterprise && (
+        <>
+          {/* subtle glassmorphism + gradient wash for the premium tier */}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/[0.04] via-transparent to-primary/[0.04]" />
+          <div className="absolute left-1/2 top-0 -translate-x-1/2">
+            <Badge className="rounded-b-md rounded-t-none border border-primary/30 bg-white/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-primary backdrop-blur">
+              <Crown className="mr-1 h-3 w-3" /> Most flexible
+            </Badge>
+          </div>
+        </>
+      )}
 
       <div className="relative">
         <div className="flex items-center justify-between">
-          <h3 className="font-display text-xl font-bold text-white">{plan.name}</h3>
+          <h3 className={"font-display text-xl font-bold " + (isEnterprise ? "text-white" : "text-white")}>{plan.name}</h3>
           {plan.popular && !highlighted && (
             <Badge className="bg-primary/15 text-primary hover:bg-primary/20">Popular</Badge>
           )}
