@@ -96,7 +96,7 @@ export function Footer() {
                   placeholder="you@company.com"
                   className="bg-background/50 border-white/10"
                 />
-                <Button type="submit" size="icon" disabled={submitting} className="bg-primary text-primary-foreground hover:bg-hover shrink-0">
+                <Button type="submit" size="icon" disabled={submitting} className="bg-gradient-to-r from-[#00E5FF] to-[#18F2B2] text-[#04121a] hover:opacity-90 shrink-0">
                   {subscribed ? <Check className="h-4 w-4" /> : submitting ? <Sparkles className="h-4 w-4 animate-pulse" /> : <Send className="h-4 w-4" />}
                 </Button>
               </div>
@@ -220,6 +220,21 @@ export function Footer() {
               >
                 <s.icon className="h-4 w-4" />
               </a>
+            ))}
+          </div>
+        </div>
+
+        {/* Payment methods */}
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-2 border-t border-white/5 pt-6 sm:justify-between">
+          <p className="text-[11px] text-muted-foreground/60">Secure payments powered by</p>
+          <div className="flex items-center gap-2">
+            {["VISA", "MC", "AMEX", "PayPal", "Stripe"].map((p) => (
+              <span
+                key={p}
+                className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-[9px] font-bold tracking-wider text-muted-foreground/80"
+              >
+                {p}
+              </span>
             ))}
           </div>
         </div>

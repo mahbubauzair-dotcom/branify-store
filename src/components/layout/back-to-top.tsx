@@ -48,7 +48,7 @@ export function BackToTop() {
               cx="24"
               cy="24"
               r="22"
-              stroke="#0fe1d2"
+              stroke="#00E5FF"
               strokeWidth="2"
               fill="none"
               style={{ pathLength }}

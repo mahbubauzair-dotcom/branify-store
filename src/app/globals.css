@@ -50,65 +50,65 @@
 
 :root {
   --radius: 0.875rem;
-  /* BRANIFY Dark Theme — forced dark */
-  --background: #0b1120;
+  /* BRANIFY Premium Dark — futuristic AI eCommerce */
+  --background: #050816;
   --foreground: #ffffff;
-  --card: #131c31;
+  --card: #111827;
   --card-foreground: #ffffff;
-  --popover: #131c31;
+  --popover: #111827;
   --popover-foreground: #ffffff;
-  --primary: #0fe1d2;
+  --primary: #00E5FF;
   --primary-foreground: #04121a;
-  --secondary: #1c2740;
+  --secondary: #7B61FF;
   --secondary-foreground: #ffffff;
-  --muted: #1c2740;
-  --muted-foreground: #cbd5e1;
-  --accent: #0fe1d2;
+  --muted: #1a2238;
+  --muted-foreground: #BFC7D5;
+  --accent: #18F2B2;
   --accent-foreground: #04121a;
   --destructive: #f43f5e;
   --border: rgba(255, 255, 255, 0.08);
   --input: rgba(255, 255, 255, 0.1);
-  --ring: #0fe1d2;
-  --surface: #131c31;
-  --surface-2: #18243f;
-  --hover: #02b6bc;
-  --chart-1: #0fe1d2;
-  --chart-2: #2fb8af;
-  --chart-3: #818cf8;
+  --ring: #00E5FF;
+  --surface: #111827;
+  --surface-2: #0B1022;
+  --hover: #00C4D8;
+  --chart-1: #00E5FF;
+  --chart-2: #7B61FF;
+  --chart-3: #18F2B2;
   --chart-4: #fbbf24;
   --chart-5: #f472b6;
-  --sidebar: #0b1120;
+  --sidebar: #050816;
   --sidebar-foreground: #ffffff;
-  --sidebar-primary: #0fe1d2;
+  --sidebar-primary: #00E5FF;
   --sidebar-primary-foreground: #04121a;
-  --sidebar-accent: #131c31;
+  --sidebar-accent: #111827;
   --sidebar-accent-foreground: #ffffff;
   --sidebar-border: rgba(255, 255, 255, 0.08);
-  --sidebar-ring: #0fe1d2;
+  --sidebar-ring: #00E5FF;
 }
 
 .dark {
-  --background: #0b1120;
+  --background: #050816;
   --foreground: #ffffff;
-  --card: #131c31;
+  --card: #111827;
   --card-foreground: #ffffff;
-  --popover: #131c31;
+  --popover: #111827;
   --popover-foreground: #ffffff;
-  --primary: #0fe1d2;
+  --primary: #00E5FF;
   --primary-foreground: #04121a;
-  --secondary: #1c2740;
+  --secondary: #7B61FF;
   --secondary-foreground: #ffffff;
-  --muted: #1c2740;
-  --muted-foreground: #cbd5e1;
-  --accent: #0fe1d2;
+  --muted: #1a2238;
+  --muted-foreground: #BFC7D5;
+  --accent: #18F2B2;
   --accent-foreground: #04121a;
   --destructive: #f43f5e;
   --border: rgba(255, 255, 255, 0.08);
   --input: rgba(255, 255, 255, 0.1);
-  --ring: #0fe1d2;
-  --surface: #131c31;
-  --surface-2: #18243f;
-  --hover: #02b6bc;
+  --ring: #00E5FF;
+  --surface: #111827;
+  --surface-2: #0B1022;
+  --hover: #00C4D8;
 }
 
 @layer base {
@@ -145,7 +145,7 @@
   border: 2px solid #0b1120;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #0fe1d2;
+  background: #00E5FF;
 }
 
 @layer utilities {
@@ -172,14 +172,14 @@
 
   /* Gradient text */
   .text-gradient {
-    background: linear-gradient(135deg, #ffffff 0%, #2fb8af 50%, #0fe1d2 100%);
+    background: linear-gradient(135deg, #ffffff 0%, #00E5FF 50%, #7B61FF 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
   }
   .text-gradient-teal {
-    background: linear-gradient(135deg, #0fe1d2 0%, #02b6bc 50%, #2fb8af 100%);
+    background: linear-gradient(135deg, #00E5FF 0%, #18F2B2 50%, #7B61FF 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -188,10 +188,10 @@
 
   /* Premium shadows */
   .shadow-glow {
-    box-shadow: 0 0 0 1px rgba(15, 225, 210, 0.2), 0 8px 40px -8px rgba(15, 225, 210, 0.35);
+    box-shadow: 0 0 0 1px rgba(0, 229, 255, 0.2), 0 8px 40px -8px rgba(0, 229, 255, 0.35);
   }
   .shadow-glow-lg {
-    box-shadow: 0 0 0 1px rgba(15, 225, 210, 0.25), 0 20px 60px -12px rgba(15, 225, 210, 0.45);
+    box-shadow: 0 0 0 1px rgba(0, 229, 255, 0.25), 0 20px 60px -12px rgba(0, 229, 255, 0.45);
   }
   .shadow-premium {
     box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.04);
@@ -318,10 +318,10 @@
 
   /* Glass badge — frosted, low-opacity, backdrop-blurred */
   .glass-badge {
-    background: rgba(15, 225, 210, 0.1);
-    color: #0fe1d2;
+    background: rgba(0, 229, 255, 0.1);
+    color: #00E5FF;
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(15, 225, 210, 0.2);
+    border: 1px solid rgba(0, 229, 255, 0.2);
   }
 }

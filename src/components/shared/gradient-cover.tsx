@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils";
 
 const gradientMap: Record<string, string> = {
-  "gradient-teal": "from-[#0fe1d2]/30 via-[#02b6bc]/20 to-slate-900",
+  "gradient-teal": "from-[#00E5FF]/30 via-[#7B61FF]/20 to-slate-900",
   "gradient-violet": "from-violet-500/30 via-violet-700/20 to-slate-900",
   "gradient-cyan": "from-cyan-500/30 via-blue-700/20 to-slate-900",
   "gradient-amber": "from-amber-500/30 via-orange-700/20 to-slate-900",
@@ -93,8 +93,8 @@ export function GradientCover({
 export function AuroraBackground({ className }: { className?: string }) {
   return (
     <div className={cn("pointer-events-none absolute inset-0 overflow-hidden", className)}>
-      <div className="absolute top-[-10%] left-[20%] w-[40rem] h-[40rem] rounded-full bg-[#0fe1d2]/15 blur-[120px] animate-pulse-slow" />
-      <div className="absolute bottom-[-15%] right-[10%] w-[35rem] h-[35rem] rounded-full bg-[#02b6bc]/10 blur-[120px] animate-pulse-slow" style={{ animationDelay: "1s" }} />
+      <div className="absolute top-[-10%] left-[20%] w-[40rem] h-[40rem] rounded-full bg-[#00E5FF]/15 blur-[120px] animate-pulse-slow" />
+      <div className="absolute bottom-[-15%] right-[10%] w-[35rem] h-[35rem] rounded-full bg-[#7B61FF]/10 blur-[120px] animate-pulse-slow" style={{ animationDelay: "1s" }} />
       <div className="absolute top-[30%] right-[30%] w-[25rem] h-[25rem] rounded-full bg-violet-500/8 blur-[100px] animate-pulse-slow" style={{ animationDelay: "2s" }} />
     </div>
   );
