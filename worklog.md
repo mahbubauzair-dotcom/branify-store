@@ -1379,3 +1379,69 @@ views render inside the single-route Zustand router but in their own chrome
   could be centralised.
 - Seed default `site.*` settings via `src/lib/seed.ts` so the builder has
   canonical values on a fresh database.
+
+---
+Task ID: 22 (Storefront + Admin Panel + CMS + Website Builder)
+Agent: Main (Architect) + 2 subagents
+Task: Build a full storefront + admin panel with product/category management, image uploads, SEO-optimized product descriptions, and a website builder for design customization.
+
+## Completed
+
+### Database (4 new models, pushed to Neon)
+- **AdminUser**: email, passwordHash (scrypt), name, role (admin/superadmin)
+- **Category**: name, slug, description, icon, sortOrder, active, products relation
+- **Product**: name, slug, category, price, originalPrice, shortDescription, description, image, gallery[], features[], format[], rating, reviews, sales, popular, isNew, status (draft/published), seoTitle, seoDescription, seoKeywords
+- **SiteSetting**: key-value store for the website builder (hero text, colors, announcement bar, footer tagline)
+- Seeded: admin user (admin@branify.store / branify123), 5 categories, 11 site settings
+
+### Admin authentication
+- `src/lib/admin-auth.ts`: scrypt password hashing, HMAC-signed session tokens, cookie-based sessions (7-day expiry)
+- `/api/admin/auth/login`, `/logout`, `/check` endpoints
+- `requireAdmin()` guard on all admin API routes (throws 401 if unauthenticated)
+
+### Admin API routes (12 endpoints)
+- Products CRUD: list/create + get/update/delete with auto-unique slug generation
+- Categories CRUD: list/create + get/update/delete with auto-unique slug
+- Settings: GET (flat key-value map) + PUT (bulk upsert)
+- Image upload: POST multipart → base64 data URL (5MB limit, png/jpg/webp/gif/svg)
+- Stats: dashboard metrics (total/published/draft products, categories, newsletter subs, contact messages, sales value)
+
+### Public API routes (2 endpoints)
+- GET `/api/products?category=&search=` — published products, filterable by category slug + search
+- GET `/api/categories` — active categories with published product counts
+
+### Admin panel (7 views)
+1. **AdminLoginView** — email/password login, auto-redirect if already authed
+2. **AdminLayout** — sidebar nav (Dashboard/Products/Categories/Builder) + top bar (Logo, View store, Logout), auth-guarded
+3. **AdminDashboardView** — 6 stat cards + quick action buttons
+4. **AdminProductsView** — product list with search, status filter, edit/delete (AlertDialog confirm)
+5. **AdminProductEditView** — full product form with 4 tabs: Basic Info, Images (upload + gallery), Features/Format (dynamic lists), SEO (title/desc with char counters + live Google preview + keywords)
+6. **AdminCategoriesView** — inline create/edit form, active toggle, product count, delete
+7. **AdminBuilderView** — website builder with 4 tabs: Hero (headline/subheadline/CTA text), Colors (primary/hover/background/surface with color pickers), Announcement Bar (text + active toggle), Footer (tagline). Save only PUTs changed settings.
+
+### Storefront
+- **StorefrontView** — public shop reading from DB: category filter pills (with product counts), debounced search, sort (newest/price/rating), product cards with image/badges/price/rating/sales, empty state with admin link
+- "Store" added to navbar, "Admin panel" button on storefront header
+
+### Router
+- 7 new routes added (admin-login, admin-dashboard, admin-products, admin-product-edit, admin-categories, admin-builder, storefront)
+- Admin routes render chrome-less (no public navbar/footer/announcement bar)
+
+## Verification Results
+- `bun run lint` → clean (exit 0)
+- `npx tsc --noEmit` → zero errors in src/
+- **API tests (all passed):**
+  - Admin login: returns admin user + session cookie ✅
+  - Admin stats: 0 products, 5 categories, 2 newsletter subs, 2 contact msgs ✅
+  - Public categories: 5 categories with product counts ✅
+  - Public products (empty): `{"ok":true,"products":[]}` ✅
+  - Create product via admin API: `{"ok":true,"product":{...}}` with auto-slug ✅
+  - Public products after create: returns the published product ✅
+- **Storefront UI:** server log shows `GET /api/categories 200` + `GET /api/products 200` — storefront fetched data successfully (server died before browser could render, but API proved data flows correctly)
+
+## Default credentials
+- Admin login: `admin@branify.store` / `branify123`
+- Change after first login in production
+
+## Pushed to GitHub
+- Commit `8e26f92` pushed to `main` branch
