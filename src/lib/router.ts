@@ -28,7 +28,32 @@ export type RouteName =
   | "admin-products"
   | "admin-product-edit"
   | "admin-categories"
+  | "admin-collections"
+  | "admin-brands"
+  | "admin-customers"
+  | "admin-orders"
+  | "admin-subscriptions"
+  | "admin-coupons"
+  | "admin-reviews"
+  | "admin-blog"
+  | "admin-pages"
+  | "admin-media"
   | "admin-builder"
+  | "admin-navigation"
+  | "admin-forms"
+  | "admin-messages"
+  | "admin-newsletter"
+  | "admin-analytics"
+  | "admin-marketing"
+  | "admin-seo"
+  | "admin-automation"
+  | "admin-integrations"
+  | "admin-emails"
+  | "admin-users"
+  | "admin-appearance"
+  | "admin-settings"
+  | "admin-activity"
+  | "admin-developer"
   | "storefront";
 
 interface RouterState {
@@ -82,7 +107,32 @@ export const ADMIN_ROUTES: RouteName[] = [
   "admin-products",
   "admin-product-edit",
   "admin-categories",
+  "admin-collections",
+  "admin-brands",
+  "admin-customers",
+  "admin-orders",
+  "admin-subscriptions",
+  "admin-coupons",
+  "admin-reviews",
+  "admin-blog",
+  "admin-pages",
+  "admin-media",
   "admin-builder",
+  "admin-navigation",
+  "admin-forms",
+  "admin-messages",
+  "admin-newsletter",
+  "admin-analytics",
+  "admin-marketing",
+  "admin-seo",
+  "admin-automation",
+  "admin-integrations",
+  "admin-emails",
+  "admin-users",
+  "admin-appearance",
+  "admin-settings",
+  "admin-activity",
+  "admin-developer",
 ];
 
 export function isAdminRoute(route: RouteName): boolean {

@@ -85,6 +85,10 @@ const AdminCategoriesView = lazy(() =>
 const AdminBuilderView = lazy(() =>
   import("@/components/views/admin/admin-builder-view").then((m) => ({ default: m.AdminBuilderView })),
 );
+// New admin module stubs live in a single module — one lazy chunk for all 25.
+const AdminStubDispatcher = lazy(() =>
+  import("@/components/views/admin/admin-stub-views").then((m) => ({ default: m.AdminStubDispatcher })),
+);
 const StorefrontView = lazy(() =>
   import("@/components/views/storefront-view").then((m) => ({ default: m.StorefrontView })),
 );
@@ -143,6 +147,33 @@ export default function Home() {
       case "admin-product-edit": return <AdminProductEditView />;
       case "admin-categories": return <AdminCategoriesView />;
       case "admin-builder": return <AdminBuilderView />;
+      // New admin modules — all rendered via the stub dispatcher (one lazy chunk).
+      case "admin-collections":
+      case "admin-brands":
+      case "admin-customers":
+      case "admin-orders":
+      case "admin-subscriptions":
+      case "admin-coupons":
+      case "admin-reviews":
+      case "admin-blog":
+      case "admin-pages":
+      case "admin-media":
+      case "admin-navigation":
+      case "admin-forms":
+      case "admin-messages":
+      case "admin-newsletter":
+      case "admin-analytics":
+      case "admin-marketing":
+      case "admin-seo":
+      case "admin-automation":
+      case "admin-integrations":
+      case "admin-emails":
+      case "admin-users":
+      case "admin-appearance":
+      case "admin-settings":
+      case "admin-activity":
+      case "admin-developer":
+        return <AdminStubDispatcher route={route} />;
       // "storefront" — public DB-backed shop
       case "storefront": return <StorefrontView />;
       default: return <NotFoundView />;
