@@ -26,14 +26,14 @@ export function Logo({
   size?: "sm" | "md" | "lg";
 }) {
   const heights = {
-    sm: "h-9",   // navbar
-    md: "h-12",  // default
-    lg: "h-16",  // footer / hero
+    sm: "h-12",  // navbar (was h-9 — too small)
+    md: "h-14",  // default
+    lg: "h-20",  // footer / hero
   } as const;
   const px = {
-    sm: 108, // 9 * 12
-    md: 144, // 12 * 12
-    lg: 192, // 16 * 12
+    sm: 156, // 13 * 12 (was 108)
+    md: 182, // ~14 * 13
+    lg: 240, // 20 * 12
   } as const;
 
   return (
