@@ -582,9 +582,11 @@ function ServicesPreview() {
                   </div>
                   <h3 className="mt-5 font-display text-xl font-semibold text-white">{s.title}</h3>
                   <p className="mt-2 text-sm text-muted-foreground">{s.description}</p>
-                  <div className="mt-4 flex items-center justify-between">
+                  <div className="mt-4 flex items-center justify-between border-t border-white/5 pt-4">
                     <span className="text-sm text-muted-foreground">From <span className="font-semibold text-white">{currency.symbol}{convert(s.startingPrice).toLocaleString("en-US", { maximumFractionDigits: 0 })}</span></span>
-                    <ArrowRight className="h-4 w-4 text-primary opacity-0 transition-all group-hover:translate-x-1 group-hover:opacity-100" />
+                    <span className="inline-flex items-center gap-1 text-sm font-medium text-primary transition-all group-hover:gap-2">
+                      View Details <ArrowRight className="h-3.5 w-3.5" />
+                    </span>
                   </div>
                 </div>
               </Card>
@@ -685,6 +687,11 @@ function ProductsPreview() {
                       <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
                       {p.rating}
                     </div>
+                  </div>
+                  <div className="mt-3 border-t border-white/5 pt-3">
+                    <span className="inline-flex items-center gap-1 text-xs font-medium text-primary transition-all group-hover:gap-2">
+                      View Details <ArrowRight className="h-3 w-3" />
+                    </span>
                   </div>
                 </div>
               </Card>
@@ -795,6 +802,11 @@ function PortfolioPreview() {
                       {p.tech.slice(0, 3).map((t) => (
                         <span key={t} className="rounded-md bg-white/5 px-2 py-0.5 text-[10px] text-muted-foreground">{t}</span>
                       ))}
+                    </div>
+                    <div className="mt-4 border-t border-white/5 pt-3">
+                      <span className="inline-flex items-center gap-1 text-sm font-medium text-primary transition-all group-hover:gap-2">
+                        View Details <ArrowRight className="h-3.5 w-3.5" />
+                      </span>
                     </div>
                   </div>
                 </div>
