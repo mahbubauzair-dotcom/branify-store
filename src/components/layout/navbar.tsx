@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Menu, X, Search, ChevronRight, Keyboard, Heart, User, ShoppingCart,
-  ArrowRight, Store,
+  ArrowRight, Store, Sparkles,
 } from "lucide-react";
 import { Logo } from "@/components/shared/logo";
 import { Button } from "@/components/ui/button";
@@ -14,14 +14,24 @@ import { navItems, siteConfig } from "@/config/site";
 import { useRouterStore, useNavigate, type RouteName } from "@/lib/router";
 import { track } from "@/lib/analytics";
 import { CurrencySelector } from "@/components/shared/currency-selector";
+import { services } from "@/data/services";
+import { products, productCategories } from "@/data/products";
+import { tools } from "@/data/tools";
 import { toast } from "sonner";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [activeMega, setActiveMega] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const route = useRouterStore((s) => s.route);
   const navigate = useNavigate();
+
+  const go = (r: RouteName) => {
+    navigate(r);
+    setMobileOpen(false);
+    setActiveMega(null);
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -31,8 +41,7 @@ export function Navbar() {
   }, []);
 
   const handleNav = (r: RouteName) => {
-    navigate(r);
-    setMobileOpen(false);
+    go(r);
   };
 
   const handleSearch = (e: React.FormEvent) => {
@@ -136,8 +145,11 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* ===== BOTTOM ROW: all categories / nav links ===== */}
-      <nav className="hidden border-t border-white/[0.05] lg:block">
+      {/* ===== BOTTOM ROW: all categories / nav links with mega menu ===== */}
+      <nav
+        className="hidden border-t border-white/[0.05] lg:block"
+        onMouseLeave={() => setActiveMega(null)}
+      >
         <div className="mx-auto flex max-w-7xl items-center gap-1 px-4 sm:px-6 lg:px-8">
           {navItems.map((item) => {
             const active =
@@ -145,28 +157,35 @@ export function Navbar() {
               (item.route === "products" && route === "product-detail") ||
               (item.route === "blog" && route === "blog-post") ||
               (item.route === "storefront" && route === "storefront");
+            const hasMega = item.mega;
             return (
-              <button
+              <div
                 key={item.route}
-                onClick={() => handleNav(item.route)}
-                className={cn(
-                  "relative flex items-center gap-1 px-3 py-2.5 text-sm font-medium transition-colors",
-                  active ? "text-white" : "text-muted-foreground hover:text-white",
-                )}
+                className="relative"
+                onMouseEnter={() => setActiveMega(hasMega ? item.route : null)}
               >
-                {item.label}
-                {active && (
-                  <motion.div
-                    layoutId="nav-underline"
-                    className="absolute -bottom-px left-3 right-3 h-0.5 rounded-full bg-gradient-to-r from-[#00E5FF] to-[#18F2B2]"
-                  />
-                )}
-              </button>
+                <button
+                  onClick={() => go(item.route)}
+                  className={cn(
+                    "relative flex items-center gap-1 px-3 py-2.5 text-sm font-medium transition-colors",
+                    active ? "text-white" : "text-muted-foreground hover:text-white",
+                  )}
+                >
+                  {item.label}
+                  {hasMega && <ChevronRight className="h-3 w-3 rotate-90 opacity-40" />}
+                  {active && (
+                    <motion.div
+                      layoutId="nav-underline"
+                      className="absolute -bottom-px left-3 right-3 h-0.5 rounded-full bg-gradient-to-r from-[#00E5FF] to-[#18F2B2]"
+                    />
+                  )}
+                </button>
+              </div>
             );
           })}
           <div className="ml-auto flex items-center gap-3">
             <button
-              onClick={() => handleNav("storefront")}
+              onClick={() => go("storefront")}
               className="flex items-center gap-1.5 py-2.5 text-sm font-medium text-primary transition-colors hover:text-accent"
             >
               <Store className="h-4 w-4" />
@@ -182,6 +201,28 @@ export function Navbar() {
             </button>
           </div>
         </div>
+
+        {/* Mega menu dropdown */}
+        <AnimatePresence>
+          {activeMega && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2 }}
+              className="absolute inset-x-0 top-full z-50"
+              onMouseEnter={() => setActiveMega(activeMega)}
+            >
+              <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#0B1022]/95 shadow-premium-lg backdrop-blur-2xl">
+                  {activeMega === "services" && <MegaServices onGo={go} />}
+                  {activeMega === "products" && <MegaProducts onGo={go} />}
+                  {activeMega === "tools" && <MegaTools onGo={go} />}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
 
       {/* Mobile search (below top row on mobile) */}
@@ -239,5 +280,96 @@ export function Navbar() {
         )}
       </AnimatePresence>
     </header>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* MEGA MENU COMPONENTS                                                */
+/* ------------------------------------------------------------------ */
+function MegaServices({ onGo }: { onGo: (r: RouteName) => void }) {
+  return (
+    <div className="grid grid-cols-3 gap-2 p-4">
+      <div className="col-span-1 rounded-xl bg-gradient-to-br from-primary/15 to-transparent p-5">
+        <p className="font-display text-lg font-semibold text-white">What we do</p>
+        <p className="mt-2 text-sm text-muted-foreground">End-to-end design, development &amp; growth services.</p>
+        <button onClick={() => onGo("services")} className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary hover:gap-2 transition-all">
+          View all services <ArrowRight className="h-3.5 w-3.5" />
+        </button>
+      </div>
+      <div className="col-span-2 grid grid-cols-2 gap-1">
+        {services.slice(0, 8).map((s) => (
+          <button key={s.slug} onClick={() => onGo("services")} className="group flex items-start gap-3 rounded-lg p-3 text-left transition-colors hover:bg-white/5">
+            <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <s.icon className="h-4 w-4" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-white group-hover:text-primary transition-colors">{s.title}</p>
+              <p className="truncate text-xs text-muted-foreground">{s.tagline}</p>
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function MegaProducts({ onGo }: { onGo: (r: RouteName) => void }) {
+  return (
+    <div className="grid grid-cols-3 gap-2 p-4">
+      <div className="col-span-1 rounded-xl bg-gradient-to-br from-primary/15 to-transparent p-5">
+        <p className="font-display text-lg font-semibold text-white">Ready-to-use assets</p>
+        <p className="mt-2 text-sm text-muted-foreground">Templates, kits &amp; bundles to launch faster.</p>
+        <button onClick={() => onGo("products")} className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary hover:gap-2 transition-all">
+          Browse marketplace <ArrowRight className="h-3.5 w-3.5" />
+        </button>
+      </div>
+      <div className="col-span-2">
+        <div className="mb-2 flex flex-wrap gap-1.5 px-3">
+          {productCategories.slice(1).map((c) => (
+            <span key={c} className="rounded-full border border-white/10 px-2.5 py-1 text-xs text-muted-foreground">{c}</span>
+          ))}
+        </div>
+        <div className="grid grid-cols-2 gap-1">
+          {products.slice(0, 6).map((p) => (
+            <button key={p.slug} onClick={() => onGo("product-detail")} className="group flex items-center gap-3 rounded-lg p-3 text-left transition-colors hover:bg-white/5">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <p.icon className="h-4 w-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium text-white group-hover:text-primary transition-colors">{p.name}</p>
+                <p className="text-xs text-muted-foreground">${p.price}</p>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MegaTools({ onGo }: { onGo: (r: RouteName) => void }) {
+  return (
+    <div className="grid grid-cols-3 gap-2 p-4">
+      <div className="col-span-1 rounded-xl bg-gradient-to-br from-primary/15 to-transparent p-5">
+        <p className="font-display text-lg font-semibold text-white">Free forever</p>
+        <p className="mt-2 text-sm text-muted-foreground">Generators &amp; calculators for modern teams.</p>
+        <button onClick={() => onGo("tools")} className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary hover:gap-2 transition-all">
+          Open all tools <ArrowRight className="h-3.5 w-3.5" />
+        </button>
+      </div>
+      <div className="col-span-2 grid grid-cols-2 gap-1">
+        {tools.slice(0, 8).map((t) => (
+          <button key={t.slug} onClick={() => onGo("tools")} className="group flex items-start gap-3 rounded-lg p-3 text-left transition-colors hover:bg-white/5">
+            <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <t.icon className="h-4 w-4" />
+            </div>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-medium text-white group-hover:text-primary transition-colors">{t.name}</p>
+              <p className="truncate text-xs text-muted-foreground">{t.category}</p>
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }

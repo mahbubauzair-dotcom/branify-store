@@ -30,6 +30,7 @@ import { SectionDivider, SectionGlow } from "@/components/shared/section-divider
 import { AnimatedGradientBg } from "@/components/shared/animated-gradient-bg";
 import { useCountUp, useInViewOnce } from "@/hooks/use-count-up";
 import { useParallax } from "@/hooks/use-parallax";
+import { useCurrency } from "@/lib/currency";
 import { track } from "@/lib/analytics";
 
 const whyFeatures = [
@@ -361,6 +362,7 @@ function CountUpNumber({ target, start }: { target: number; start: boolean }) {
 /* ------------------------------------------------------------------ */
 function ServicesPreview() {
   const navigate = useNavigate();
+  const { currency, convert } = useCurrency();
   return (
     <section className="relative py-20 sm:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -389,7 +391,7 @@ function ServicesPreview() {
                   <h3 className="mt-5 font-display text-xl font-semibold text-white">{s.title}</h3>
                   <p className="mt-2 text-sm text-muted-foreground">{s.description}</p>
                   <div className="mt-4 flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">From <span className="font-semibold text-white">${s.startingPrice}</span></span>
+                    <span className="text-sm text-muted-foreground">From <span className="font-semibold text-white">{currency.symbol}{convert(s.startingPrice).toLocaleString("en-US", { maximumFractionDigits: 0 })}</span></span>
                     <ArrowRight className="h-4 w-4 text-primary opacity-0 transition-all group-hover:translate-x-1 group-hover:opacity-100" />
                   </div>
                 </div>
@@ -444,6 +446,7 @@ function WhyBranify() {
 /* ------------------------------------------------------------------ */
 function ProductsPreview() {
   const navigate = useNavigate();
+  const { currency, convert } = useCurrency();
   return (
     <section className="relative py-20 sm:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -483,8 +486,8 @@ function ProductsPreview() {
                   <p className="mt-1 text-xs text-muted-foreground line-clamp-1">{p.tagline}</p>
                   <div className="mt-3 flex items-center justify-between">
                     <div className="flex items-baseline gap-1.5">
-                      <span className="font-display text-lg font-bold text-white">${p.price}</span>
-                      {p.originalPrice && <span className="text-xs text-muted-foreground line-through">${p.originalPrice}</span>}
+                      <span className="font-display text-lg font-bold text-white">{currency.symbol}{convert(p.price).toLocaleString("en-US", { maximumFractionDigits: 0 })}</span>
+                      {p.originalPrice && <span className="text-xs text-muted-foreground line-through">{currency.symbol}{convert(p.originalPrice).toLocaleString("en-US", { maximumFractionDigits: 0 })}</span>}
                     </div>
                     <div className="flex items-center gap-1 text-xs text-muted-foreground">
                       <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
