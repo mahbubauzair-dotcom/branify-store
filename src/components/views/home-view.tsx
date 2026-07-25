@@ -60,6 +60,7 @@ const heroFloatingCards = [
     id: "web",
     icon: Code2,
     title: "Website Design & Development",
+    description: "Modern, high-performance and responsive websites",
     accent: "from-[#00E5FF]/30 to-[#00E5FF]/0",
     ring: "ring-[#00E5FF]/20",
     iconBg: "bg-[#00E5FF]/15 text-[#00E5FF]",
@@ -72,6 +73,7 @@ const heroFloatingCards = [
     id: "brand",
     icon: Palette,
     title: "Brand Identity & Strategy",
+    description: "Unique designs that inspire trust and loyalty",
     accent: "from-[#7B61FF]/30 to-[#7B61FF]/0",
     ring: "ring-[#7B61FF]/20",
     iconBg: "bg-[#7B61FF]/15 text-[#7B61FF]",
@@ -84,6 +86,7 @@ const heroFloatingCards = [
     id: "ai",
     icon: BrainCircuit,
     title: "AI Solutions & Automation",
+    description: "Intelligent solutions to automate and scale your business",
     accent: "from-[#18F2B2]/30 to-[#18F2B2]/0",
     ring: "ring-[#18F2B2]/20",
     iconBg: "bg-[#18F2B2]/15 text-[#18F2B2]",
@@ -96,6 +99,7 @@ const heroFloatingCards = [
     id: "products",
     icon: ShoppingBag,
     title: "Digital Products & Tools",
+    description: "Premium tools and resources for modern businesses",
     accent: "from-amber-400/30 to-amber-400/0",
     ring: "ring-amber-400/20",
     iconBg: "bg-amber-400/15 text-amber-300",
@@ -335,6 +339,14 @@ function HeroVisual() {
           </div>
 
           <div className="relative">
+            {/* Mini nav bar on screen */}
+            <div className="mb-3 flex items-center justify-center gap-2 text-[7px] text-muted-foreground">
+              <span>Home</span><span>·</span>
+              <span>Services</span><span>·</span>
+              <span>Portfolio</span><span>·</span>
+              <span>About</span><span>·</span>
+              <span>Contact</span>
+            </div>
             <Badge className="mb-3 bg-[#00E5FF]/15 text-[#00E5FF] hover:bg-[#00E5FF]/20">
               <Sparkles className="mr-1 h-3 w-3" /> BRANIFY
             </Badge>
@@ -345,8 +357,11 @@ function HeroVisual() {
               </span>
             </p>
             <p className="mt-2 text-xs text-muted-foreground">
-              Premium digital agency &amp; product studio
+              We create digital experiences that deliver real results
             </p>
+            <div className="mt-3 inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-[#00E5FF] to-[#18F2B2] px-3 py-1 text-[9px] font-bold text-[#04121a]">
+              Get Started
+            </div>
           </div>
         </div>
       </motion.div>
@@ -426,6 +441,9 @@ function FloatingCard({
         <div className="min-w-0 flex-1">
           <p className="text-[10px] font-semibold leading-tight text-white sm:text-xs">
             {card.title}
+          </p>
+          <p className="mt-0.5 text-[8px] leading-tight text-muted-foreground sm:text-[9px]">
+            {card.description}
           </p>
           <div className="mt-1.5 flex items-baseline gap-1">
             <span className="font-display text-base font-bold text-white sm:text-lg">

@@ -23,8 +23,8 @@ export function AnimatedGradientBg({ className }: { className?: string }) {
       )}
     >
       {/* Base dark navy gradient */}
-      <div className="absolute inset-0 bg-[#050816]" />
-      <div className="absolute inset-0 bg-gradient-to-br from-[#0B1022] via-[#050816] to-[#0B1022]" />
+      <div className="absolute inset-0 bg-[#070B16]" />
+      <div className="absolute inset-0 bg-gradient-to-br from-[#0D1324] via-[#070B16] to-[#0D1324]" />
 
       {/* Top-left cyan glow — slow drift */}
       <div

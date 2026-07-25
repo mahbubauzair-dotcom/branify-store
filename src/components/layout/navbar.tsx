@@ -56,8 +56,8 @@ export function Navbar() {
       className={cn(
         "sticky top-0 z-40 w-full transition-all duration-300",
         scrolled
-          ? "bg-[#050816]/90 backdrop-blur-xl border-b border-white/[0.08]"
-          : "bg-[#050816]/60 backdrop-blur-md border-b border-white/[0.05]",
+          ? "bg-[#070B16]/90 backdrop-blur-xl border-b border-white/[0.08]"
+          : "bg-[#070B16]/60 backdrop-blur-md border-b border-white/[0.05]",
       )}
     >
       {/* ===== TOP ROW: logo | search | currency | signin | wishlist | cart | whatsapp | book ===== */}
@@ -232,7 +232,7 @@ export function Navbar() {
               onMouseEnter={() => setActiveMega(activeMega)}
             >
               <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#0B1022]/95 shadow-premium-lg backdrop-blur-2xl">
+                <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#0D1324]/95 shadow-premium-lg backdrop-blur-2xl">
                   {activeMega === "services" && <MegaServices onGo={go} />}
                   {activeMega === "products" && <MegaProducts onGo={go} />}
                   {activeMega === "tools" && <MegaTools onGo={go} />}
@@ -266,7 +266,7 @@ export function Navbar() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.25 }}
-            className="overflow-hidden border-t border-white/5 bg-[#050816]/95 backdrop-blur-xl lg:hidden"
+            className="overflow-hidden border-t border-white/5 bg-[#070B16]/95 backdrop-blur-xl lg:hidden"
           >
             <div className="max-h-[70vh] overflow-y-auto px-4 py-4">
               <nav className="flex flex-col gap-1">

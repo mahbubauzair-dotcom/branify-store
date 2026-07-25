@@ -51,11 +51,11 @@
 :root {
   --radius: 0.875rem;
   /* BRANIFY Premium Dark — futuristic AI eCommerce */
-  --background: #050816;
+  --background: #070B16;
   --foreground: #ffffff;
-  --card: #111827;
+  --card: #0D1324;
   --card-foreground: #ffffff;
-  --popover: #111827;
+  --popover: #0D1324;
   --popover-foreground: #ffffff;
   --primary: #00E5FF;
   --primary-foreground: #04121a;
@@ -69,7 +69,7 @@
   --border: rgba(255, 255, 255, 0.08);
   --input: rgba(255, 255, 255, 0.1);
   --ring: #00E5FF;
-  --surface: #111827;
+  --surface: #0D1324;
   --surface-2: #0B1022;
   --hover: #00C4D8;
   --chart-1: #00E5FF;
@@ -88,11 +88,11 @@
 }
 
 .dark {
-  --background: #050816;
+  --background: #070B16;
   --foreground: #ffffff;
-  --card: #111827;
+  --card: #0D1324;
   --card-foreground: #ffffff;
-  --popover: #111827;
+  --popover: #0D1324;
   --popover-foreground: #ffffff;
   --primary: #00E5FF;
   --primary-foreground: #04121a;
@@ -106,7 +106,7 @@
   --border: rgba(255, 255, 255, 0.08);
   --input: rgba(255, 255, 255, 0.1);
   --ring: #00E5FF;
-  --surface: #111827;
+  --surface: #0D1324;
   --surface-2: #0B1022;
   --hover: #00C4D8;
 }
