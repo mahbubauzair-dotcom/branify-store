@@ -8,7 +8,7 @@ export const siteConfig = {
   email: "admin@branify.store",
   phone: "+92 334 1079333",
   whatsapp: "https://wa.me/923341079333",
-  address: "548 Market Street, San Francisco, CA 94104",
+  address: "Crown Business Centre, E11/2, Islamabad, Pakistan",
   social: {
     twitter: "https://twitter.com/branify",
     instagram: "https://instagram.com/branify",

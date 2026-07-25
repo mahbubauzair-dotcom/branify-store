@@ -342,11 +342,17 @@ function ContactInfoColumn() {
     },
     {
       icon: MapPin,
-      label: "Studio",
-      value: siteConfig.address,
-      href: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-        siteConfig.address,
-      )}`,
+      label: "🇵🇰 Pakistan Office",
+      value: "Crown Business Centre, E11/2, Islamabad",
+      href: "https://www.google.com/maps/search/?api=1&query=Crown+Business+Centre+E11+2+Islamabad+Pakistan",
+      external: true,
+      hint: "By appointment",
+    },
+    {
+      icon: MapPin,
+      label: "🇧🇩 Bangladesh Office",
+      value: "Gulshan-1, Dhaka, Bangladesh",
+      href: "https://www.google.com/maps/search/?api=1&query=Gulshan+1+Dhaka+Bangladesh",
       external: true,
       hint: "By appointment",
     },
@@ -409,61 +415,70 @@ function ContactInfoColumn() {
 /* MAP SECTION (placeholder)                                           */
 /* ------------------------------------------------------------------ */
 function MapSection() {
-  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-    siteConfig.address,
-  )}`;
+  const locations = [
+    { flag: "🇵🇰", city: "Islamabad, Pakistan", address: "Crown Business Centre, E11/2, Islamabad", query: "Crown+Business+Centre+E11+2+Islamabad+Pakistan" },
+    { flag: "🇧🇩", city: "Dhaka, Bangladesh", address: "Gulshan-1, Dhaka", query: "Gulshan+1+Dhaka+Bangladesh" },
+  ];
   return (
     <section className="relative py-12 sm:py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Reveal>
-          <GradientCover
-            variant="gradient-teal"
-            pattern="grid"
-            className="relative h-64 overflow-hidden rounded-2xl border border-white/10 sm:h-72"
-          >
-            {/* Faux map grid */}
-            <div
-              className="absolute inset-0 opacity-30"
-              style={{
-                backgroundImage:
-                  "linear-gradient(rgba(20,184,166,0.25) 1px, transparent 1px), linear-gradient(90deg, rgba(20,184,166,0.25) 1px, transparent 1px)",
-                backgroundSize: "44px 44px",
-              }}
-            />
-            <div
-              className="absolute inset-0 opacity-40"
-              style={{
-                background:
-                  "radial-gradient(circle at 50% 50%, rgba(20,184,166,0.18), transparent 60%)",
-              }}
-            />
-            {/* Road lines */}
-            <div className="absolute left-0 right-0 top-1/2 h-px -translate-y-1/2 bg-primary/30" />
-            <div className="absolute bottom-0 left-1/3 top-0 w-px bg-primary/30" />
-
-            {/* Pin */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-              <div className="relative">
-                <span className="absolute inset-0 animate-ping rounded-full bg-primary/30" />
-                <span className="relative flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-glow">
-                  <MapPin className="h-6 w-6" />
-                </span>
-              </div>
-              <p className="mt-3 font-display text-lg font-semibold text-white">
-                San Francisco, CA
-              </p>
-              <p className="mt-1 text-xs text-white/70">{siteConfig.address}</p>
-              <Button
-                asChild
-                size="sm"
-                className="mt-4 bg-primary text-primary-foreground hover:bg-hover"
+          <div className="grid gap-4 sm:grid-cols-2">
+            {locations.map((loc) => (
+              <GradientCover
+                key={loc.city}
+                variant="gradient-teal"
+                pattern="grid"
+                className="relative h-56 overflow-hidden rounded-2xl border border-white/10"
               >
-                <a href={mapsUrl} target="_blank" rel="noopener noreferrer">
-                  Open in Maps <ArrowUpRight className="ml-1.5 h-3.5 w-3.5" />
-                </a>
-              </Button>
-            </div>
-          </GradientCover>
+                {/* Faux map grid */}
+                <div
+                  className="absolute inset-0 opacity-30"
+                  style={{
+                    backgroundImage:
+                      "linear-gradient(rgba(0,229,255,0.25) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,255,0.25) 1px, transparent 1px)",
+                    backgroundSize: "44px 44px",
+                  }}
+                />
+                <div
+                  className="absolute inset-0 opacity-40"
+                  style={{
+                    background:
+                      "radial-gradient(circle at 50% 50%, rgba(0,229,255,0.18), transparent 60%)",
+                  }}
+                />
+                {/* Road lines */}
+                <div className="absolute left-0 right-0 top-1/2 h-px -translate-y-1/2 bg-primary/30" />
+                <div className="absolute bottom-0 left-1/3 top-0 w-px bg-primary/30" />
+
+                {/* Pin */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+                  <div className="relative">
+                    <span className="absolute inset-0 animate-ping rounded-full bg-primary/30" />
+                    <span className="relative flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-glow">
+                      <MapPin className="h-5 w-5" />
+                    </span>
+                  </div>
+                  <p className="mt-3 font-display text-base font-semibold text-white">
+                    {loc.flag} {loc.city}
+                  </p>
+                  <p className="mt-1 text-xs text-white/70">{loc.address}</p>
+                  <Button
+                    asChild
+                    size="sm"
+                    className="mt-3 bg-primary text-primary-foreground hover:bg-hover"
+                  >
+                    <a href={`https://www.google.com/maps/search/?api=1&query=${loc.query}`} target="_blank" rel="noopener noreferrer">
+                      Open in Maps
+                    </a>
+                  </Button>
+                </div>
+              </GradientCover>
+            ))}
+          </div>
+          <p className="mt-4 text-center text-sm text-muted-foreground">
+            🌍 Available Worldwide — Remote & On-site
+          </p>
         </Reveal>
       </div>
     </section>
