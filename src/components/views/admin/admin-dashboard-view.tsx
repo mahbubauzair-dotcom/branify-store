@@ -289,7 +289,7 @@ function DashboardContent() {
             </Badge>
             <Button
               onClick={() => navigate("admin-product-edit", { slug: "new" })}
-              className="bg-gradient-to-r from-[#00E5FF] to-[#18F2B2] text-[#04121a] hover:opacity-90"
+              className="bg-gradient-to-r from-[#00E5FF] to-[#00FFD1] text-[#04121a] hover:opacity-90"
             >
               <Plus className="h-4 w-4" />
               <span className="hidden sm:inline">New Product</span>

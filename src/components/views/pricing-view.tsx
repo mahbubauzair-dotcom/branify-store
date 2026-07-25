@@ -200,7 +200,7 @@ function TierCard({ tier }: { tier: ServiceTier }) {
         <>
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-primary/10 to-transparent" />
           <div className="absolute left-1/2 top-0 -translate-x-1/2">
-            <Badge className="rounded-b-md rounded-t-none bg-gradient-to-r from-[#00E5FF] to-[#18F2B2] px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-[#04121a]">
+            <Badge className="rounded-b-md rounded-t-none bg-gradient-to-r from-[#00E5FF] to-[#00FFD1] px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-[#04121a]">
               <Sparkles className="mr-1 h-3 w-3" /> Most Popular
             </Badge>
           </div>
@@ -266,7 +266,7 @@ function TierCard({ tier }: { tier: ServiceTier }) {
           className={cn(
             "w-full rounded-full",
             highlighted
-              ? "bg-gradient-to-r from-[#00E5FF] to-[#18F2B2] text-[#04121a] hover:opacity-90"
+              ? "bg-gradient-to-r from-[#00E5FF] to-[#00FFD1] text-[#04121a] hover:opacity-90"
               : "bg-white/5 text-white hover:bg-primary hover:text-primary-foreground",
           )}
         >
@@ -405,7 +405,7 @@ function CtaSection() {
                 <Button
                   onClick={() => navigate("contact")}
                   size="lg"
-                  className="h-12 rounded-full bg-gradient-to-r from-[#00E5FF] to-[#18F2B2] px-7 text-[#04121a] hover:opacity-90"
+                  className="h-12 rounded-full bg-gradient-to-r from-[#00E5FF] to-[#00FFD1] px-7 text-[#04121a] hover:opacity-90"
                 >
                   Start a project <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>

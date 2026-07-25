@@ -56,8 +56,8 @@ export function Navbar() {
       className={cn(
         "sticky top-0 z-40 w-full transition-all duration-300",
         scrolled
-          ? "bg-[#070B16]/90 backdrop-blur-xl border-b border-white/[0.08]"
-          : "bg-[#070B16]/60 backdrop-blur-md border-b border-white/[0.05]",
+          ? "bg-[#050816]/90 backdrop-blur-xl border-b border-white/[0.08]"
+          : "bg-[#050816]/60 backdrop-blur-md border-b border-white/[0.05]",
       )}
     >
       {/* ===== TOP ROW: logo | search | currency | signin | wishlist | cart | whatsapp | book ===== */}
@@ -126,7 +126,7 @@ export function Navbar() {
             className="relative flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-white/5 hover:text-white"
           >
             <ShoppingCart className="h-4 w-4" />
-            <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-gradient-to-r from-[#00E5FF] to-[#18F2B2] text-[9px] font-bold text-[#04121a] ring-2 ring-[#050816]">
+            <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-gradient-to-r from-[#00E5FF] to-[#00FFD1] text-[9px] font-bold text-[#04121a] ring-2 ring-[#050816]">
               {cartCount}
             </span>
           </button>
@@ -146,7 +146,7 @@ export function Navbar() {
           {/* Book a Free Consultation */}
           <Button
             onClick={() => go("contact")}
-            className="hidden h-9 rounded-full bg-gradient-to-r from-[#00E5FF] to-[#18F2B2] px-4 text-sm font-semibold text-[#04121a] shadow-sm transition-all hover:shadow-md lg:inline-flex"
+            className="hidden h-9 rounded-full bg-gradient-to-r from-[#00E5FF] to-[#00FFD1] px-4 text-sm font-semibold text-[#04121a] shadow-sm transition-all hover:shadow-md lg:inline-flex"
           >
             <Rocket className="mr-1.5 h-4 w-4" />
             Book a Free Consultation
@@ -194,7 +194,7 @@ export function Navbar() {
                   {active && (
                     <motion.div
                       layoutId="nav-underline"
-                      className="absolute -bottom-px left-3 right-3 h-0.5 rounded-full bg-gradient-to-r from-[#00E5FF] to-[#18F2B2]"
+                      className="absolute -bottom-px left-3 right-3 h-0.5 rounded-full bg-gradient-to-r from-[#00E5FF] to-[#00FFD1]"
                     />
                   )}
                 </button>
@@ -232,7 +232,7 @@ export function Navbar() {
               onMouseEnter={() => setActiveMega(activeMega)}
             >
               <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#0D1324]/95 shadow-premium-lg backdrop-blur-2xl">
+                <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#111B35]/95 shadow-premium-lg backdrop-blur-2xl">
                   {activeMega === "services" && <MegaServices onGo={go} />}
                   {activeMega === "products" && <MegaProducts onGo={go} />}
                   {activeMega === "tools" && <MegaTools onGo={go} />}
@@ -266,7 +266,7 @@ export function Navbar() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.25 }}
-            className="overflow-hidden border-t border-white/5 bg-[#070B16]/95 backdrop-blur-xl lg:hidden"
+            className="overflow-hidden border-t border-white/5 bg-[#050816]/95 backdrop-blur-xl lg:hidden"
           >
             <div className="max-h-[70vh] overflow-y-auto px-4 py-4">
               <nav className="flex flex-col gap-1">
@@ -282,7 +282,7 @@ export function Navbar() {
                 ))}
               </nav>
               <div className="mt-4 flex flex-col gap-2 border-t border-white/5 pt-4">
-                <Button onClick={() => go("storefront")} className="bg-gradient-to-r from-[#00E5FF] to-[#18F2B2] text-[#04121a]">
+                <Button onClick={() => go("storefront")} className="bg-gradient-to-r from-[#00E5FF] to-[#00FFD1] text-[#04121a]">
                   <Store className="mr-1.5 h-4 w-4" /> Shop All Products
                 </Button>
                 <a
@@ -294,7 +294,7 @@ export function Navbar() {
                   <MessageCircle className="h-4 w-4" />
                   Chat on WhatsApp
                 </a>
-                <Button onClick={() => go("contact")} className="bg-gradient-to-r from-[#00E5FF] to-[#18F2B2] text-[#04121a]">
+                <Button onClick={() => go("contact")} className="bg-gradient-to-r from-[#00E5FF] to-[#00FFD1] text-[#04121a]">
                   <Rocket className="mr-1.5 h-4 w-4" /> Book a Free Consultation
                 </Button>
                 <div className="flex items-center justify-between rounded-lg border border-white/5 bg-white/5 px-3 py-2">

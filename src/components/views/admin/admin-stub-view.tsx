@@ -87,7 +87,7 @@ export function AdminStubView({
               <div className="flex flex-wrap items-center justify-center gap-2 pt-1 sm:justify-start">
                 <Button
                   onClick={() => navigate("admin-dashboard")}
-                  className="bg-gradient-to-r from-[#00E5FF] to-[#18F2B2] text-[#04121a] hover:opacity-90"
+                  className="bg-gradient-to-r from-[#00E5FF] to-[#00FFD1] text-[#04121a] hover:opacity-90"
                 >
                   <Sparkles className="h-4 w-4" />
                   Back to Dashboard

@@ -22,7 +22,7 @@ export function AnnouncementBar() {
           animate={{ height: "auto", opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
           transition={{ duration: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
-          className="relative z-50 overflow-hidden bg-gradient-to-r from-[#7B61FF] via-[#00E5FF] to-[#18F2B2]"
+          className="relative z-50 overflow-hidden bg-gradient-to-r from-[#7B61FF] via-[#00E5FF] to-[#2F7BFF]"
         >
           {/* subtle shimmer sheen */}
           <div className="pointer-events-none absolute inset-0 opacity-30">

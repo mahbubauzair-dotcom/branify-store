@@ -365,7 +365,7 @@ export function AdminLayout({
       {/* Desktop sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-30 hidden border-r border-white/[0.08] bg-[#0D1324]/80 backdrop-blur-xl transition-[width] duration-300 ease-in-out lg:block",
+          "fixed inset-y-0 left-0 z-30 hidden border-r border-white/[0.08] bg-[#111B35]/80 backdrop-blur-xl transition-[width] duration-300 ease-in-out lg:block",
           collapsed ? "w-16" : "w-64",
         )}
       >
@@ -376,7 +376,7 @@ export function AdminLayout({
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
         <SheetContent
           side="left"
-          className="w-[280px] border-r border-white/[0.08] bg-[#0D1324]/95 p-0 backdrop-blur-xl"
+          className="w-[280px] border-r border-white/[0.08] bg-[#111B35]/95 p-0 backdrop-blur-xl"
         >
           <SheetHeader className="sr-only">
             <SheetTitle>Navigation</SheetTitle>
@@ -398,7 +398,7 @@ export function AdminLayout({
         )}
       >
         {/* Top bar */}
-        <header className="sticky top-0 z-20 border-b border-white/[0.08] bg-[#070B16]/80 backdrop-blur-xl">
+        <header className="sticky top-0 z-20 border-b border-white/[0.08] bg-[#050816]/80 backdrop-blur-xl">
           <div className="flex h-16 items-center gap-3 px-4 sm:px-6">
             {/* Hamburger (mobile) */}
             <Button

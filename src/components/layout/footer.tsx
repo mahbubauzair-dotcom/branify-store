@@ -96,7 +96,7 @@ export function Footer() {
                   placeholder="you@company.com"
                   className="bg-background/50 border-white/10"
                 />
-                <Button type="submit" size="icon" disabled={submitting} className="bg-gradient-to-r from-[#00E5FF] to-[#18F2B2] text-[#04121a] hover:opacity-90 shrink-0">
+                <Button type="submit" size="icon" disabled={submitting} className="bg-gradient-to-r from-[#00E5FF] to-[#00FFD1] text-[#04121a] hover:opacity-90 shrink-0">
                   {subscribed ? <Check className="h-4 w-4" /> : submitting ? <Sparkles className="h-4 w-4 animate-pulse" /> : <Send className="h-4 w-4" />}
                 </Button>
               </div>

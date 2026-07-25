@@ -87,9 +87,9 @@ const heroFloatingCards = [
     icon: BrainCircuit,
     title: "AI Solutions & Automation",
     description: "Intelligent solutions to automate and scale your business",
-    accent: "from-[#18F2B2]/30 to-[#18F2B2]/0",
-    ring: "ring-[#18F2B2]/20",
-    iconBg: "bg-[#18F2B2]/15 text-[#18F2B2]",
+    accent: "from-[#2F7BFF]/30 to-[#18F2B2]/0",
+    ring: "ring-[#2F7BFF]/20",
+    iconBg: "bg-[#2F7BFF]/15 text-[#2F7BFF]",
     metric: "70%",
     metricLabel: "auto-resolve",
     position: "left-bottom",
@@ -222,7 +222,7 @@ function Hero() {
                     navigate("contact");
                   }}
                   size="lg"
-                  className="group h-12 rounded-full bg-gradient-to-r from-[#00E5FF] to-[#18F2B2] px-7 text-[#04121a] shadow-glow hover:shadow-glow-lg"
+                  className="group h-12 rounded-full bg-gradient-to-r from-[#00E5FF] to-[#00FFD1] px-7 text-[#04121a] shadow-glow hover:shadow-glow-lg"
                 >
                   Start a Project
                   <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
@@ -352,14 +352,14 @@ function HeroVisual() {
             </Badge>
             <p className="font-display text-2xl font-bold leading-tight text-white sm:text-3xl">
               Build. <span className="text-[#00E5FF]">Brand.</span>{" "}
-              <span className="bg-gradient-to-r from-[#18F2B2] to-[#7B61FF] bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#2F7BFF] to-[#7B61FF] bg-clip-text text-transparent">
                 Grow.
               </span>
             </p>
             <p className="mt-2 text-xs text-muted-foreground">
               We create digital experiences that deliver real results
             </p>
-            <div className="mt-3 inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-[#00E5FF] to-[#18F2B2] px-3 py-1 text-[9px] font-bold text-[#04121a]">
+            <div className="mt-3 inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-[#00E5FF] to-[#00FFD1] px-3 py-1 text-[9px] font-bold text-[#04121a]">
               Get Started
             </div>
           </div>
