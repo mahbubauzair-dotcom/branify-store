@@ -45,6 +45,7 @@ import {
   AuroraBackground,
 } from "@/components/shared/gradient-cover";
 import { JsonLd, buildBreadcrumbSchema } from "@/components/shared/json-ld";
+import { PremiumCTAButton } from "@/components/shared/premium-cta-button";
 import { useCurrency } from "@/lib/currency";
 import { track } from "@/lib/analytics";
 
@@ -193,16 +194,14 @@ function ServiceHero({ service }: { service: Service }) {
                   </p>
                 </div>
                 <MagneticButton strength={0.4} radius={50}>
-                  <Button
+                  <PremiumCTAButton
                     onClick={() => {
                       track("cta_click", { label: service.title, location: "service-detail-hero" });
                       navigate("contact");
                     }}
-                    size="lg"
-                    className="h-12 rounded-full bg-primary px-7 text-primary-foreground hover:bg-hover"
                   >
-                    Start this service <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
+                    Start this service
+                  </PremiumCTAButton>
                 </MagneticButton>
                 <Button
                   onClick={() => navigate("pricing")}
@@ -563,16 +562,14 @@ function ServiceCta({ service }: { service: Service }) {
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <MagneticButton strength={0.4} radius={50}>
-                <Button
+                <PremiumCTAButton
                   onClick={() => {
                     track("cta_click", { label: service.title, location: "service-detail-cta" });
                     navigate("contact");
                   }}
-                  size="lg"
-                  className="h-12 rounded-full bg-primary px-7 text-primary-foreground hover:bg-hover"
                 >
-                  Book a free call <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
+                  Book a free call
+                </PremiumCTAButton>
               </MagneticButton>
               <Button
                 onClick={() => navigate("portfolio")}

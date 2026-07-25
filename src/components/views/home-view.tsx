@@ -28,6 +28,7 @@ import { CursorSpotlight } from "@/components/shared/cursor-spotlight";
 import { MagneticButton } from "@/components/shared/magnetic-button";
 import { SectionDivider } from "@/components/shared/section-divider";
 import { AnimatedGradientBg } from "@/components/shared/animated-gradient-bg";
+import { PremiumCTAButton } from "@/components/shared/premium-cta-button";
 import { useCountUp, useInViewOnce } from "@/hooks/use-count-up";
 import { useCurrency } from "@/lib/currency";
 import { track } from "@/lib/analytics";
@@ -216,17 +217,14 @@ function Hero() {
               className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center"
             >
               <MagneticButton strength={0.4} radius={50}>
-                <Button
+                <PremiumCTAButton
                   onClick={() => {
                     track("cta_click", { label: "Start a project", location: "hero" });
                     navigate("contact");
                   }}
-                  size="lg"
-                  className="group h-12 rounded-full bg-gradient-to-r from-[#00E5FF] to-[#00FFD1] px-7 text-[#04121a] shadow-glow hover:shadow-glow-lg"
                 >
                   Start a Project
-                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                </Button>
+                </PremiumCTAButton>
               </MagneticButton>
               <MagneticButton strength={0.3} radius={40}>
                 <Button
@@ -965,9 +963,9 @@ function CtaSection() {
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <MagneticButton strength={0.4} radius={50}>
-                <Button onClick={() => navigate("contact")} size="lg" className="h-12 rounded-full bg-primary px-7 text-primary-foreground hover:bg-hover">
-                  Book a free call <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
+                <PremiumCTAButton onClick={() => navigate("contact")}>
+                  Book a free call
+                </PremiumCTAButton>
               </MagneticButton>
               <MagneticButton strength={0.3} radius={40}>
                 <Button onClick={() => navigate("pricing")} size="lg" variant="outline" className="h-12 rounded-full border-white/15 bg-white/5 px-7 hover:bg-white/10">

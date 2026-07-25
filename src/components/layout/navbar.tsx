@@ -143,14 +143,20 @@ export function Navbar() {
             <span className="hidden lg:inline">WhatsApp</span>
           </a>
 
-          {/* Book a Free Consultation */}
-          <Button
+          {/* Book a Free Consultation — premium CTA */}
+          <button
             onClick={() => go("contact")}
-            className="hidden h-9 rounded-full bg-gradient-to-r from-[#00E5FF] to-[#00FFD1] px-4 text-sm font-semibold text-[#04121a] shadow-sm transition-all hover:shadow-md lg:inline-flex"
+            className="group relative hidden h-9 items-center justify-center overflow-hidden rounded-full border-2 border-white/85 px-4 transition-all duration-350 hover:-translate-y-[2px] active:scale-[0.98] lg:inline-flex"
+            style={{ boxShadow: "0 8px 25px rgba(0,229,255,0.3), 0 0 15px rgba(47,123,255,0.25)" }}
           >
-            <Rocket className="mr-1.5 h-4 w-4" />
-            Book a Free Consultation
-          </Button>
+            <span className="absolute inset-0 rounded-full" style={{ background: "linear-gradient(90deg, #00E5FF 0%, #2F7BFF 55%, #7B61FF 100%)" }} />
+            <span className="absolute inset-0 rounded-full opacity-0 transition-opacity duration-350 group-hover:opacity-100" style={{ background: "linear-gradient(90deg, #11F7FF 0%, #4287FF 55%, #9062FF 100%)" }} />
+            <span className="absolute inset-0 rounded-full" style={{ backgroundImage: "linear-gradient(180deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.08) 35%, rgba(255,255,255,0) 60%)" }} />
+            <span className="relative z-10 flex items-center gap-1.5 font-display text-xs font-bold uppercase tracking-wide text-white">
+              <Rocket className="h-3.5 w-3.5" />
+              Book a Free Consultation
+            </span>
+          </button>
 
           {/* Mobile menu toggle */}
           <button
