@@ -1,0 +1,785 @@
+     1→"use client";
+     2→
+     3→import { motion, useScroll, useTransform } from "framer-motion";
+     4→import { useRef } from "react";
+     5→import {
+     6→  ArrowRight, Sparkles, Star, Check, Zap, Shield, Clock, Award,
+     7→  TrendingUp, Layers, Cpu, Globe, Code2, Palette, BrainCircuit,
+     8→  Quote, Play, Search,
+     9→} from "lucide-react";
+    10→import { Button } from "@/components/ui/button";
+    11→import { Badge } from "@/components/ui/badge";
+    12→import { Card } from "@/components/ui/card";
+    13→import {
+    14→  Accordion, AccordionContent, AccordionItem, AccordionTrigger,
+    15→} from "@/components/ui/accordion";
+    16→import { useNavigate } from "@/lib/router";
+    17→import { siteConfig } from "@/config/site";
+    18→import { services } from "@/data/services";
+    19→import { products } from "@/data/products";
+    20→import { tools } from "@/data/tools";
+    21→import { projects } from "@/data/portfolio";
+    22→import { testimonials, stats, trustedBrands } from "@/data/testimonials";
+    23→import { faqItems, processSteps } from "@/data/faq";
+    24→import { SectionHeading } from "@/components/shared/section-heading";
+    25→import { Reveal, Stagger, StaggerItem, GradientTextTeal } from "@/components/shared/reveal";
+    26→import { GradientCover, AuroraBackground } from "@/components/shared/gradient-cover";
+    27→import { CursorSpotlight } from "@/components/shared/cursor-spotlight";
+    28→import { MagneticButton } from "@/components/shared/magnetic-button";
+    29→import { SectionDivider, SectionGlow } from "@/components/shared/section-divider";
+    30→import { AnimatedGradientBg } from "@/components/shared/animated-gradient-bg";
+    31→import { useCountUp, useInViewOnce } from "@/hooks/use-count-up";
+    32→import { useParallax } from "@/hooks/use-parallax";
+    33→import { useCurrency } from "@/lib/currency";
+    34→import { track } from "@/lib/analytics";
+    35→
+    36→const whyFeatures = [
+    37→  { icon: Award, title: "World-class craft", description: "Every pixel, animation and line of code held to the standard of Stripe, Linear and Vercel." },
+    38→  { icon: Zap, title: "Performance obsessed", description: "95+ Lighthouse scores out of the box. Sub-second loads. Edge-optimized by default." },
+    39→  { icon: Shield, title: "Accessible & secure", description: "WCAG-compliant, keyboard-navigable, and hardened against the modern threat landscape." },
+    40→  { icon: Clock, title: "On-time, every time", description: "Weekly milestones, transparent timelines, and delivery dates we actually hit." },
+    41→  { icon: Cpu, title: "AI-native", description: "We ship real AI features — copilots, RAG, automation — not just demos." },
+    42→  { icon: Globe, title: "Scale-ready", description: "Architecture that grows from 1 to 1M users without rewrites." },
+    43→];
+    44→
+    45→export function HomeView() {
+    46→  const navigate = useNavigate();
+    47→
+    48→  return (
+    49→    <div className="relative">
+    50→      <AnimatedGradientBg />
+    51→      <Hero />
+    52→      <TrustedBrands />
+    53→      <StatsSection />
+    54→      <SectionDivider />
+    55→      <ServicesPreview />
+    56→      <WhyBranify />
+    57→      <SectionDivider />
+    58→      <ProductsPreview />
+    59→      <ToolsPreview />
+    60→      <SectionDivider />
+    61→      <PortfolioPreview />
+    62→      <ProcessSection />
+    63→      <TestimonialsSection />
+    64→      <FaqPreview />
+    65→      <CtaSection />
+    66→    </div>
+    67→  );
+    68→}
+    69→
+    70→/* ------------------------------------------------------------------ */
+    71→/* HERO                                                                */
+    72→/* ------------------------------------------------------------------ */
+    73→function Hero() {
+    74→  const navigate = useNavigate();
+    75→  const ref = useRef<HTMLDivElement>(null);
+    76→  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
+    77→  const y = useTransform(scrollYProgress, [0, 1], [0, 120]);
+    78→  const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+    79→
+    80→  return (
+    81→    <section ref={ref} className="relative overflow-hidden">
+    82→      <div className="absolute inset-0 bg-grid opacity-30 mask-radial" />
+    83→
+    84→      <CursorSpotlight className="relative">
+    85→        <motion.div style={{ y, opacity }} className="relative mx-auto max-w-7xl px-4 pt-20 pb-24 sm:px-6 lg:px-8 lg:pt-32 lg:pb-32">
+    86→        <div className="mx-auto max-w-4xl text-center">
+    87→          <motion.div
+    88→            initial={{ opacity: 0, y: 12 }}
+    89→            animate={{ opacity: 1, y: 0 }}
+    90→            transition={{ duration: 0.5 }}
+    91→            className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-sm text-primary"
+    92→          >
+    93→            <Sparkles className="h-3.5 w-3.5" />
+    94→            Premium digital agency · {new Date().getFullYear()}
+    95→            <span className="mx-1 h-3 w-px bg-primary/30" />
+    96→            <span className="text-primary/80">Trusted by 320+ brands</span>
+    97→          </motion.div>
+    98→
+    99→          <motion.h1
+   100→            initial={{ opacity: 0, y: 20 }}
+   101→            animate={{ opacity: 1, y: 0 }}
+   102→            transition={{ duration: 0.6, delay: 0.08 }}
+   103→            className="font-display text-5xl font-bold leading-[1.05] tracking-tight text-white sm:text-6xl lg:text-7xl"
+   104→          >
+   105→            Brands that feel like a{" "}
+   106→            <GradientTextTeal>million dollars</GradientTextTeal>
+   107→          </motion.h1>
+   108→
+   109→          <motion.p
+   110→            initial={{ opacity: 0, y: 20 }}
+   111→            animate={{ opacity: 1, y: 0 }}
+   112→            transition={{ duration: 0.6, delay: 0.16 }}
+   113→            className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground sm:text-xl"
+   114→          >
+   115→            BRANIFY is a premium digital agency crafting world-class websites, brand identities,
+   116→            AI solutions and digital products. We design, build and grow brands that win.
+   117→          </motion.p>
+   118→
+   119→          <motion.div
+   120→            initial={{ opacity: 0, y: 20 }}
+   121→            animate={{ opacity: 1, y: 0 }}
+   122→            transition={{ duration: 0.6, delay: 0.24 }}
+   123→            className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row"
+   124→          >
+   125→            <MagneticButton strength={0.4} radius={50}>
+   126→              <Button
+   127→                onClick={() => {
+   128→                  track("cta_click", { label: "Start a project", location: "hero" });
+   129→                  navigate("contact");
+   130→                }}
+   131→                size="lg"
+   132→                className="group h-12 rounded-full bg-primary px-7 text-primary-foreground hover:bg-hover"
+   133→              >
+   134→                Start a project
+   135→                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+   136→              </Button>
+   137→            </MagneticButton>
+   138→            <MagneticButton strength={0.3} radius={40}>
+   139→              <Button
+   140→                onClick={() => navigate("portfolio")}
+   141→                size="lg"
+   142→                variant="outline"
+   143→                className="h-12 rounded-full border-white/15 bg-white/5 px-7 text-white backdrop-blur hover:bg-white/10"
+   144→              >
+   145→                <Play className="mr-2 h-4 w-4" />
+   146→                View our work
+   147→              </Button>
+   148→            </MagneticButton>
+   149→          </motion.div>
+   150→
+   151→          <motion.div
+   152→            initial={{ opacity: 0 }}
+   153→            animate={{ opacity: 1 }}
+   154→            transition={{ duration: 0.6, delay: 0.4 }}
+   155→            className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground"
+   156→          >
+   157→            {["No long-term contracts", "98% client satisfaction", "7-day delivery on Starter"].map((t) => (
+   158→              <span key={t} className="inline-flex items-center gap-1.5">
+   159→                <Check className="h-4 w-4 text-primary" />
+   160→                {t}
+   161→              </span>
+   162→            ))}
+   163→          </motion.div>
+   164→        </div>
+   165→
+   166→        <HeroDashboard />
+   167→      </motion.div>
+   168→      </CursorSpotlight>
+   169→    </section>
+   170→  );
+   171→}
+   172→
+   173→function HeroDashboard() {
+   174→  const { ref, y } = useParallax(60);
+   175→  return (
+   176→    <motion.div
+   177→      ref={ref}
+   178→      initial={{ opacity: 0, y: 40, rotateX: 12 }}
+   179→      animate={{ opacity: 1, y: 0, rotateX: 0 }}
+   180→      transition={{ duration: 0.8, delay: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }}
+   181→      className="relative mx-auto mt-16 max-w-5xl"
+   182→      style={{ perspective: 1200, y }}
+   183→    >
+   184→      <div className="absolute -inset-4 rounded-[2rem] bg-gradient-to-r from-primary/20 via-primary/5 to-transparent blur-2xl" />
+   185→      <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-card/80 shadow-premium-lg backdrop-blur-xl">
+   186→        {/* window chrome */}
+   187→        <div className="flex items-center gap-2 border-b border-white/5 px-4 py-3">
+   188→          <div className="flex gap-1.5">
+   189→            <div className="h-3 w-3 rounded-full bg-rose-500/80" />
+   190→            <div className="h-3 w-3 rounded-full bg-amber-500/80" />
+   191→            <div className="h-3 w-3 rounded-full bg-emerald-500/80" />
+   192→          </div>
+   193→          <div className="mx-auto flex items-center gap-2 rounded-md bg-white/5 px-3 py-1 text-xs text-muted-foreground">
+   194→            <Globe className="h-3 w-3" />
+   195→            branify.store
+   196→          </div>
+   197→        </div>
+   198→        {/* dashboard body */}
+   199→        <div className="grid gap-4 p-5 sm:grid-cols-3 sm:p-6">
+   200→          <div className="sm:col-span-2 space-y-4">
+   201→            <div className="flex items-center justify-between">
+   202→              <div>
+   203→                <p className="text-sm text-muted-foreground">Performance overview</p>
+   204→                <p className="font-display text-2xl font-bold text-white">+148% conversion</p>
+   205→              </div>
+   206→              <Badge className="bg-primary/15 text-primary hover:bg-primary/20">▲ 32.4%</Badge>
+   207→            </div>
+   208→            {/* fake chart */}
+   209→            <div className="relative h-32 overflow-hidden rounded-xl border border-white/5 bg-background/50 p-3">
+   210→              <svg viewBox="0 0 300 100" className="h-full w-full" preserveAspectRatio="none">
+   211→                <defs>
+   212→                  <linearGradient id="hero-chart" x1="0" y1="0" x2="0" y2="1">
+   213→                    <stop offset="0%" stopColor="#0fe1d2" stopOpacity="0.4" />
+   214→                    <stop offset="100%" stopColor="#0fe1d2" stopOpacity="0" />
+   215→                  </linearGradient>
+   216→                </defs>
+   217→                <path d="M0,80 C40,70 60,40 100,45 C140,50 160,20 200,25 C240,30 260,10 300,15 L300,100 L0,100 Z" fill="url(#hero-chart)" />
+   218→                <path d="M0,80 C40,70 60,40 100,45 C140,50 160,20 200,25 C240,30 260,10 300,15" fill="none" stroke="#0fe1d2" strokeWidth="2" />
+   219→              </svg>
+   220→            </div>
+   221→            <div className="grid grid-cols-3 gap-3">
+   222→              {[
+   223→                { label: "Lighthouse", value: "98" },
+   224→                { label: "Load time", value: "0.8s" },
+   225→                { label: "Bounce", value: "−32%" },
+   226→              ].map((s) => (
+   227→                <div key={s.label} className="rounded-lg border border-white/5 bg-background/50 p-3">
+   228→                  <p className="text-xs text-muted-foreground">{s.label}</p>
+   229→                  <p className="font-display text-lg font-bold text-white">{s.value}</p>
+   230→                </div>
+   231→              ))}
+   232→            </div>
+   233→          </div>
+   234→          <div className="space-y-3">
+   235→            <div className="rounded-xl border border-white/5 bg-background/50 p-4">
+   236→              <div className="flex items-center gap-2">
+   237→                <div className="h-8 w-8 rounded-lg bg-primary/15 flex items-center justify-center">
+   238→                  <BrainCircuit className="h-4 w-4 text-primary" />
+   239→                </div>
+   240→                <p className="text-sm font-medium text-white">AI Copilot</p>
+   241→              </div>
+   242→              <p className="mt-2 text-xs text-muted-foreground">Auto-resolving 70% of support tickets in real-time.</p>
+   243→              <div className="mt-3 h-1.5 rounded-full bg-white/5">
+   244→                <div className="h-full w-[70%] rounded-full bg-primary" />
+   245→              </div>
+   246→            </div>
+   247→            <div className="rounded-xl border border-white/5 bg-background/50 p-4">
+   248→              <p className="text-xs text-muted-foreground">Active projects</p>
+   249→              <div className="mt-2 space-y-2">
+   250→                {["Lumen Finance", "Pulse AI", "Vertex SaaS"].map((p, i) => (
+   251→                  <div key={p} className="flex items-center gap-2">
+   252→                    <div className={`h-2 w-2 rounded-full ${["bg-primary", "bg-amber-400", "bg-violet-400"][i]}`} />
+   253→                    <span className="text-xs text-white">{p}</span>
+   254→                    <span className="ml-auto text-xs text-muted-foreground">{[92, 64, 38][i]}%</span>
+   255→                  </div>
+   256→                ))}
+   257→              </div>
+   258→            </div>
+   259→          </div>
+   260→        </div>
+   261→      </div>
+   262→      {/* floating cards */}
+   263→      <motion.div
+   264→        animate={{ y: [0, -10, 0] }}
+   265→        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+   266→        className="absolute -left-4 top-1/3 hidden rounded-xl border border-white/10 bg-card/90 p-3 shadow-premium backdrop-blur-xl sm:block"
+   267→      >
+   268→        <div className="flex items-center gap-2">
+   269→          <div className="h-8 w-8 rounded-lg bg-emerald-500/15 flex items-center justify-center">
+   270→            <TrendingUp className="h-4 w-4 text-emerald-400" />
+   271→          </div>
+   272→          <div>
+   273→            <p className="text-xs text-muted-foreground">Revenue</p>
+   274→            <p className="text-sm font-bold text-white">+$240k</p>
+   275→          </div>
+   276→        </div>
+   277→      </motion.div>
+   278→      <motion.div
+   279→        animate={{ y: [0, 10, 0] }}
+   280→        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+   281→        className="absolute -right-4 bottom-1/4 hidden rounded-xl border border-white/10 bg-card/90 p-3 shadow-premium backdrop-blur-xl sm:block"
+   282→      >
+   283→        <div className="flex items-center gap-2">
+   284→          <div className="h-8 w-8 rounded-lg bg-primary/15 flex items-center justify-center">
+   285→            <Star className="h-4 w-4 text-primary" />
+   286→          </div>
+   287→          <div>
+   288→            <p className="text-xs text-muted-foreground">Client rating</p>
+   289→            <p className="text-sm font-bold text-white">4.9 / 5.0</p>
+   290→          </div>
+   291→        </div>
+   292→      </motion.div>
+   293→    </motion.div>
+   294→  );
+   295→}
+   296→
+   297→/* ------------------------------------------------------------------ */
+   298→/* TRUSTED BRANDS                                                      */
+   299→/* ------------------------------------------------------------------ */
+   300→function TrustedBrands() {
+   301→  const list = [...trustedBrands, ...trustedBrands];
+   302→  return (
+   303→    <section className="relative border-y border-white/5 py-12">
+   304→      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   305→        <p className="text-center text-sm font-medium uppercase tracking-wider text-muted-foreground">
+   306→          Trusted by fast-growing teams worldwide
+   307→        </p>
+   308→        <div className="relative mt-8 overflow-hidden mask-fade-b" style={{
+   309→          maskImage: "linear-gradient(to right, transparent, black 10%, black 90%, transparent)",
+   310→          WebkitMaskImage: "linear-gradient(to right, transparent, black 10%, black 90%, transparent)",
+   311→        }}>
+   312→          <div className="flex w-max animate-marquee items-center gap-12">
+   313→            {list.map((brand, i) => (
+   314→              <div key={i} className="flex items-center gap-2 text-2xl font-display font-bold text-white/50 transition-colors hover:text-white">
+   315→                <div className="h-7 w-7 rounded-lg bg-white/10" />
+   316→                {brand}
+   317→              </div>
+   318→            ))}
+   319→          </div>
+   320→        </div>
+   321→      </div>
+   322→    </section>
+   323→  );
+   324→}
+   325→
+   326→/* ------------------------------------------------------------------ */
+   327→/* STATS                                                               */
+   328→/* ------------------------------------------------------------------ */
+   329→function StatsSection() {
+   330→  const { ref, inView } = useInViewOnce();
+   331→  return (
+   332→    <section className="relative py-20 sm:py-28">
+   333→      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   334→        <div ref={ref} className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+   335→          {stats.map((s, i) => (
+   336→            <Reveal key={s.label} delay={i * 0.08}>
+   337→              <Card className="relative overflow-hidden border-white/5 bg-card/40 p-6 text-center backdrop-blur">
+   338→                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent" />
+   339→                <div className="relative">
+   340→                  <p className="font-display text-4xl font-bold text-white sm:text-5xl">
+   341→                    <CountUpNumber target={s.value} start={inView} />
+   342→                    <span className="text-primary">{s.suffix}</span>
+   343→                  </p>
+   344→                  <p className="mt-2 text-sm text-muted-foreground">{s.label}</p>
+   345→                </div>
+   346→              </Card>
+   347→            </Reveal>
+   348→          ))}
+   349→        </div>
+   350→      </div>
+   351→    </section>
+   352→  );
+   353→}
+   354→
+   355→function CountUpNumber({ target, start }: { target: number; start: boolean }) {
+   356→  const value = useCountUp(target, 2, start);
+   357→  return <>{value}</>;
+   358→}
+   359→
+   360→/* ------------------------------------------------------------------ */
+   361→/* SERVICES PREVIEW                                                    */
+   362→/* ------------------------------------------------------------------ */
+   363→function ServicesPreview() {
+   364→  const navigate = useNavigate();
+   365→  const { currency, convert } = useCurrency();
+   366→  return (
+   367→    <section className="relative py-20 sm:py-28">
+   368→      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   369→        <SectionHeading
+   370→          eyebrow="What we do"
+   371→          title={<>Services that <GradientTextTeal>compound</GradientTextTeal></>}
+   372→          description="From a single logo to a full AI-powered platform — we cover the entire digital journey under one roof."
+   373→        />
+   374→        <Stagger className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+   375→          {services.slice(0, 6).map((s) => (
+   376→            <StaggerItem key={s.slug}>
+   377→              <Card
+   378→                className="card-premium group relative h-full overflow-hidden border-white/5 bg-card/40 p-6 backdrop-blur hover:border-primary/30 hover:bg-card/60 cursor-pointer"
+   379→                onClick={() => navigate("service-detail", { slug: s.slug })}
+   380→              >
+   381→                <div className={`absolute inset-0 bg-gradient-to-br ${s.accent} opacity-0 transition-opacity group-hover:opacity-100`} />
+   382→                <div className="relative">
+   383→                  <div className="flex items-center justify-between">
+   384→                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-transform group-hover:scale-110">
+   385→                      <s.icon className="h-6 w-6" />
+   386→                    </div>
+   387→                    {s.popular && (
+   388→                      <Badge className="bg-primary/15 text-primary hover:bg-primary/20">Popular</Badge>
+   389→                    )}
+   390→                  </div>
+   391→                  <h3 className="mt-5 font-display text-xl font-semibold text-white">{s.title}</h3>
+   392→                  <p className="mt-2 text-sm text-muted-foreground">{s.description}</p>
+   393→                  <div className="mt-4 flex items-center justify-between">
+   394→                    <span className="text-sm text-muted-foreground">From <span className="font-semibold text-white">{currency.symbol}{convert(s.startingPrice).toLocaleString("en-US", { maximumFractionDigits: 0 })}</span></span>
+   395→                    <ArrowRight className="h-4 w-4 text-primary opacity-0 transition-all group-hover:translate-x-1 group-hover:opacity-100" />
+   396→                  </div>
+   397→                </div>
+   398→              </Card>
+   399→            </StaggerItem>
+   400→          ))}
+   401→        </Stagger>
+   402→        <div className="mt-10 flex justify-center">
+   403→          <Button onClick={() => navigate("services")} variant="outline" className="rounded-full border-white/15 bg-white/5 hover:bg-white/10">
+   404→            View all 12 services <ArrowRight className="ml-2 h-4 w-4" />
+   405→          </Button>
+   406→        </div>
+   407→      </div>
+   408→    </section>
+   409→  );
+   410→}
+   411→
+   412→/* ------------------------------------------------------------------ */
+   413→/* WHY BRANIFY                                                         */
+   414→/* ------------------------------------------------------------------ */
+   415→function WhyBranify() {
+   416→  return (
+   417→    <section className="relative overflow-hidden border-y border-white/5 py-20 sm:py-28">
+   418→      <div className="absolute inset-0 bg-grid opacity-20" />
+   419→      <div className="absolute top-1/2 left-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/10 blur-[120px]" />
+   420→      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   421→        <SectionHeading
+   422→          eyebrow="Why BRANIFY"
+   423→          title={<>Premium isn't a price. It's a <GradientTextTeal>standard</GradientTextTeal>.</>}
+   424→          description="We hold every decision — from typography to deployment — to the standard of the world's best technology companies."
+   425→        />
+   426→        <Stagger className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+   427→          {whyFeatures.map((f) => (
+   428→            <StaggerItem key={f.title}>
+   429→              <div className="card-premium group h-full rounded-2xl border border-white/5 bg-card/40 p-6 backdrop-blur hover:border-primary/30 hover:bg-card/60">
+   430→                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary transition-transform group-hover:scale-110">
+   431→                  <f.icon className="h-5 w-5" />
+   432→                </div>
+   433→                <h3 className="mt-4 font-display text-lg font-semibold text-white">{f.title}</h3>
+   434→                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{f.description}</p>
+   435→              </div>
+   436→            </StaggerItem>
+   437→          ))}
+   438→        </Stagger>
+   439→      </div>
+   440→    </section>
+   441→  );
+   442→}
+   443→
+   444→/* ------------------------------------------------------------------ */
+   445→/* PRODUCTS PREVIEW                                                    */
+   446→/* ------------------------------------------------------------------ */
+   447→function ProductsPreview() {
+   448→  const navigate = useNavigate();
+   449→  const { currency, convert } = useCurrency();
+   450→  return (
+   451→    <section className="relative py-20 sm:py-28">
+   452→      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   453→        <div className="flex flex-col items-center justify-between gap-6 sm:flex-row sm:items-end">
+   454→          <SectionHeading
+   455→            align="left"
+   456→            eyebrow="Digital Products"
+   457→            title={<>Launch faster with <GradientTextTeal>ready-to-use</GradientTextTeal> assets</>}
+   458→            description="Templates, kits and bundles crafted with the same care as our client work. Instant download."
+   459→          />
+   460→          <Button onClick={() => navigate("products")} variant="outline" className="shrink-0 rounded-full border-white/15 bg-white/5 hover:bg-white/10">
+   461→            Browse all <ArrowRight className="ml-2 h-4 w-4" />
+   462→          </Button>
+   463→        </div>
+   464→        <Stagger className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+   465→          {products.slice(0, 4).map((p) => (
+   466→            <StaggerItem key={p.slug}>
+   467→              <Card
+   468→                className="card-premium group flex h-full flex-col overflow-hidden border-white/5 bg-card/40 backdrop-blur hover:border-primary/30 hover:bg-card/60 cursor-pointer"
+   469→                onClick={() => navigate("product-detail", { slug: p.slug })}
+   470→              >
+   471→                <GradientCover variant={p.preview} className="h-40">
+   472→                  <div className="flex h-full items-center justify-center">
+   473→                    <p.icon className="h-10 w-10 text-white/80" />
+   474→                  </div>
+   475→                  {(p.popular || p.new) && (
+   476→                    <div className="absolute left-3 top-3">
+   477→                      <Badge className={p.new ? "bg-emerald-500/20 text-emerald-300" : "bg-primary/20 text-primary"}>
+   478→                        {p.new ? "New" : "Popular"}
+   479→                      </Badge>
+   480→                    </div>
+   481→                  )}
+   482→                </GradientCover>
+   483→                <div className="p-4">
+   484→                  <p className="text-xs text-muted-foreground">{p.category}</p>
+   485→                  <h3 className="mt-1 font-display font-semibold text-white group-hover:text-primary transition-colors">{p.name}</h3>
+   486→                  <p className="mt-1 text-xs text-muted-foreground line-clamp-1">{p.tagline}</p>
+   487→                  <div className="mt-3 flex items-center justify-between">
+   488→                    <div className="flex items-baseline gap-1.5">
+   489→                      <span className="font-display text-lg font-bold text-white">{currency.symbol}{convert(p.price).toLocaleString("en-US", { maximumFractionDigits: 0 })}</span>
+   490→                      {p.originalPrice && <span className="text-xs text-muted-foreground line-through">{currency.symbol}{convert(p.originalPrice).toLocaleString("en-US", { maximumFractionDigits: 0 })}</span>}
+   491→                    </div>
+   492→                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+   493→                      <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+   494→                      {p.rating}
+   495→                    </div>
+   496→                  </div>
+   497→                </div>
+   498→              </Card>
+   499→            </StaggerItem>
+   500→          ))}
+   501→        </Stagger>
+   502→      </div>
+   503→    </section>
+   504→  );
+   505→}
+   506→
+   507→/* ------------------------------------------------------------------ */
+   508→/* TOOLS PREVIEW                                                       */
+   509→/* ------------------------------------------------------------------ */
+   510→function ToolsPreview() {
+   511→  const navigate = useNavigate();
+   512→  return (
+   513→    <section className="relative overflow-hidden border-y border-white/5 py-20 sm:py-28">
+   514→      <div className="absolute inset-0 bg-dots opacity-30" />
+   515→      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   516→        <SectionHeading
+   517→          eyebrow="Free Tools"
+   518→          title={<>Free, fast & <GradientTextTeal>beautiful</GradientTextTeal> tools</>}
+   519→          description="Generators and calculators for modern teams. No signup. No ads. Just press a button and copy."
+   520→        />
+   521→        <Stagger className="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+   522→          {tools.slice(0, 6).map((t) => (
+   523→            <StaggerItem key={t.slug}>
+   524→              <button
+   525→                onClick={() => navigate("tools")}
+   526→                className="group flex w-full items-center gap-4 rounded-xl border border-white/5 bg-card/40 p-4 text-left backdrop-blur transition-all hover:border-primary/30 hover:bg-card/60"
+   527→              >
+   528→                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-transform group-hover:scale-110">
+   529→                  <t.icon className="h-5 w-5" />
+   530→                </div>
+   531→                <div className="min-w-0 flex-1">
+   532→                  <div className="flex items-center gap-2">
+   533→                    <h3 className="font-medium text-white group-hover:text-primary transition-colors">{t.name}</h3>
+   534→                    {t.badge && (
+   535→                      <Badge variant="outline" className="border-primary/30 text-primary text-[10px]">{t.badge}</Badge>
+   536→                    )}
+   537→                  </div>
+   538→                  <p className="truncate text-xs text-muted-foreground">{t.description}</p>
+   539→                </div>
+   540→                <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground opacity-0 transition-all group-hover:translate-x-1 group-hover:opacity-100" />
+   541→              </button>
+   542→            </StaggerItem>
+   543→          ))}
+   544→        </Stagger>
+   545→        <div className="mt-10 flex justify-center">
+   546→          <Button onClick={() => navigate("tools")} variant="outline" className="rounded-full border-white/15 bg-white/5 hover:bg-white/10">
+   547→            Explore all 10 tools <ArrowRight className="ml-2 h-4 w-4" />
+   548→          </Button>
+   549→        </div>
+   550→      </div>
+   551→    </section>
+   552→  );
+   553→}
+   554→
+   555→/* ------------------------------------------------------------------ */
+   556→/* PORTFOLIO PREVIEW                                                   */
+   557→/* ------------------------------------------------------------------ */
+   558→function PortfolioPreview() {
+   559→  const navigate = useNavigate();
+   560→  return (
+   561→    <section className="relative py-20 sm:py-28">
+   562→      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   563→        <div className="flex flex-col items-center justify-between gap-6 sm:flex-row sm:items-end">
+   564→          <SectionHeading
+   565→            align="left"
+   566→            eyebrow="Portfolio"
+   567→            title={<>Work that <GradientTextTeal>moves metrics</GradientTextTeal></>}
+   568→            description="Real case studies with real results. We measure success in your growth, not just pretty pixels."
+   569→          />
+   570→          <Button onClick={() => navigate("portfolio")} variant="outline" className="shrink-0 rounded-full border-white/15 bg-white/5 hover:bg-white/10">
+   571→            View all work <ArrowRight className="ml-2 h-4 w-4" />
+   572→          </Button>
+   573→        </div>
+   574→        <div className="mt-12 grid gap-4 lg:grid-cols-2">
+   575→          {projects.slice(0, 4).map((p, i) => (
+   576→            <Reveal key={p.slug} delay={i * 0.08}>
+   577→              <Card
+   578→                className="group cursor-pointer overflow-hidden border-white/5 bg-card/40 backdrop-blur transition-all hover:border-primary/30 hover:bg-card/60"
+   579→                onClick={() => navigate("portfolio")}
+   580→              >
+   581→                <div className="grid sm:grid-cols-2">
+   582→                  <GradientCover variant={p.cover} className="min-h-[200px] p-6">
+   583→                    <div className="flex h-full flex-col justify-between">
+   584→                      <Badge className="w-fit bg-white/10 text-white hover:bg-white/15">{p.category}</Badge>
+   585→                      <div>
+   586→                        <p className="font-display text-2xl font-bold text-white">{p.client}</p>
+   587→                        <p className="text-sm text-white/60">{p.year}</p>
+   588→                      </div>
+   589→                    </div>
+   590→                  </GradientCover>
+   591→                  <div className="p-6">
+   592→                    <h3 className="font-display text-lg font-semibold text-white group-hover:text-primary transition-colors">{p.title}</h3>
+   593→                    <p className="mt-2 text-sm text-muted-foreground">{p.summary}</p>
+   594→                    <div className="mt-4 grid grid-cols-2 gap-2">
+   595→                      {p.results.slice(0, 2).map((r) => (
+   596→                        <div key={r.label} className="rounded-lg bg-background/50 p-2.5">
+   597→                          <p className="font-display text-xl font-bold text-primary">{r.value}</p>
+   598→                          <p className="text-xs text-muted-foreground">{r.label}</p>
+   599→                        </div>
+   600→                      ))}
+   601→                    </div>
+   602→                    <div className="mt-4 flex flex-wrap gap-1.5">
+   603→                      {p.tech.slice(0, 3).map((t) => (
+   604→                        <span key={t} className="rounded-md bg-white/5 px-2 py-0.5 text-[10px] text-muted-foreground">{t}</span>
+   605→                      ))}
+   606→                    </div>
+   607→                  </div>
+   608→                </div>
+   609→              </Card>
+   610→            </Reveal>
+   611→          ))}
+   612→        </div>
+   613→      </div>
+   614→    </section>
+   615→  );
+   616→}
+   617→
+   618→/* ------------------------------------------------------------------ */
+   619→/* PROCESS                                                             */
+   620→/* ------------------------------------------------------------------ */
+   621→function ProcessSection() {
+   622→  const icons: Record<string, React.ElementType> = { Search, Palette, Code2, Rocket: TrendingUp, TrendingUp };
+   623→  return (
+   624→    <section className="relative overflow-hidden border-y border-white/5 py-20 sm:py-28">
+   625→      <div className="absolute inset-0 bg-grid opacity-20" />
+   626→      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   627→        <SectionHeading
+   628→          eyebrow="Our Process"
+   629→          title={<>A process built for <GradientTextTeal>outcomes</GradientTextTeal></>}
+   630→          description="Five phases, weekly milestones, zero surprises. You always know what's happening and why."
+   631→        />
+   632→        <div className="mt-14 grid gap-4 lg:grid-cols-5">
+   633→          {processSteps.map((step, i) => {
+   634→            const Icon = icons[step.icon] || Layers;
+   635→            return (
+   636→              <Reveal key={step.number} delay={i * 0.1}>
+   637→                <div className="relative h-full rounded-2xl border border-white/5 bg-card/40 p-6 backdrop-blur">
+   638→                  <div className="absolute -top-3 left-6 flex h-7 items-center rounded-full bg-primary px-3 text-xs font-bold text-primary-foreground">
+   639→                    {step.number}
+   640→                  </div>
+   641→                  <div className="mt-3 flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+   642→                    <Icon className="h-5 w-5" />
+   643→                  </div>
+   644→                  <h3 className="mt-4 font-display text-lg font-semibold text-white">{step.title}</h3>
+   645→                  <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{step.description}</p>
+   646→                  {i < processSteps.length - 1 && (
+   647→                    <ArrowRight className="absolute -right-2 top-1/2 hidden h-5 w-5 -translate-y-1/2 text-primary/30 lg:block" />
+   648→                  )}
+   649→                </div>
+   650→              </Reveal>
+   651→            );
+   652→          })}
+   653→        </div>
+   654→      </div>
+   655→    </section>
+   656→  );
+   657→}
+   658→
+   659→/* ------------------------------------------------------------------ */
+   660→/* TESTIMONIALS                                                        */
+   661→/* ------------------------------------------------------------------ */
+   662→function TestimonialsSection() {
+   663→  return (
+   664→    <section className="relative py-20 sm:py-28">
+   665→      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   666→        <SectionHeading
+   667→          eyebrow="Testimonials"
+   668→          title={<>Loved by <GradientTextTeal>founders</GradientTextTeal> &amp; teams</>}
+   669→          description="Don't take our word for it. Here's what happens when ambition meets craftsmanship."
+   670→        />
+   671→        <Stagger className="mt-12 columns-1 gap-4 sm:columns-2 lg:columns-3 [&>*]:mb-4">
+   672→          {testimonials.map((t) => (
+   673→            <StaggerItem key={t.name}>
+   674→              <Card className="card-premium break-inside-avoid border-white/5 bg-card/40 p-6 backdrop-blur hover:border-primary/30 hover:bg-card/60">
+   675→                <div className="flex items-center justify-between">
+   676→                  <div className="flex gap-0.5">
+   677→                    {Array.from({ length: t.rating }).map((_, i) => (
+   678→                      <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
+   679→                    ))}
+   680→                  </div>
+   681→                  {t.metric && (
+   682→                    <Badge className="bg-primary/15 text-primary hover:bg-primary/20">{t.metric}</Badge>
+   683→                  )}
+   684→                </div>
+   685→                <Quote className="mt-4 h-6 w-6 text-primary/30" />
+   686→                <p className="mt-3 text-sm text-white/90 leading-relaxed">{t.quote}</p>
+   687→                <div className="mt-5 flex items-center gap-3">
+   688→                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-primary/30 to-primary/5 font-display text-sm font-bold text-primary">
+   689→                    {t.avatar}
+   690→                  </div>
+   691→                  <div>
+   692→                    <p className="text-sm font-medium text-white">{t.name}</p>
+   693→                    <p className="text-xs text-muted-foreground">{t.role}, {t.company}</p>
+   694→                  </div>
+   695→                </div>
+   696→              </Card>
+   697→            </StaggerItem>
+   698→          ))}
+   699→        </Stagger>
+   700→      </div>
+   701→    </section>
+   702→  );
+   703→}
+   704→
+   705→/* ------------------------------------------------------------------ */
+   706→/* FAQ PREVIEW                                                         */
+   707→/* ------------------------------------------------------------------ */
+   708→function FaqPreview() {
+   709→  const navigate = useNavigate();
+   710→  return (
+   711→    <section className="relative overflow-hidden border-y border-white/5 py-20 sm:py-28">
+   712→      <div className="absolute inset-0 bg-dots opacity-30" />
+   713→      <SectionGlow side="top" color="rgba(20, 184, 166, 0.07)" size={560} />
+   714→      <div className="relative mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+   715→        <SectionHeading
+   716→          eyebrow="FAQ"
+   717→          title={<>Questions, <GradientTextTeal>answered</GradientTextTeal></>}
+   718→          description="Everything you need to know about working with BRANIFY."
+   719→        />
+   720→        <Accordion type="single" collapsible className="mt-10 space-y-3">
+   721→          {faqItems.slice(0, 6).map((f, i) => (
+   722→            <AccordionItem key={i} value={`item-${i}`} className="rounded-xl border border-white/5 bg-card/40 px-5 backdrop-blur">
+   723→              <AccordionTrigger className="text-left text-white hover:no-underline">
+   724→                {f.question}
+   725→              </AccordionTrigger>
+   726→              <AccordionContent className="text-muted-foreground">
+   727→                {f.answer}
+   728→              </AccordionContent>
+   729→            </AccordionItem>
+   730→          ))}
+   731→        </Accordion>
+   732→        <div className="mt-8 text-center">
+   733→          <Button onClick={() => navigate("faq")} variant="outline" className="rounded-full border-white/15 bg-white/5 hover:bg-white/10">
+   734→            See all FAQs <ArrowRight className="ml-2 h-4 w-4" />
+   735→          </Button>
+   736→        </div>
+   737→      </div>
+   738→    </section>
+   739→  );
+   740→}
+   741→
+   742→/* ------------------------------------------------------------------ */
+   743→/* CTA                                                                 */
+   744→/* ------------------------------------------------------------------ */
+   745→function CtaSection() {
+   746→  const navigate = useNavigate();
+   747→  return (
+   748→    <section className="relative py-20 sm:py-28">
+   749→      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   750→        <div className="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/15 via-card/60 to-card/40 p-10 backdrop-blur-xl sm:p-16">
+   751→          <div className="absolute inset-0 bg-grid opacity-20" />
+   752→          <div className="relative mx-auto max-w-3xl text-center">
+   753→            <Badge className="mb-6 bg-primary/20 text-primary hover:bg-primary/25">
+   754→              <Sparkles className="mr-1.5 h-3 w-3" /> Let's build something premium
+   755→            </Badge>
+   756→            <h2 className="font-display text-4xl font-bold tracking-tight text-white sm:text-5xl">
+   757→              Ready to make your brand feel{" "}
+   758→              <GradientTextTeal>unforgettable?</GradientTextTeal>
+   759→            </h2>
+   760→            <p className="mx-auto mt-5 max-w-xl text-lg text-muted-foreground">
+   761→              Book a free 30-minute strategy call. We'll map out exactly how to take your brand to the next level — no pressure, no jargon.
+   762→            </p>
+   763→            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+   764→              <MagneticButton strength={0.4} radius={50}>
+   765→                <Button onClick={() => navigate("contact")} size="lg" className="h-12 rounded-full bg-primary px-7 text-primary-foreground hover:bg-hover">
+   766→                  Book a free call <ArrowRight className="ml-2 h-4 w-4" />
+   767→                </Button>
+   768→              </MagneticButton>
+   769→              <MagneticButton strength={0.3} radius={40}>
+   770→                <Button onClick={() => navigate("pricing")} size="lg" variant="outline" className="h-12 rounded-full border-white/15 bg-white/5 px-7 hover:bg-white/10">
+   771→                  View pricing
+   772→                </Button>
+   773→              </MagneticButton>
+   774→            </div>
+   775→            <p className="mt-6 text-sm text-muted-foreground/70">
+   776→              Or email us at{" "}
+   777→              <a href={`mailto:${siteConfig.email}`} className="text-primary hover:underline">{siteConfig.email}</a>
+   778→            </p>
+   779→          </div>
+   780→        </div>
+   781→      </div>
+   782→    </section>
+   783→  );
+   784→}
+   785→

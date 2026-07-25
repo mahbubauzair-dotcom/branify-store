@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Menu, X, Search, ChevronRight, Keyboard, Heart, User, ShoppingCart,
-  ArrowRight, Store, Sparkles,
+  ArrowRight, Store, ShoppingBag, MessageCircle, Rocket,
 } from "lucide-react";
 import { Logo } from "@/components/shared/logo";
 import { Button } from "@/components/ui/button";
@@ -40,10 +40,6 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const handleNav = (r: RouteName) => {
-    go(r);
-  };
-
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
@@ -64,23 +60,26 @@ export function Navbar() {
           : "bg-[#050816]/60 backdrop-blur-md border-b border-white/[0.05]",
       )}
     >
-      {/* ===== TOP ROW: logo | search | currency | signin | wishlist | cart ===== */}
+      {/* ===== TOP ROW: logo | search | currency | signin | wishlist | cart | whatsapp | book ===== */}
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:gap-4 sm:px-6 lg:px-8">
         {/* Logo */}
-        <button onClick={() => handleNav("home")} className="shrink-0 transition-opacity hover:opacity-90">
+        <button onClick={() => go("home")} className="shrink-0 transition-opacity hover:opacity-90">
           <Logo size="sm" />
         </button>
 
         {/* Search bar (desktop) */}
         <form onSubmit={handleSearch} className="hidden flex-1 md:block">
-          <div className="relative max-w-md">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <div className="relative max-w-xl">
+            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search products, categories…"
-              className="h-10 rounded-full border-white/10 bg-white/5 pl-10 pr-4 text-sm placeholder:text-muted-foreground/60"
+              placeholder="Search products, categories, tools..."
+              className="h-10 rounded-full border-white/10 bg-white/5 pl-10 pr-16 text-sm placeholder:text-muted-foreground/60"
             />
+            <kbd className="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 select-none items-center gap-0.5 rounded-md border border-white/10 bg-white/5 px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground lg:inline-flex">
+              <span className="text-xs">⌘</span>K
+            </kbd>
           </div>
         </form>
 
@@ -91,16 +90,16 @@ export function Navbar() {
 
           {/* Sign in / Register */}
           <button
-            onClick={() => handleNav("contact")}
+            onClick={() => go("contact")}
             aria-label="Sign in"
             className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-white/5 hover:text-white sm:hidden"
           >
             <User className="h-4 w-4" />
           </button>
           <Button
-            onClick={() => handleNav("contact")}
+            onClick={() => go("contact")}
             variant="ghost"
-            className="hidden text-sm text-muted-foreground hover:text-white sm:inline-flex"
+            className="hidden h-9 px-3 text-sm text-muted-foreground hover:text-white sm:inline-flex"
           >
             <User className="mr-1.5 h-4 w-4" />
             Sign in
@@ -127,12 +126,31 @@ export function Navbar() {
             className="relative flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-white/5 hover:text-white"
           >
             <ShoppingCart className="h-4 w-4" />
-            {cartCount > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-gradient-to-r from-[#00E5FF] to-[#18F2B2] text-[9px] font-bold text-[#04121a]">
-                {cartCount}
-              </span>
-            )}
+            <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-gradient-to-r from-[#00E5FF] to-[#18F2B2] text-[9px] font-bold text-[#04121a] ring-2 ring-[#050816]">
+              {cartCount}
+            </span>
           </button>
+
+          {/* WhatsApp button */}
+          <a
+            href={siteConfig.whatsapp}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Chat on WhatsApp"
+            className="hidden h-9 items-center gap-1.5 rounded-lg bg-[#25D366] px-3 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[#1ebe5d] hover:shadow-md sm:inline-flex"
+          >
+            <MessageCircle className="h-4 w-4" />
+            <span className="hidden lg:inline">WhatsApp</span>
+          </a>
+
+          {/* Book a Free Consultation */}
+          <Button
+            onClick={() => go("contact")}
+            className="hidden h-9 rounded-full bg-gradient-to-r from-[#00E5FF] to-[#18F2B2] px-4 text-sm font-semibold text-[#04121a] shadow-sm transition-all hover:shadow-md lg:inline-flex"
+          >
+            <Rocket className="mr-1.5 h-4 w-4" />
+            Book a Free Consultation
+          </Button>
 
           {/* Mobile menu toggle */}
           <button
@@ -186,9 +204,9 @@ export function Navbar() {
           <div className="ml-auto flex items-center gap-3">
             <button
               onClick={() => go("storefront")}
-              className="flex items-center gap-1.5 py-2.5 text-sm font-medium text-primary transition-colors hover:text-accent"
+              className="group flex items-center gap-1.5 rounded-full border border-[#00E5FF]/30 bg-[#00E5FF]/10 px-3.5 py-1.5 text-sm font-semibold text-primary transition-all hover:border-[#00E5FF]/50 hover:bg-[#00E5FF]/20 hover:text-accent"
             >
-              <Store className="h-4 w-4" />
+              <ShoppingBag className="h-4 w-4 transition-transform group-hover:scale-110" />
               Shop All
             </button>
             <button
@@ -255,7 +273,7 @@ export function Navbar() {
                 {navItems.map((item) => (
                   <button
                     key={item.route}
-                    onClick={() => handleNav(item.route)}
+                    onClick={() => go(item.route)}
                     className="flex items-center justify-between rounded-lg px-3 py-2.5 text-left text-base font-medium text-muted-foreground transition-colors hover:bg-white/5 hover:text-white"
                   >
                     {item.label}
@@ -264,8 +282,20 @@ export function Navbar() {
                 ))}
               </nav>
               <div className="mt-4 flex flex-col gap-2 border-t border-white/5 pt-4">
-                <Button onClick={() => handleNav("storefront")} className="bg-gradient-to-r from-[#00E5FF] to-[#18F2B2] text-[#04121a]">
+                <Button onClick={() => go("storefront")} className="bg-gradient-to-r from-[#00E5FF] to-[#18F2B2] text-[#04121a]">
                   <Store className="mr-1.5 h-4 w-4" /> Shop All Products
+                </Button>
+                <a
+                  href={siteConfig.whatsapp}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex h-10 items-center justify-center gap-1.5 rounded-md bg-[#25D366] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#1ebe5d]"
+                >
+                  <MessageCircle className="h-4 w-4" />
+                  Chat on WhatsApp
+                </a>
+                <Button onClick={() => go("contact")} className="bg-gradient-to-r from-[#00E5FF] to-[#18F2B2] text-[#04121a]">
+                  <Rocket className="mr-1.5 h-4 w-4" /> Book a Free Consultation
                 </Button>
                 <div className="flex items-center justify-between rounded-lg border border-white/5 bg-white/5 px-3 py-2">
                   <span className="text-xs text-muted-foreground">Currency</span>
