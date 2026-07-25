@@ -42,6 +42,16 @@ import { MetaDescriptionGenerator } from "@/components/tools/meta-description-ge
 import { PrivacyPolicyGenerator } from "@/components/tools/privacy-policy-generator";
 import { TermsGenerator } from "@/components/tools/terms-generator";
 import { BrandSloganGenerator } from "@/components/tools/brand-slogan-generator";
+import { ImageCompressor } from "@/components/tools/image-compressor";
+import { ImageResizer } from "@/components/tools/image-resizer";
+import { WebpConverter } from "@/components/tools/webp-converter";
+import { SvgOptimizer } from "@/components/tools/svg-optimizer";
+import { FaviconGenerator } from "@/components/tools/favicon-generator";
+import { PdfToJpg } from "@/components/tools/pdf-to-jpg";
+import { JpgToPdf } from "@/components/tools/jpg-to-pdf";
+import { MergePdf } from "@/components/tools/merge-pdf";
+import { SplitPdf } from "@/components/tools/split-pdf";
+import { CompressPdf } from "@/components/tools/compress-pdf";
 
 function ToolContent({ slug }: { slug: string }) {
   switch (slug) {
@@ -65,6 +75,26 @@ function ToolContent({ slug }: { slug: string }) {
       return <TermsGenerator />;
     case "brand-slogan-generator":
       return <BrandSloganGenerator />;
+    case "image-compressor":
+      return <ImageCompressor />;
+    case "image-resizer":
+      return <ImageResizer />;
+    case "webp-converter":
+      return <WebpConverter />;
+    case "svg-optimizer":
+      return <SvgOptimizer />;
+    case "favicon-generator":
+      return <FaviconGenerator />;
+    case "pdf-to-jpg":
+      return <PdfToJpg />;
+    case "jpg-to-pdf":
+      return <JpgToPdf />;
+    case "merge-pdf":
+      return <MergePdf />;
+    case "split-pdf":
+      return <SplitPdf />;
+    case "compress-pdf":
+      return <CompressPdf />;
     default:
       return null;
   }
