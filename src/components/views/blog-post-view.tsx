@@ -257,21 +257,36 @@ function ArticleHero({ post }: { post: BlogPost }) {
       {/* Banner */}
       <div className="relative mx-auto max-w-5xl px-4 pb-12 sm:px-6 lg:px-8 lg:pb-16">
         <Reveal delay={0.25}>
-          <GradientCover
-            variant={post.cover}
-            className="h-64 w-full overflow-hidden rounded-3xl border border-white/10 sm:h-72 lg:h-80"
-          >
-            <div className="flex h-full items-center justify-center">
-              <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-white/10 backdrop-blur-sm">
-                <Quote className="h-10 w-10 text-white/80" />
+          {post.coverImage ? (
+            <div className="relative h-64 w-full overflow-hidden rounded-3xl border border-white/10 sm:h-72 lg:h-80">
+              <img
+                src={post.coverImage}
+                alt={post.title}
+                className="h-full w-full object-cover"
+              />
+              <div className="absolute left-5 top-5">
+                <Badge className="bg-black/40 text-white backdrop-blur-sm hover:bg-black/50">
+                  {post.category}
+                </Badge>
               </div>
             </div>
-            <div className="absolute left-5 top-5">
-              <Badge className="bg-black/40 text-white backdrop-blur-sm hover:bg-black/50">
-                {post.category}
-              </Badge>
-            </div>
-          </GradientCover>
+          ) : (
+            <GradientCover
+              variant={post.cover}
+              className="h-64 w-full overflow-hidden rounded-3xl border border-white/10 sm:h-72 lg:h-80"
+            >
+              <div className="flex h-full items-center justify-center">
+                <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-white/10 backdrop-blur-sm">
+                  <Quote className="h-10 w-10 text-white/80" />
+                </div>
+              </div>
+              <div className="absolute left-5 top-5">
+                <Badge className="bg-black/40 text-white backdrop-blur-sm hover:bg-black/50">
+                  {post.category}
+                </Badge>
+              </div>
+            </GradientCover>
+          )}
         </Reveal>
       </div>
     </section>
@@ -316,6 +331,20 @@ const ArticleBody = forwardRef<HTMLElement, { post: BlogPost; tocItems: TocItem[
                       {block.body}
                     </p>
                   );
+                }).flatMap((el, i) => {
+                  const block = post.content[i];
+                  if (block?.image) {
+                    return [
+                      el,
+                      <img
+                        key={`img-${i}`}
+                        src={block.image}
+                        alt={block.heading || block.body.substring(0, 60)}
+                        className="my-6 w-full rounded-2xl border border-white/10"
+                      />,
+                    ];
+                  }
+                  return [el];
                 })}
               </article>
             </Reveal>
