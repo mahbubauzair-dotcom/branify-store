@@ -9,6 +9,7 @@ import { ScrollProgress } from "@/components/layout/scroll-progress";
 import { CommandPalette } from "@/components/layout/command-palette";
 import { BackToTop } from "@/components/layout/back-to-top";
 import { ShortcutHelp } from "@/components/layout/shortcut-help";
+import { CurrencyProvider } from "@/lib/currency";
 import { useRouterStore, isAdminRoute } from "@/lib/router";
 import { useNavigationTracking } from "@/lib/analytics";
 import { HomeView } from "@/components/views/home-view";
@@ -208,31 +209,33 @@ export default function Home() {
   }
 
   return (
-    <div className="relative flex min-h-screen flex-col bg-background">
-      {!isBlogPost && <ScrollProgress />}
-      <CommandPalette />
-      <ShortcutHelp />
-      <AnnouncementBar />
-      <Navbar />
-      <main className="flex-1">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={route + (slug ?? "")}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-          >
-            {isHome ? (
-              view
-            ) : (
-              <Suspense fallback={<ViewSkeleton />}>{view}</Suspense>
-            )}
-          </motion.div>
-        </AnimatePresence>
-      </main>
-      <Footer />
-      <BackToTop />
-    </div>
+    <CurrencyProvider>
+      <div className="relative flex min-h-screen flex-col bg-background">
+        {!isBlogPost && <ScrollProgress />}
+        <CommandPalette />
+        <ShortcutHelp />
+        <AnnouncementBar />
+        <Navbar />
+        <main className="flex-1">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={route + (slug ?? "")}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+            >
+              {isHome ? (
+                view
+              ) : (
+                <Suspense fallback={<ViewSkeleton />}>{view}</Suspense>
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </main>
+        <Footer />
+        <BackToTop />
+      </div>
+    </CurrencyProvider>
   );
 }
