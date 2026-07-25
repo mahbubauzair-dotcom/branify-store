@@ -45,6 +45,7 @@ import {
   AuroraBackground,
 } from "@/components/shared/gradient-cover";
 import { JsonLd, buildBreadcrumbSchema } from "@/components/shared/json-ld";
+import { useCurrency } from "@/lib/currency";
 import { track } from "@/lib/analytics";
 
 const processIconMap: Record<string, LucideIcon> = {
@@ -116,6 +117,7 @@ export function ServiceDetailView() {
 /* ------------------------------------------------------------------ */
 function ServiceHero({ service }: { service: Service }) {
   const navigate = useNavigate();
+  const { currency, convert } = useCurrency();
   return (
     <section className="relative overflow-hidden border-b border-white/5">
       <AuroraBackground />
@@ -187,7 +189,7 @@ function ServiceHero({ service }: { service: Service }) {
                 <div className="rounded-2xl border border-white/5 bg-card/40 px-5 py-3 backdrop-blur">
                   <p className="text-[11px] uppercase tracking-wider text-muted-foreground">Starting at</p>
                   <p className="font-display text-3xl font-bold text-white tabular-nums">
-                    ${service.startingPrice.toLocaleString()}
+                    {currency.symbol}{convert(service.startingPrice).toLocaleString("en-US", { maximumFractionDigits: service.startingPrice < 100 ? 2 : 0 })}
                   </p>
                 </div>
                 <MagneticButton strength={0.4} radius={50}>
@@ -499,6 +501,7 @@ function ServiceFaq({ service }: { service: Service }) {
 /* ------------------------------------------------------------------ */
 function RelatedServices({ services: list }: { services: Service[] }) {
   const navigate = useNavigate();
+  const { currency, convert } = useCurrency();
   return (
     <section className="relative py-20 sm:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -525,7 +528,7 @@ function RelatedServices({ services: list }: { services: Service[] }) {
                   </div>
                   <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{s.tagline}</p>
                   <p className="mt-3 text-sm text-white/70">
-                    From <span className="font-semibold text-white tabular-nums">${s.startingPrice.toLocaleString()}</span>
+                    From <span className="font-semibold text-white tabular-nums">{currency.symbol}{convert(s.startingPrice).toLocaleString("en-US", { maximumFractionDigits: s.startingPrice < 100 ? 2 : 0 })}</span>
                   </p>
                 </div>
               </button>

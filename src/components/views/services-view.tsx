@@ -30,6 +30,7 @@ import { Reveal, Stagger, StaggerItem, GradientTextTeal } from "@/components/sha
 import { AuroraBackground } from "@/components/shared/gradient-cover";
 import { MagneticButton } from "@/components/shared/magnetic-button";
 import { GlassBadge } from "@/components/shared/glass-badge";
+import { useCurrency } from "@/lib/currency";
 import { useCountUp, useInViewOnce } from "@/hooks/use-count-up";
 
 const processIconMap: Record<string, LucideIcon> = {
@@ -117,6 +118,7 @@ export function ServicesView() {
 /* ------------------------------------------------------------------ */
 function ServicesGrid() {
   const navigate = useNavigate();
+  const { currency, convert } = useCurrency();
   return (
     <section className="relative py-20 sm:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -187,7 +189,7 @@ function ServicesGrid() {
                       Starting at
                     </p>
                     <p className="font-display text-2xl font-bold text-white tabular-nums">
-                      ${s.startingPrice.toLocaleString()}
+                      {currency.symbol}{convert(s.startingPrice).toLocaleString("en-US", { maximumFractionDigits: s.startingPrice < 100 ? 2 : 0 })}
                     </p>
                   </div>
                   <Button
